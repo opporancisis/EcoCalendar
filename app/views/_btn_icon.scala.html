@@ -1,0 +1,5 @@
+@* _btn Template File *@
+@(path: AnyRef, label: String, glyph: String)
+<a class="btn btn-default btn-xs" href='@path' title="@Messages(label).capitalize">
+	<span class="glyphicon glyphicon-@glyph"></span>
+</a>

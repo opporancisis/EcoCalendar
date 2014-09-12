@@ -1,0 +1,79 @@
+@(messages: List[models.message.Message])
+
+@import helper._
+@import scala.collection.mutable.LinkedHashMap
+@import helper.twitterBootstrap._
+@import be.objectify.deadbolt.java.views.html._
+@import be.objectify.deadbolt.core.utils.TemplateUtils._
+@import be.objectify.deadbolt.java.DeadboltViewSupport._
+
+@preview(s: String, n: Int) = @{
+	val res = s.replaceAll("\\<[^>]*>","")
+	if (res.length <= n) {
+		res
+	} else {
+		res.take(res.lastIndexWhere(_.isSpaceChar, n + 1)).trim
+	}
+}
+@scripts = {
+	<link href="@routes.Assets.at("stylesheets/tablesorter/theme.bootstrap.css")" rel="stylesheet">
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.pager.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.widgets.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/tables.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/messages.js")"></script>
+}
+
+@main(
+	"nav.message.list",
+	scripts = scripts,
+	breadcrumbs = LinkedHashMap(
+		"nav.message.list" -> routes.MessageController.list
+	),
+	leftNav = LinkedHashMap(
+		"nav.profile" -> routes.Account.profile,
+		"nav.message.list" -> routes.MessageController.list,
+		"nav.profile.password_change" -> routes.Account.changePersonalPassword,
+		"nav.profile.link_more" -> routes.Account.link
+	)
+) {
+
+@if(!messages.isEmpty) {
+	<div class="form-group">
+		<button id="remove" class="btn btn-danger" style="display:none">Удалить</button>
+	</div>
+	<table id="messages" class="table table-striped js-tablesorter">
+		<thead>
+			<th class="sorter-false filter-false">
+				<button id="checkbox-toggle" class="btn btn-default"><span class="glyphicon glyphicon-check"></span></button>
+			</th>
+			<th>@Messages("label.message")</th>
+			<th>@Messages("label.time")</th>
+		</thead>
+		<tbody>
+			@for(message <- messages) {
+				<tr data-id="@message.id">
+					<td>
+						<input type="checkbox">
+					</td>
+					<td>
+						<span class="message">
+							<a href="@{routes.MessageController.read(message.id)}"><span class="subject@if(message.unread) { unread}">@message.subject</span></a>
+							<span class="bodyPreview">
+								@preview(message.body, 100)
+							</span>
+						</span>
+					</td>
+					<td>@Formatters.print(message.time)</td>
+				</tr>
+			}
+		</tbody>
+		<tfoot>
+			@_tablePager(columns = 3)
+		</tfoot>
+	</table>
+} else {
+	@_foundNoneOf(classOf[models.message.Message])
+}
+
+}

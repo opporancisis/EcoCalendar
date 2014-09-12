@@ -1,0 +1,184 @@
+@(title: String, scripts: Html = Html(""), leftNav: collection.Map[String, _] = null, breadcrumbs: collection.Map[String, _] = null)(content: Html)(implicit implicitScripts: Html = Html(""))
+
+@import scala.collection.mutable.LinkedHashMap
+@import com.feth.play.module.pa.views.html._
+@import be.objectify.deadbolt.java.views.html._
+@import be.objectify.deadbolt.core.utils.TemplateUtils._
+@import be.objectify.deadbolt.java.DeadboltViewSupport._
+
+@portalTitle = @{models.sys.Setting.get(models.sys.SettingName.PORTAL_TITLE).value}
+
+@user = @{
+	ctx.args.get("user").asInstanceOf[models.user.User]
+}
+
+<!DOCTYPE html>
+<html lang="@lang().code()">
+	<head>
+		<title>@if(portalTitle != null) {@portalTitle ::} @Messages(title).capitalize</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<link href="@routes.Assets.at("images/favicon.png")" type="image/png" rel="shortcut icon">
+
+		<script type="text/javascript" src="@routes.Application.jsMessages()"></script>
+
+		<link href="@routes.Assets.at("lib/bootstrap/css/bootstrap.min.css")" rel="stylesheet">
+		<link href="@routes.Assets.at("stylesheets/bootstrap-multiselect.css")" rel="stylesheet">
+		<link href="@routes.Assets.at("stylesheets/main.min.css")" rel="stylesheet">
+		<script src="@routes.Assets.at("lib/jquery/jquery.min.js")"></script>
+		<script src="@routes.Assets.at("lib/underscorejs/underscore-min.js")" defer="defer"></script>
+		<script src="@routes.Assets.at("lib/bootstrap/js/bootstrap.min.js")" defer="defer"></script>
+		<script src="@routes.Assets.at("lib/momentjs/min/moment.min.js")" defer="defer"></script>
+		<script src="@routes.Assets.at("lib/momentjs/lang/ru.js")" defer="defer"></script>
+		<script src="@routes.Application.jsRoutes" defer="defer"></script>
+		<script src="@routes.Assets.at("javascripts/jquery.bootstrap-growl.min.js")" defer="defer"></script>
+		<script src="@routes.Assets.at("javascripts/bootbox.min.js")" defer="defer"></script>
+		<script src="@routes.Assets.at("javascripts/spin.min.js")" defer="defer"></script>
+		<script src="@routes.Assets.at("javascripts/bootstrap-multiselect.js")" defer="defer"></script>
+		<script src="@routes.Assets.at("javascripts/jquery.form.min.js")" defer="defer"></script>
+		<script src="@routes.Assets.at("javascripts/reconnecting-websocket.min.js")" defer="defer"></script>
+		<script src="@routes.Assets.at("javascripts/bootstrap-hover-dropdown.min.js")" defer="defer"></script>
+		<script src="@routes.Assets.at("javascripts/application.js")"></script>
+		<script src="@routes.Assets.at("javascripts/ajax.js")" defer="defer"></script>
+
+		@subjectPresent() {
+			<script src="@routes.Assets.at("javascripts/alerts.js")" defer="defer"></script>
+		}
+
+		@scripts
+		
+		@implicitScripts
+
+		<script src="@routes.Assets.at("javascripts/main.js")" defer="defer"></script>
+	</head>
+
+	<body class="@request.path.replaceAll("[\\d\\s/]+", " ").trim.toLowerCase">
+
+		@if(flash.contains(Application.FLASH_ERROR_KEY)) {
+			<div class="alert alert-danger">
+				@flash().get(Application.FLASH_ERROR_KEY)
+			</div>
+		}
+		@if(flash.contains(Application.FLASH_MESSAGE_KEY)) {
+			<div class="alert alert-success" style="color: blue;">
+				@flash().get(Application.FLASH_MESSAGE_KEY)
+			</div>
+		}
+
+		@*<input type="hidden" id="ws-url" value="@routes.CommunicationController.alerts().webSocketURL(request)" />*@
+		<input type="hidden" id="ws-url" value="@routes.CommunicationController.alerts(ctx.args.get("uuid").asInstanceOf[String]).url" />
+
+		<div role="navigation" class="navbar navbar-default navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-header">
+					<button data-target=".navbar-collapse" data-toggle="collapse" class="navbar-toggle" type="button">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a href="@routes.HomePageController.index" class="navbar-brand"><img src="@routes.Assets.at("images/Logo.png")" style="margin-top: -10px;" width=64 height="64" /></a>
+				</div>
+				<div class="navbar-collapse collapse">
+					<ul class="nav navbar-nav">
+						@restrict(la(as("admin"))) {
+							<li class="dropdown">
+								<a data-toggle="dropdown" data-hover="dropdown" class="dropdown-toggle" href="#">Система <b class="caret"></b></a>
+								<ul class="dropdown-menu">
+									<li>@_link(routes.SettingController.edit, "nav.sys.settings")</li>
+									<li>@_link(routes.HomePageController.edit, "nav.homePage.edit")</li>
+									<li>@_link(routes.UsersController.list, "nav.user.list")</li>
+									<li>@_link(routes.FileController.list, "nav.file.list")</li>
+									<li>@_link(routes.StandardPageController.list, "nav.stdPage.list")</li>
+									<li class="divider"></li>
+									<li>@_link(routes.EventTagController.list, "nav.event.tag.list")</li>
+									<li class="divider"></li>
+									<li>@_link(routes.OrganizationTagController.list, "nav.organization.tag.list")</li>
+									<li>@_link(routes.OrganizationController.list, "nav.organization.list")</li>
+									<li class="divider"></li>
+									<li>@_link(routes.CountryController.list, "nav.geo.country.list")</li>
+									<li>@_link(routes.CityController.list, "nav.geo.city.list")</li>
+									<li>@_link(routes.MapEngineController.list, "nav.geo.map.list")</li>
+								</ul>
+							</li>
+						}
+						<li class="dropdown">
+							<a data-toggle="dropdown" data-hover="dropdown" class="dropdown-toggle" href="#">События <b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								<li>@_link(routes.EventController.list, "nav.event.list")</li>
+								<li>@_link(routes.GrandEventController.list, "nav.event.grand.list")</li>
+							</ul>
+						</li>
+						<li class="dropdown">
+							<a data-toggle="dropdown" data-hover="dropdown" class="dropdown-toggle" href="#">@Messages("nav.information").capitalize <b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								@for(page <- ctx.args.get("stdPages").asInstanceOf[List[models.standardPage.StandardPage]]) {
+									<li><a href="@page.reallink">@page.title</a></li>
+								}
+							</ul>
+						</li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						@subjectPresentOr() {
+							<li class="dropdown">
+								<a data-toggle="dropdown" data-hover="dropdown" class="dropdown-toggle" href="#">@user.somename @_unread_badge() <b class="caret"></b></a>
+								<ul class="dropdown-menu">
+									<li>@_link(routes.Account.profile, "nav.profile")</li>
+									<li>@_link(routes.MessageController.list, "nav.message.list", _unread_badge())</li>
+									<li>@_link(routes.Account.changePersonalPassword, "nav.profile.password_change")</li>
+									<li>@_link(routes.Account.link, "nav.profile.link_more")</li>
+									<li class="divider"></li>
+									<li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout()"><i class="icon-off"></i> @Messages("nav.logout")</a></li>
+								</ul>
+							</li>
+						}{
+							<li class="active"><a href="@routes.Application.login()">@Messages("nav.login")</a></li>
+						}
+					</ul>
+				</div><!--/.nav-collapse -->
+			</div>
+		</div>
+
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-3 col-md-2 sidebar">
+					<ul class="nav nav-pills nav-stacked">
+						<li@if(routes.HomePageController.index.toString == request.path) { class="active"}>
+							<a href="@routes.HomePageController.index">@Messages("nav.home")</a>
+						</li>
+						@if(leftNav != null) {
+							@for((label, path) <- leftNav) {
+								<li class="@("active".when(path.toString == request.path))">
+									<a href="@path">@Messages(label).capitalize</a>
+								</li>
+							}
+						}
+					</ul>
+				</div>
+				<div class="col-sm-9 col-md-10 main">
+					<h1>@Messages(title).capitalize</h1>
+					@defining(request.path.split("/").toList) { parts =>
+						@_breadcrumbs(if (breadcrumbs != null) breadcrumbs else parts.size match {
+							case 2 => LinkedHashMap(
+								("nav" + parts.mkString(".") + ".list") -> parts.mkString("/")
+							)
+							case 3 => LinkedHashMap(
+								("nav" + parts.take(2).mkString(".") + ".list") -> parts.take(2).mkString("/"),
+								("nav" + parts.mkString(".")) -> parts.mkString("/")
+							)
+							case 4 => LinkedHashMap(
+								("nav" + parts.take(2).mkString(".") + ".list") -> parts.take(2).mkString("/"),
+								Messages("nav" + parts.take(3).mkString("."), parts(3)) -> parts.mkString("/")
+							)
+							case _ => collection.Map[String, Any]()
+						})
+					}
+
+					@content
+				</div>
+			</div>
+		</div>
+
+	</body>
+</html>

@@ -1,0 +1,38 @@
+@(signupForm: play.data.Form[_])
+
+@import helper._
+@import helpers.BootstrapHelper._
+
+@main("playauthenticate.signup.title") {
+
+	<div id="signup" class="row">
+		<div>
+			@* Display proprietary login form *@
+			@helper.form(routes.Application.doSignup) {
+
+				@if(signupForm.hasGlobalErrors) { 
+					<div class="alert alert-danger">@signupForm.globalError.message</div>
+				}
+
+				@inputText(
+					signupForm("name"),
+					'_label -> Messages("playauthenticate.signup.name")
+				)
+
+				@_emailPartial(signupForm)
+
+				@_passwordPartial(signupForm)
+
+				<input type="submit" value="@Messages("playauthenticate.signup.now")" class="btn btn-primary">
+			}
+		</div>
+
+		<div>
+			@Messages("playauthenticate.signup.oauth")
+			@* Display list of available providers *@
+			@_providerPartial(skipCurrent=false)
+		</div>
+
+	</div>
+
+}

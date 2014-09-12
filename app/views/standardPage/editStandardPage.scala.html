@@ -1,0 +1,82 @@
+@(editForm: play.data.Form[models.standardPage.StandardPage], files: List[models.file.UploadedFile])
+
+@import helper._
+@import helpers.BootstrapHelper._
+@import scala.collection.mutable.LinkedHashMap
+
+@scripts = {
+	<link rel="stylesheet" href="@routes.Assets.at("stylesheets/summernote.css")" />
+	<link rel="stylesheet" href="@routes.Assets.at("stylesheets/summernote-bs3.css")" />
+	<link rel="stylesheet" href="@routes.Assets.at("lib/font-awesome/css/font-awesome.min.css")" />
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/dynamicAttachments.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/summernote.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/summernote-ru-RU.js")"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#description').summernote({lang: "ru-RU"});
+		});
+	</script>
+}
+
+@main(
+	if(editForm("id").value != null) "nav.stdPage.edit" else "nav.stdPage.create",
+	scripts = scripts,
+	leftNav = LinkedHashMap(
+		"nav.sys.settings" -> routes.SettingController.edit,
+		"nav.homePage.edit" -> routes.HomePageController.edit,
+		"nav.user.list" -> routes.UsersController.list,
+		"nav.file.list" -> routes.FileController.list,
+		"nav.stdPage.list" -> routes.StandardPageController.list
+	),
+	breadcrumbs = LinkedHashMap(
+		"nav.stdPage.list" -> routes.StandardPageController.list,
+		if (editForm("id").value != null) editForm("title").value -> routes.StandardPageController.edit(editForm("id").value.toLong)
+		else "nav.stdPage.create" -> routes.StandardPageController.create
+	)
+) {
+
+  <div class="row">
+        
+    	@helper.form(if(editForm("id").value != null) routes.StandardPageController.doEdit(editForm("id").value.toLong) else routes.StandardPageController.doCreate, 'class -> "form-horizontal") {
+    	
+            @if(editForm.hasGlobalErrors) { 
+				<div class="alert alert-danger">@editForm.globalError.message</div>
+            }
+            
+            @if(editForm("id").value != null) {
+	            @checkbox(
+	            	field = editForm("disabled"),
+	            	'_label -> "label.stdPage.is.disabled"
+	           	)(FieldConstructor(views.html.bootstrap.checkbox.f), null)
+           	}
+            
+            @inputText(
+            	field = editForm("title"),
+            	'_label -> "label.title"
+           	)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+            @inputText(
+            	field = editForm("link"),
+            	'_label -> "label.link"
+           	)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+            @textarea(
+             	field = editForm("description"),
+             	args = 'rows -> 3, 'cols -> 50,
+                '_label -> "label.description"
+           	)(FieldConstructor(views.html.bootstrap.textarea.f), null)
+
+						@bootstrap.selectB(
+							field = editForm("attachments"),
+							optionMap = files.map(a => a.id + ":" + a.name -> (editForm("attachments").value != null && editForm("attachments").value.split(",").contains("" + a.id).booleanValue)),
+							isMultiple = true,
+							label = "label.file.files"
+						)
+            
+      <input type="submit" value="@{if(editForm("id").value != null) {Messages("label.save")} else {Messages("label.create")}}" class="btn btn-primary">
+            
+    	}
+
+  </div>
+
+}

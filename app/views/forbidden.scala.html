@@ -1,0 +1,19 @@
+@()
+
+@import helper._
+@import scala.collection.mutable.LinkedHashMap
+@import helper.twitterBootstrap._
+@import be.objectify.deadbolt.java.views.html._
+@import be.objectify.deadbolt.core.utils.TemplateUtils._
+@import be.objectify.deadbolt.java.DeadboltViewSupport._
+
+@main(
+	"nav.forbidden",
+	breadcrumbs = LinkedHashMap()
+) {
+
+	@Messages("error.access.forbidden")
+	<br /><br />
+	<a href="javascript:window.history.back()">@Messages("label.do.go.back")</a>
+
+}

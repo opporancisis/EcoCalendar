@@ -1,0 +1,31 @@
+@(elements: helper.FieldElements)
+
+@***************************************************
+* Generate select according twitter bootsrap rules *
+***************************************************@
+
+  <div class="form-group@if(elements.hasErrors){ has-error}">
+    <label class="col-sm-2 control-label" for="@elements.field.name">@Messages(elements.label.toString).capitalize</label>
+    <div class="col-sm-10">
+    	@elements.input
+      @*
+      <select
+        class="form-control"
+        id="@elements.field.name"
+        name="@if(elements.args.get('multiple)) {@(elements.field.name + "[]")} else {@elements.field.name}"
+        @if(elements.args.get('multiple)) {multiple="multiple"}>
+        @if(!elements.args.get('multiple)) {<option class="blank" value="">Please select a value</option>}
+        @for((optionName, isSelected) <- elements.options) {
+          <option id="@optionName" value="@optionName" @if(isSelected.asInstanceOf[Boolean]) {selected}>@optionName</option>
+        }
+      </select>*@
+      @if(elements.args.get('help)){
+		<p class="help-block">@elements.args.get('help)</p>
+      }
+      @elements.field
+      @elements.hasErrors
+      @if(elements.hasErrors){
+      	<div class="help-block"><span class="glyphicon glyphicon-exclamation-sign"></span> @elements.errors.mkString(", ")</div>
+      }
+    </div>
+  </div>

@@ -1,0 +1,23 @@
+@()
+
+@import scala.collection.mutable.LinkedHashMap
+
+@main(
+	"nav.profile.link_more",
+	breadcrumbs = LinkedHashMap(
+		"nav.profile" -> routes.Account.profile,
+		"nav.profile.link_more" -> routes.Account.link
+	),
+	leftNav = LinkedHashMap(
+		"nav.profile" -> routes.Account.profile,
+		"nav.message.list" -> routes.MessageController.list,
+		"nav.profile.password_change" -> routes.Account.changePersonalPassword,
+		"nav.profile.link_more" -> routes.Account.link
+	)
+) {
+    
+    <p>
+	@_providerPartial()
+    <br/>
+    </p>
+}

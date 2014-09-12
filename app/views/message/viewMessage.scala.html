@@ -1,0 +1,28 @@
+@(message: models.message.Message)
+
+@import helper._
+@import scala.collection.mutable.LinkedHashMap
+@import helper.twitterBootstrap._
+@import be.objectify.deadbolt.java.views.html._
+@import be.objectify.deadbolt.core.utils.TemplateUtils._
+@import be.objectify.deadbolt.java.DeadboltViewSupport._
+
+@main(
+	"nav.message.list",
+	breadcrumbs = LinkedHashMap(
+		"nav.message.list" -> routes.MessageController.list,
+		Messages("nav.message.read", message.subject) -> routes.MessageController.read(message.id)
+	),
+	leftNav = LinkedHashMap(
+		"nav.profile" -> routes.Account.profile,
+		"nav.message.list" -> routes.MessageController.list,
+		"nav.profile.password_change" -> routes.Account.changePersonalPassword,
+		"nav.profile.link_more" -> routes.Account.link
+	)
+) {
+
+	<div class="row">
+		<h1>@message.subject</h1>
+		<div>@Html(message.body)</div>
+	</div>
+}

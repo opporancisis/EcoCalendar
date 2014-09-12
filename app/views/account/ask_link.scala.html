@@ -1,0 +1,30 @@
+@(acceptForm: play.data.Form[Account.Accept], newAccount: com.feth.play.module.pa.user.AuthUser)
+
+@import helper._
+
+@label = {
+	@_providerIcon(newAccount.getProvider()) @Messages("playauthenticate.link.account.question",newAccount)
+}
+
+@main("nav.profile.link_more") {
+
+	<p>
+	@helper.form(routes.Account.doLink) {
+
+		@if(acceptForm.hasGlobalErrors) { 
+			<div class="alert alert-danger">@acceptForm.globalError.message</div>
+		}
+
+		@inputRadioGroup(
+			acceptForm("accept"),
+			options = Seq(
+				"true"-> Messages("playauthenticate.link.account.true"),
+				"false"->Messages("playauthenticate.link.account.false")
+			),
+			'_label -> label
+		)
+
+		<input type="submit" value="@Messages("playauthenticate.link.account.ok")" class="btn btn-primary"> 
+	}
+	</p>
+}

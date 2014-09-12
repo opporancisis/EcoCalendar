@@ -1,0 +1,76 @@
+@(editForm: play.data.Form[models.geo.City],
+	city: models.geo.City,
+	countries: List[models.geo.Country],
+	mapEngines: List[models.geo.MapEngine])
+
+@import helper._
+@import scala.collection.mutable.LinkedHashMap
+
+@main(
+	if(city != null)
+		"nav.geo.city.edit"
+	else
+		"nav.geo.city.create",
+	leftNav = LinkedHashMap(
+		"nav.geo.city.list" -> routes.CityController.list
+	),
+	breadcrumbs = LinkedHashMap(
+		"nav.geo.city.list" -> routes.CityController.list,
+		if (city != null) editForm("name").value -> routes.CityController.edit(city.id)
+		else "nav.geo.city.create" -> routes.CityController.create
+	)
+) {
+
+	<div class="row">
+
+		@helper.form(if(city != null) routes.CityController.doEdit(city.id) else routes.CityController.doCreate, 'class -> "form-horizontal") {
+
+			@if(editForm.hasGlobalErrors) { 
+				<div class="alert alert-danger">@editForm.globalError.message</div>
+			}
+
+			@if(city != null) {
+				@_staticFormField("label.country", city.country.name)
+			} else {
+				@bootstrap.selectB(
+					field = editForm("country"),
+					optionMap = countries.map(a => a.id + ":" + a.name -> {val c = editForm("country").value; c != null && c.toLong == a.id}),
+					isMultiple = false,
+					label = "label.country"
+				)
+			}
+
+			@inputText(
+				field = editForm("name"),
+				'_label -> "label.name"
+			)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+			@inputText(
+				field = editForm("centerLatitude"),
+				'_label -> "label.centerLatitude"
+			)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+			@inputText(
+				field = editForm("centerLongitude"),
+				'_label -> "label.centerLongitude"
+			)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+			@inputText(
+				field = editForm("defaultZoom"),
+				'_label -> "label.defaultZoom"
+			)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+			@bootstrap.selectB(
+				field = editForm("defaultMapEngine"),
+				optionMap = mapEngines.map(a => a.id + ":" + a.name -> {val e = editForm("defaultMapEngine").value; e != null && e.toLong == a.id}),
+				isMultiple = false,
+				label = "label.defaultMapEngine"
+			)
+
+			<input type="submit" value="@Messages(if(city != null) "label.save" else "label.create")" class="btn btn-primary">
+
+		}
+
+	</div>
+
+}

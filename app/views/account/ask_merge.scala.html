@@ -1,0 +1,32 @@
+@(acceptForm: play.data.Form[Account.Accept], aUser: com.feth.play.module.pa.user.AuthUser, bUser: com.feth.play.module.pa.user.AuthUser)
+
+@import helper._
+@import helpers.BootstrapHelper._
+
+@label = {
+	@Messages("playauthenticate.merge.accounts.question",aUser,bUser)
+}
+
+@main("playauthenticate.merge.accounts.title") {
+
+	<p>
+	@form(routes.Account.doMerge) {
+
+		@if(acceptForm.hasGlobalErrors) { 
+			<div class="alert alert-danger">@acceptForm.globalError.message</div>
+		}
+
+		@inputRadioGroup(
+			acceptForm("accept"),
+			options = Seq(
+				"true"-> Messages("playauthenticate.merge.accounts.true"),
+				"false"->Messages("playauthenticate.merge.accounts.false")
+			),
+			'_label -> label,
+			'_showConstraints -> false
+		)
+
+		<input type="submit" value="@Messages("playauthenticate.merge.accounts.ok")" class="btn btn-primary">
+	}
+	</p>
+}

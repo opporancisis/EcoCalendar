@@ -1,0 +1,34 @@
+@(homePage: models.standardPage.HomePage)
+
+@import scala.collection.mutable.LinkedHashMap
+
+@portalTitle = @{models.sys.Setting.get(models.sys.SettingName.PORTAL_TITLE).value}
+
+@main(
+	homePage.title,
+	leftNav = {
+		val ln = LinkedHashMap[String, Any]()
+		for(page <- ctx.args.get("stdPages").asInstanceOf[List[models.standardPage.StandardPage]]) {
+			ln.put(page.title, page.reallink);
+		}
+		ln
+	}
+) {
+	<div>
+	@Html(homePage.body)
+	</div>
+
+	@if(homePage.attachments != null && !homePage.attachments.isEmpty) {
+		<div>
+			@for(attachment <- homePage.attachments) {
+				@if(attachment.isImage) {
+					<img src="@routes.FileController.get(attachment.id)" />
+				} else {
+					<a href="@routes.FileController.get(attachment.id)">@attachment.name</a>
+				}
+				<br />
+			}
+		</div>
+	}
+	
+}

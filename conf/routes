@@ -1,0 +1,152 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET    /                                 controllers.HomePageController.index
+GET    /homePage/edit                    controllers.HomePageController.edit
+POST   /homePage/edit                    controllers.HomePageController.doEdit
+
+
+GET    /keepAlive                        controllers.Application.justOk
+
+GET    /assets/javascript/routes.js      controllers.Application.jsRoutes
+GET    /messages.js                      controllers.Application.jsMessages
+
+GET    /sys/settings                     controllers.SettingController.edit
+POST   /sys/settings                     controllers.SettingController.doEdit
+
+GET    /account                          controllers.Account.profile
+POST   /account                          controllers.Account.doChangeProfile
+GET    /account/password                 controllers.Account.changePersonalPassword
+POST   /account/password                 controllers.Account.doChangePersonalPassword
+GET    /account/link                     controllers.Account.askLink
+POST   /account/link                     controllers.Account.doLink
+GET    /account/create                   controllers.Account.link
+GET    /account/unverified               controllers.Signup.unverified
+GET    /account/message                  controllers.MessageController.list
+GET    /account/message/:id              controllers.MessageController.read(id: Long)
+POST   /account/message/remove/:id       controllers.MessageController.remove(id:Long)
+POST   /account/message/removeMany       controllers.MessageController.removeMany
+
+GET    /login                            controllers.Application.login
+POST   /login                            controllers.Application.doLogin
+
+GET    /logout                           com.feth.play.module.pa.controllers.Authenticate.logout
+GET    /authenticate/:provider           com.feth.play.module.pa.controllers.Authenticate.authenticate(provider: String)
+
+GET    /signup                           controllers.Application.signup
+POST   /signup                           controllers.Application.doSignup
+
+GET    /authenticate/:provider/denied    controllers.Signup.oAuthDenied(provider: String)
+
+GET    /accounts/verify/:token           controllers.Signup.verify(token: String)
+GET    /accounts/exists                  controllers.Signup.exists
+
+GET    /accounts/password/reset/:token   controllers.Signup.resetPassword(token: String)
+POST   /accounts/password/reset          controllers.Signup.doResetPassword
+
+GET    /accounts/verify                  controllers.Account.verifyEmail
+
+
+GET    /accounts/merge                   controllers.Account.askMerge
+POST   /accounts/merge                   controllers.Account.doMerge
+
+GET    /login/password/forgot            controllers.Signup.forgotPassword(email: String ?= "")
+POST   /login/password/forgot            controllers.Signup.doForgotPassword
+
+# Map static resources from the /public folder to the /assets URL path
+GET    /assets/*file                     controllers.Assets.at(path="/public", file)
+
+GET    /user/create                      controllers.UsersController.create
+POST   /user/create                      controllers.UsersController.doCreate
+GET    /user/edit/:id                    controllers.UsersController.edit(id:Long)
+POST   /user/edit/:id                    controllers.UsersController.doEdit(id:Long)
+POST   /user/remove/:id                  controllers.UsersController.remove(id:Long)
+GET    /user/passwd/:id                  controllers.UsersController.changePassword(id:Long)
+POST   /user/passwd/:id                  controllers.UsersController.doChangePassword(id:Long)
+GET    /user/:id                         controllers.UsersController.details(id: Long)
+GET    /user                             controllers.UsersController.list
+
+GET    /alert/ws/:uuid                   controllers.CommunicationController.alerts(uuid: String)
+
+GET    /file/edit/:id                    controllers.FileController.edit(id: Long)
+POST   /file/edit/:id                    controllers.FileController.doEdit(id: Long)
+GET    /file/create                      controllers.FileController.create
+POST   /file/create                      controllers.FileController.doCreate
+POST   /file/remove/:id                  controllers.FileController.remove(id: Long)
+GET    /file/:id                         controllers.FileController.get(id: Long)
+GET    /file/preview/:id                 controllers.FileController.preview(id: Long)
+GET    /file                             controllers.FileController.list
+
+GET    /stdPage/up/:id                   controllers.StandardPageController.moveUp(id: Long)
+GET    /stdPage/down/:id                 controllers.StandardPageController.moveDown(id: Long)
+GET    /stdPage/edit/:id                 controllers.StandardPageController.edit(id: Long)
+POST   /stdPage/edit/:id                 controllers.StandardPageController.doEdit(id: Long)
+GET    /stdPage/create                   controllers.StandardPageController.create
+POST   /stdPage/create                   controllers.StandardPageController.doCreate
+POST   /stdPage/remove/:id               controllers.StandardPageController.remove(id: Long)
+GET    /stdPage/:id                      controllers.StandardPageController.getStdPageById(id: Long)
+GET    /stdPage                          controllers.StandardPageController.list
+
+GET    /grandevent/create                controllers.GrandEventController.create
+POST   /grandevent/create                controllers.GrandEventController.doCreate
+GET    /grandevent/edit/:id              controllers.GrandEventController.edit(id: Long)
+POST   /grandevent/edit/:id              controllers.GrandEventController.doEdit(id: Long)
+POST   /grandevent/remove/:id            controllers.GrandEventController.remove(id: Long)
+GET    /grandevent/:id                   controllers.GrandEventController.details(id: Long)
+GET    /grandevent                       controllers.GrandEventController.list
+
+GET    /event/get                        controllers.EventController.getEvents
+GET    /event/create                     controllers.EventController.create
+POST   /event/create                     controllers.EventController.doCreate
+GET    /event/edit/:id                   controllers.EventController.edit(id: Long)
+POST   /event/edit/:id                   controllers.EventController.doEdit(id: Long)
+POST   /event/remove/:id                 controllers.EventController.remove(id: Long)
+GET    /event                            controllers.EventController.list
+
+GET    /event/tag/create                 controllers.EventTagController.create
+POST   /event/tag/create                 controllers.EventTagController.doCreate()
+GET    /event/tag/edit/:id               controllers.EventTagController.edit(id: Long)
+POST   /event/tag/edit/:id               controllers.EventTagController.doEdit(id: Long)
+POST   /event/tag/remove/:id             controllers.EventTagController.remove(id: Long)
+GET    /event/tag                        controllers.EventTagController.list
+
+GET    /organization/tag/create          controllers.OrganizationTagController.create
+POST   /organization/tag/create          controllers.OrganizationTagController.doCreate()
+GET    /organization/tag/edit/:id        controllers.OrganizationTagController.edit(id: Long)
+POST   /organization/tag/edit/:id        controllers.OrganizationTagController.doEdit(id: Long)
+POST   /organization/tag/remove/:id      controllers.OrganizationTagController.remove(id: Long)
+GET    /organization/tag                 controllers.OrganizationTagController.list
+
+GET    /organization/create              controllers.OrganizationController.create
+POST   /organization/create              controllers.OrganizationController.doCreate()
+GET    /organization/edit/:id            controllers.OrganizationController.edit(id: Long)
+POST   /organization/edit/:id            controllers.OrganizationController.doEdit(id: Long)
+POST   /organization/remove/:id          controllers.OrganizationController.remove(id: Long)
+GET    /organization/:id                 controllers.OrganizationController.details(id: Long)
+GET    /organization                     controllers.OrganizationController.list
+
+GET    /geo/country/create               controllers.CountryController.create
+POST   /geo/country/create               controllers.CountryController.doCreate()
+GET    /geo/country/edit/:id             controllers.CountryController.edit(id: Long)
+POST   /geo/country/edit/:id             controllers.CountryController.doEdit(id: Long)
+POST   /geo/country/remove/:id           controllers.CountryController.remove(id: Long)
+GET    /geo/country                      controllers.CountryController.list
+
+GET    /geo/city/create                  controllers.CityController.create
+POST   /geo/city/create                  controllers.CityController.doCreate()
+GET    /geo/city/edit/:id                controllers.CityController.edit(id: Long)
+POST   /geo/city/edit/:id                controllers.CityController.doEdit(id: Long)
+POST   /geo/city/remove/:id              controllers.CityController.remove(id: Long)
+GET    /geo/city                         controllers.CityController.list
+
+GET    /geo/map/create                   controllers.MapEngineController.create
+POST   /geo/map/create                   controllers.MapEngineController.doCreate()
+GET    /geo/map/edit/:id                 controllers.MapEngineController.edit(id: Long)
+POST   /geo/map/edit/:id                 controllers.MapEngineController.doEdit(id: Long)
+POST   /geo/map/remove/:id               controllers.MapEngineController.remove(id: Long)
+GET    /geo/map                          controllers.MapEngineController.list
+
+# ALLWAYS LAST LINE!!!!
+GET    /*path                            controllers.StandardPageController.getStdPage(path: String)

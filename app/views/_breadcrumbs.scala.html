@@ -1,0 +1,16 @@
+@* _breadcrumbs Template File *@
+@(breadcrumbs: collection.Map[String, _])
+<ol class="breadcrumb">
+	@if(request.path == "/") {
+		<li class="active">@Messages("nav.home").capitalize</li>
+	} else {
+		<li><a href="/">@Messages("nav.home").capitalize</a></li>
+	}
+	@for((title, path) <- breadcrumbs) {
+		@if(path == null || request.path == path.toString) {
+			<li@if(path != null && request.path == path.toString) { class="active"}>@Messages(title).capitalize</li>
+		} else {
+			<li><a href="@path">@Messages(title).capitalize</a></li>
+		}
+	}
+</ol>

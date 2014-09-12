@@ -1,0 +1,99 @@
+@(editForm: play.data.Form[controllers.Account.ProfileChange])
+
+@import helper._
+@import helpers.BootstrapHelper._
+@import com.feth.play.module.pa.views.html._
+@import scala.collection.mutable.LinkedHashMap
+@import be.objectify.deadbolt.java.views.html._
+@import be.objectify.deadbolt.core.utils.TemplateUtils._
+@import be.objectify.deadbolt.java.DeadboltViewSupport._
+
+@user = @{
+	ctx.args.get("user").asInstanceOf[models.user.User]
+}
+
+@main(
+	"nav.profile",
+	breadcrumbs = LinkedHashMap(
+		"nav.profile" -> routes.Account.profile
+	),
+	leftNav = LinkedHashMap(
+		"nav.profile" -> routes.Account.profile,
+		"nav.message.list" -> routes.MessageController.list,
+		"nav.profile.password_change" -> routes.Account.changePersonalPassword,
+		"nav.profile.link_more" -> routes.Account.link
+	)
+) {
+
+<div class="row panel">
+
+	@helper.form(routes.Account.doChangeProfile, 'class -> "form-horizontal") {
+   	
+		@if(editForm.hasGlobalErrors) { 
+			<div class="alert alert-danger">@editForm.globalError.message</div>
+		}
+
+		@inputText(
+			field = editForm("email"),
+			'_label -> "label.email"
+		)(FieldConstructor(views.html.bootstrap.input.f), null)
+           
+		@inputText(
+			field = editForm("nick"),
+			'_label -> "label.nick"
+		)(FieldConstructor(views.html.bootstrap.input.f), null)
+          	
+		<input type="submit" value="@Messages("label.save")" class="btn btn-primary">
+
+	}
+
+    @if(!user.emailValidated && user.email) {
+    	<span class="alert-warning">
+			@Messages("label.your.email.need.verification"): <a href="@routes.Account.verifyEmail">@Messages("label.click.to.verify")</a>
+		</span>
+    }
+
+</div>
+
+@if(viewRestrict(la(as("user")), null)) {
+<div class="panel">
+	<div class="row">
+    	@Messages("label.user.your.registration.data"):
+    </div>
+    
+	<div class="row">
+	  <div class="col-md-4">@Messages("label.name")</div>
+	  <div class="col-md-8">@user.name</div>
+	</div>
+</div>
+}	
+
+	<div class="row panel">
+    @defining(user.getProviders()) { providers =>
+        @if(providers.size() > 0) {
+	        @if(providers.size() ==1) {
+	            @Messages("playauthenticate.profile.providers_one")
+	        } else {
+	            @Messages("playauthenticate.profile.providers_many",providers.size().toString())
+	        }
+	        @for(p <- providers) {
+	            @_providerIcon(p)
+	        }
+	        <br/>
+        }
+    }
+    </div>
+
+	@*
+    <br/>
+    @currentAuth() { auth =>
+        @Messages("playauthenticate.profile.logged") @_providerIcon(auth.getProvider())<br/>
+        @if(auth.expires() != -1){
+            @Messages("playauthenticate.profile.session", auth.getId(), Application.formatTimestamp(auth.expires()))
+        } else {
+            @Messages("playauthenticate.profile.session_endless", auth.getId())
+        }
+    }
+    *@
+
+}

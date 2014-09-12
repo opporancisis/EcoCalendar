@@ -1,0 +1,81 @@
+@(events: List[models.event.GrandEvent])
+
+@import scala.collection.mutable.LinkedHashMap
+@import be.objectify.deadbolt.core.utils.TemplateUtils._
+@import be.objectify.deadbolt.java.DeadboltViewSupport._
+@import be.objectify.deadbolt.java.views.html._
+
+@user = @{
+	ctx.args.get("user").asInstanceOf[models.user.User]
+}
+
+@implicitScripts = {
+	<link href="@routes.Assets.at("stylesheets/tablesorter/theme.bootstrap.css")" rel="stylesheet">
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.pager.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.widgets.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/tables.js")"></script>
+}
+
+@main(
+	"nav.event.grand.list",
+	leftNav = LinkedHashMap(
+		"nav.event.grand.list" -> routes.GrandEventController.list
+	),
+	breadcrumbs = LinkedHashMap(
+		"nav.event.grand.list" -> routes.GrandEventController.list
+	)
+) {
+
+@if(!events.isEmpty) {
+	<table class="events table table-striped js-tablesorter">
+		<thead>
+			<th>@Messages("label.name")</th>
+			<th>@Messages("label.start")</th>
+			<th>@Messages("label.end")</th>
+			<th>@Messages("label.events")</th>
+			<th>@Messages("label.author")</th>
+			<th>@Messages("label.organizations")</th>
+			<th>@Messages("label.tags")</th>
+			<th class="sorter-false filter-false">@Messages("label.action")</th>
+		</thead>
+		<tbody>
+		@for(event <- events) {
+			<tr>
+				<td>@event.name</td>
+				<td>@Formatters.print(event.startDate)</td>
+				<td>@Formatters.print(event.endDate)</td>
+				<td>@event.events.size</td>
+				<td>@event.author.nick</td>
+				<td>@event.organizations.map(_.name).mkString(", ")</td>
+				<td>@event.tags.map(_.name).mkString(", ")</td>
+				<td>
+					@restrict(la(as("admin"))) {
+						<a class="btn btn-default btn-xs" href='@{routes.GrandEventController.edit(event.id)}' title="@Messages("label.do.edit")">
+							<span class="glyphicon glyphicon-pencil"></span>
+						</a>
+						<a class="btn btn-default btn-xs js-ajax" title="@Messages("label.do.remove")"
+								data-action="remove"
+								data-method="POST"
+								data-url="@routes.GrandEventController.remove(event.id)"
+								data-confirm="@Messages("label.are.you.sure.you.want.to.delete", event.name)">
+							<span class="glyphicon glyphicon-remove"></span>
+						</a>
+					}
+				</td>
+			</tr>
+		}
+		</tbody>
+		<tfoot>
+			@_tablePager(columns = 7)
+		</tfoot>
+	</table>
+} else {
+	@_foundNoneOf(classOf[models.event.GrandEvent])
+}
+
+@restrict(la(as("admin"))) {
+	@_btn(routes.GrandEventController.create, "label.do.create")
+}
+	
+}

@@ -1,0 +1,44 @@
+@(loginForm: play.data.Form[_])
+
+@import helper._
+@import scala.collection.mutable.LinkedHashMap
+
+@main(
+	"playauthenticate.login.title",
+	breadcrumbs = LinkedHashMap(
+		"playauthenticate.login.title" -> routes.Application.login
+	)
+) {
+
+<div id="login" class="row">
+	<div>
+		@* Display proprietary login form *@
+		@helper.form(routes.Application.doLogin, 'class -> "form-horizontal") {
+
+			@if(loginForm.hasGlobalErrors) { 
+				<div class="alert alert-danger">@loginForm.globalError.message</div>
+			}
+
+			@_emailPartial(loginForm)
+
+			@inputPassword(
+				loginForm("password"),
+				'_showConstraints -> false,
+				'inputType -> "password",
+				'_label -> Messages("playauthenticate.login.password.placeholder")
+			)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+			<input type="submit" value="@Messages("playauthenticate.login.now")" class="btn btn-primary"><br/>
+			<br/>
+			<a href="javascript:void(0);" onclick="window.location.href = jsRoutes.controllers.Signup.forgotPassword($('#email').val() || null).absoluteURL();">@Messages("playauthenticate.login.forgot.password")</a>
+		}
+	</div>
+
+	<div>
+		@Messages("playauthenticate.login.oauth")
+		@* Display list of available providers *@
+		@_providerPartial(skipCurrent=false)
+	</div>
+
+</div>
+}

@@ -1,0 +1,4 @@
+@* _link Template File *@
+@()
+@unread = @{ctx.args.get("unread").asInstanceOf[Integer]}
+<span class="badge unreadMessagesCounter" style="display:@if(unread != null && unread > 0) {inline} else {none}">@unread</span>

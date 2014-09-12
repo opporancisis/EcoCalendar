@@ -1,0 +1,71 @@
+@(orgs: List[models.organization.Organization])
+
+@import scala.collection.mutable.LinkedHashMap
+@import be.objectify.deadbolt.core.utils.TemplateUtils._
+@import be.objectify.deadbolt.java.DeadboltViewSupport._
+@import scala.collection.JavaConversions._
+
+@user = @{
+	ctx.args.get("user").asInstanceOf[models.user.User]
+}
+
+@implicitScripts = {
+	<link href="@routes.Assets.at("stylesheets/tablesorter/theme.bootstrap.css")" rel="stylesheet">
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.pager.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.widgets.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/tables.js")"></script>
+}
+
+@main(
+	"nav.organization.list",
+	leftNav = LinkedHashMap(
+		"nav.organization.list" -> routes.OrganizationController.list
+	),
+	breadcrumbs = LinkedHashMap(
+		"nav.organization.list" -> routes.OrganizationController.list
+	)
+) {
+
+@if(!orgs.isEmpty) {
+	<table class="table table-striped js-tablesorter">
+		<thead>
+			<th>@Messages("label.name")</th>
+			<th>@Messages("label.tags")</th>
+			<th>@Messages("label.event.count")</th>
+			<th>@Messages("label.grand.event.count")</th>
+			<th class="sorter-false filter-false">@Messages("label.action")</th>
+		</thead>
+		<tbody>
+			@for(org <- orgs) {
+				<tr>
+					<td>@org.name</td>
+					<td>@org.tags.map(_.name).mkString(", ")</td>
+					<td>@org.events.size</td>
+					<td>@org.grandEvents.size</td>
+					<td>
+						<a class="btn btn-default btn-xs" href='@{routes.OrganizationController.edit(org.id)}' title="@Messages("label.do.edit")">
+							<span class="glyphicon glyphicon-pencil"></span>
+						</a>
+						<a class="btn btn-default btn-xs js-ajax" title="@Messages("label.do.remove")"
+								data-action="remove"
+								data-method="POST"
+								data-url="@routes.OrganizationController.remove(org.id)"
+								data-confirm="@Messages("label.are.you.sure.you.want.to.delete", org.name)">
+							<span class="glyphicon glyphicon-remove"></span>
+						</a>
+					</td>
+				</tr>
+			}
+		</tbody>
+		<tfoot>
+			@_tablePager(columns = 5)
+		</tfoot>
+	</table>
+} else {
+	@_foundNoneOf(classOf[models.organization.Organization])
+}
+	
+	@_btn(routes.OrganizationController.create, "label.do.create")
+	
+}

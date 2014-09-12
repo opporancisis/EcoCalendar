@@ -1,0 +1,93 @@
+@(editForm: play.data.Form[models.event.GrandEvent],
+	event: models.event.GrandEvent,
+	organizations: List[models.organization.Organization],
+	tags: List[models.event.tag.EventTag])
+
+@import helper._
+@import scala.collection.mutable.LinkedHashMap
+
+@implicitScripts = {
+	<link href="@routes.Assets.at("lib/bootstrap-datepicker/css/datepicker3.css")" rel="stylesheet">
+	<script type="text/javascript" src="@routes.Assets.at("lib/bootstrap-datepicker/js/bootstrap-datepicker.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("lib/bootstrap-datepicker/js/locales/bootstrap-datepicker.ru.js")"></script>
+	<script>
+		$(document).ready(function() {
+			$("#startDate").datepicker(app.settings.bootstrapDatepicker);
+			$("#endDate").datepicker(app.settings.bootstrapDatepicker);
+		});
+	</script>
+}
+
+@main(
+	if(event != null)
+		"nav.event.grand.edit"
+	else
+		"nav.event.grand.create",
+	leftNav = LinkedHashMap(
+		"nav.event.grand.list" -> routes.GrandEventController.list
+	),
+	breadcrumbs = LinkedHashMap(
+		"nav.event.grand.list" -> routes.GrandEventController.list,
+		if (event != null) editForm("name").value -> routes.GrandEventController.edit(event.id)
+		else "nav.event.grand.create" -> routes.GrandEventController.create
+	)
+) {
+
+	<div class="row">
+
+		@helper.form(if(event != null) routes.GrandEventController.doEdit(event.id) else routes.GrandEventController.doCreate, 'class -> "form-horizontal") {
+
+			@if(editForm.hasGlobalErrors) { 
+				<div class="alert alert-danger">@editForm.globalError.message</div>
+			}
+
+			@if(event != null) {
+				@_staticFormField("label.created", Formatters.print(event.created))
+				@_staticFormField("label.updated", Formatters.print(event.updated))
+				@_staticFormField("label.author", event.author.nick)
+			}
+
+			@inputText(
+				field = editForm("name"),
+				'_label -> "label.name"
+			)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+			@textarea(
+				field = editForm("description"),
+				args = 'rows -> 3, 'cols -> 50,
+				'_label -> "label.description"
+			)(FieldConstructor(views.html.bootstrap.textarea.f), null)
+
+			@inputText(
+				field = editForm("startDate"),
+				args = 'required -> true,
+				'_label -> "label.start"
+			)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+			@inputText(
+				field = editForm("endDate"),
+				args = 'required -> true,
+				'_label -> "label.end"
+			)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+			@bootstrap.selectB(
+				field = editForm("tags"),
+				optionMap = tags.map(a => a.id + ":" + a.name -> {val t = editForm("tags").value; t != null && t.split(",").contains("" + a.id).booleanValue}),
+				isMultiple = true,
+				label = "label.tags"
+			)
+
+			@bootstrap.selectB(
+				field = editForm("organizations"),
+				optionMap = organizations.map(a => a.id + ":" + a.name -> {val t = editForm("organizations").value; t != null && t.split(",").contains("" + a.id).booleanValue}),
+				isMultiple = true,
+				label = "label.organizations"
+			)
+
+			<input type="submit" value="@Messages(if(event != null) {"label.save"} else {"label.create"})" class="btn btn-primary">
+
+		}
+
+	</div>
+
+}

@@ -1,0 +1,8 @@
+@(verificationUrl: String, token: String, name: String, email: String)Здравствуйте, @name.
+
+
+Пожалуйста, для подтверждения своего адреса e-mail перейдите по этой ссылке:
+@verificationUrl
+
+С уважением, 
+служба поддержки портала ТСЖ

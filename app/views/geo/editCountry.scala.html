@@ -1,0 +1,68 @@
+@(editForm: play.data.Form[models.geo.Country],
+	country: models.geo.Country,
+	mapEngines: List[models.geo.MapEngine])
+
+@import helper._
+@import scala.collection.mutable.LinkedHashMap
+
+@main(
+	if(country != null)
+		"nav.geo.country.edit"
+	else
+		"nav.geo.country.create",
+	leftNav = LinkedHashMap(
+		"nav.geo.country.list" -> routes.CountryController.list
+	),
+	breadcrumbs = LinkedHashMap(
+		"nav.geo.country.list" -> routes.CountryController.list,
+		if (country != null) editForm("name").value -> routes.CountryController.edit(country.id)
+		else "nav.geo.country.create" -> routes.CountryController.create
+	)
+) {
+
+	<div class="row">
+
+		@helper.form(if(country != null) routes.CountryController.doEdit(country.id) else routes.CountryController.doCreate, 'class -> "form-horizontal") {
+
+			@if(editForm.hasGlobalErrors) { 
+				<div class="alert alert-danger">@editForm.globalError.message</div>
+			}
+
+			@if(country != null) {
+				@_staticFormField("label.cities", country.cities.size)
+			}
+
+			@inputText(
+				field = editForm("name"),
+				'_label -> "label.name"
+			)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+			@inputText(
+				field = editForm("centerLatitude"),
+				'_label -> "label.centerLatitude"
+			)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+			@inputText(
+				field = editForm("centerLongitude"),
+				'_label -> "label.centerLongitude"
+			)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+			@inputText(
+				field = editForm("defaultZoom"),
+				'_label -> "label.defaultZoom"
+			)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+			@bootstrap.selectB(
+				field = editForm("defaultMapEngine"),
+				optionMap = mapEngines.map(a => a.id + ":" + a.name -> {val e = editForm("defaultMapEngine").value; e != null && e.toLong == a.id}),
+				isMultiple = false,
+				label = "label.defaultMapEngine"
+			)
+
+			<input type="submit" value="@Messages(if(country != null) {"label.save"} else {"label.create"})" class="btn btn-primary">
+
+		}
+
+	</div>
+
+}

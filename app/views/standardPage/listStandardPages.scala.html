@@ -1,0 +1,68 @@
+@(standardPages: List[models.standardPage.StandardPage])
+
+@import scala.collection.mutable.LinkedHashMap; var disabledExist=false
+@import be.objectify.deadbolt.core.utils.TemplateUtils._
+@import be.objectify.deadbolt.java.DeadboltViewSupport._
+
+@main(
+	"nav.stdPage.list",
+	leftNav = LinkedHashMap(
+		"nav.sys.settings" -> routes.SettingController.edit,
+		"nav.homePage.edit" -> routes.HomePageController.edit,
+		"nav.user.list" -> routes.UsersController.list,
+		"nav.file.list" -> routes.FileController.list,
+		"nav.stdPage.list" -> routes.StandardPageController.list
+	)
+) {
+
+@if(!standardPages.isEmpty) {
+	<table class="table table-striped">
+		<thead>
+			<th>@Messages("label.item.number")</th>
+			<th>@Messages("label.name")</th>
+			<th>@Messages("label.link")</th>
+			<th>@Messages("label.file.files")</th>
+			<th>@Messages("label.action")</th>
+		</thead>
+		<tbody>
+			@for(page <- standardPages) {
+				<tr class="@if(page.disabled){@{disabledExist = true}alert-brown}">
+					<td>@page.orderInd</td>
+					<td>@page.title</td>
+					<td>@page.link</td>
+					<td>@page.attachments.size</td>
+					<td>
+						<a class="btn btn-default btn-xs" href='@{routes.StandardPageController.moveUp(page.id)}' title="@Messages("label.do.move.up")">
+							<span class="glyphicon glyphicon-arrow-up"></span>
+						</a>
+						<a class="btn btn-default btn-xs" href='@{routes.StandardPageController.moveDown(page.id)}' title="@Messages("label.do.move.down")">
+							<span class="glyphicon glyphicon-arrow-down"></span>
+						</a>
+						<a class="btn btn-default btn-xs" href='@{routes.StandardPageController.edit(page.id)}' title="@Messages("label.do.edit")">
+							<span class="glyphicon glyphicon-pencil"></span>
+						</a>
+						<a class="btn btn-default btn-xs js-ajax" title="@Messages("label.do.remove")"
+								data-action="remove"
+								data-method="POST"
+								data-url="@routes.StandardPageController.remove(page.id)"
+								data-confirm="@Messages("label.are.you.sure.you.want.to.delete", page.title)">
+							<span class="glyphicon glyphicon-remove"></span>
+						</a>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+} else {
+	@_foundNoneOf(classOf[models.standardPage.StandardPage])
+}
+
+			@if(viewRestrict(la(as("admin")), null)) {
+				<a href="@routes.StandardPageController.create" class="btn btn-primary">@Messages("label.do.create")</a>
+			}
+
+@_legend(Seq(
+	(disabledExist, "brown", "label.stdPage.page.is.disabled")
+))
+
+}

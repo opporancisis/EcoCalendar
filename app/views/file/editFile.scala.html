@@ -1,0 +1,50 @@
+@(editForm: play.data.Form[models.file.UploadedFile], file: models.file.UploadedFile)
+
+@import helper._
+@import helpers.BootstrapHelper._
+@import scala.collection.mutable.LinkedHashMap
+
+@main(
+	if(editForm("id").value != null)
+		Messages("nav.file.edit", if(editForm("originalName").value != null) editForm("originalName").value else editForm("name").value)
+		else "nav.file.create",
+	leftNav = LinkedHashMap(
+		"nav.sys.settings" -> routes.SettingController.edit,
+		"nav.homePage.edit" -> routes.HomePageController.edit,
+		"nav.user.list" -> routes.UsersController.list,
+		"nav.file.list" -> routes.FileController.list,
+		"nav.stdPage.list" -> routes.StandardPageController.list
+	)
+) {
+
+  <div class="row">
+        
+    	@helper.form(if(editForm("id").value != null) routes.FileController.doEdit(editForm("id").value.toLong) else routes.FileController.doCreate, 'class -> "form-horizontal", 'enctype -> "multipart/form-data") {
+    	
+            @if(editForm.hasGlobalErrors) { 
+				<div class="alert alert-danger">@editForm.globalError.message</div>
+            }
+            
+            @inputText(
+            	field = editForm("name"),
+            	'_label -> "label.name"
+           	)(FieldConstructor(views.html.bootstrap.input.f), null)
+           	
+           	@inputFile(
+           		field = editForm("uploadedFile"),
+           		'_label -> "label.file"
+           	)(FieldConstructor(views.html.bootstrap.field.f), null)
+
+			<input type="submit" value="@{if(editForm("id").value != null) {Messages("label.save")} else {Messages("label.create")}}" class="btn btn-primary">
+            
+    	}
+
+  </div>
+	@if(file != null && file.isImage && file.preview.exists) {
+  <div class="row" style="margin-top: 20px">
+		<b>@Messages("label.file.preview")</b><br /><br />
+			<img src="@routes.FileController.preview(file.id)" />
+	</div>
+	}
+
+}

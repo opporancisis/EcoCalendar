@@ -1,0 +1,14 @@
+@* _legend Template File *@
+@(list: Seq[(Boolean, String, String)])
+@if(list.map(_._1).contains(true)) {
+	<div class="legend">
+		<h5>@Messages("label.legend")</h5>
+		<ul class="list-group col-md-6">
+		@for(s <- list) {
+			@if(s._1) {
+				<li class="list-group-item alert-@s._2">@Messages(s._3)</li>
+			}
+		}
+		</ul>
+	</div>
+}

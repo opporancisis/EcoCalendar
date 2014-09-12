@@ -1,0 +1,102 @@
+@(editForm: play.data.Form[models.user.User])
+
+@import helper._
+@import helpers.BootstrapHelper._
+@import scala.collection.mutable.LinkedHashMap
+@import play.libs.Json
+
+@scripts = {
+	<link rel="stylesheet" href="@routes.Assets.at("stylesheets/bootstrapValidator.min.css")" />
+	<link href="@routes.Assets.at("lib/bootstrap-datepicker/css/datepicker3.css")" rel="stylesheet">
+	<script type="text/javascript" src="@routes.Assets.at("lib/knockout/knockout.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/users.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/bootstrapValidator.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("lib/bootstrap-datepicker/js/bootstrap-datepicker.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("lib/bootstrap-datepicker/js/locales/bootstrap-datepicker.ru.js")"></script>
+	<script>
+		$(document).ready(function() {
+			$("form.form-horizontal").bootstrapValidator($.extend({}, app.settings.bootstrapValidator, {
+				excluded: [':disabled', function($field, validator) {
+				    return !$field.is(':visible') && !$field.is("select#roles");
+				}]
+			}));
+
+		});
+	</script>
+}
+
+@main(
+	if(editForm("id").value != null)
+		"nav.user.edit"
+	else
+		"nav.user.create",
+	scripts = scripts,
+	leftNav = LinkedHashMap(
+		"nav.sys.settings" -> routes.SettingController.edit,
+		"nav.homePage.edit" -> routes.HomePageController.edit,
+		"nav.user.list" -> routes.UsersController.list,
+		"nav.file.list" -> routes.FileController.list,
+		"nav.stdPage.list" -> routes.StandardPageController.list
+	),
+	breadcrumbs = LinkedHashMap(
+		"nav.user.list" -> routes.UsersController.list,
+		if (editForm("id").value != null) editForm("surname").value -> routes.UsersController.edit(editForm("id").value.toLong)
+		else "nav.user.create" -> routes.UsersController.create
+	)
+) {
+
+	<div class="row">
+
+		@helper.form(if(editForm("id").value != null) routes.UsersController.doEdit(editForm("id").value.toLong) else routes.UsersController.doCreate, 'class -> "form-horizontal") {
+
+			@if(editForm.hasGlobalErrors) { 
+				<div class="alert alert-danger">@editForm.globalError.message</div>
+			}
+
+			@if(editForm("id").value != null) {
+				<input type="hidden" name="id" value="@editForm("id").value" />
+				@_staticFormField("label.last.login.time", editForm("lastLogin").value)
+			}
+
+			@checkbox(
+				field = editForm("blocked"),
+				'_label -> Messages("label.status.blocked")
+			)(FieldConstructor(views.html.bootstrap.checkbox.f), null)
+
+			@inputText(
+				field = editForm("email"),
+				'_label -> "label.email"
+			)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+			@inputText(
+				field = editForm("nick"),
+				'_label -> "label.nick"
+			)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+			@bootstrap.selectB(
+				field = editForm("roles"),
+				optionMap = Seq("admin","user").map(a => a + ":" + Messages("label.roles." + a) -> {editForm("roles").value != null && editForm("roles").value.split(",").contains(a).booleanValue}),
+				isMultiple = true,
+				isRequired = true,
+				label = "label.roles"
+			)
+
+			@inputText(
+				field = editForm("name"),
+				'_label -> "label.name",
+				'help -> "Будет видно только администратору"
+			)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+			@textarea(
+				field = editForm("note"),
+				args = 'rows -> 3, 'cols -> 50,
+				'_label -> "label.note"
+			)(FieldConstructor(views.html.bootstrap.textarea.f), null)
+
+			<input type="submit" value="@{if(editForm("id").value != null) {Messages("label.save")} else {Messages("label.create")}}" class="btn btn-primary">
+
+		}
+
+	</div>
+
+}

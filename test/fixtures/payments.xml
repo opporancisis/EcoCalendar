@@ -1,0 +1,4 @@
+<payments>
+	<payment id="123456" account="id123456" timestamp="20140729 100511" credit="333.2" />
+	<payment id="2" account="id123456" timestamp="20140729 100911" credit="444.622" />
+</payments>

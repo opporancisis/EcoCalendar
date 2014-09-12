@@ -1,0 +1,10 @@
+@(f: play.data.Form[_], constraints: Boolean = false)
+
+@import helper._
+@import helpers.BootstrapHelper._
+
+@inputText(
+	f("email"),
+	'_showConstraints -> constraints,
+	'_label -> Messages("playauthenticate.login.email.placeholder")
+)(FieldConstructor(views.html.bootstrap.input.f), null)

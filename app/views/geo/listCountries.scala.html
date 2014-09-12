@@ -1,0 +1,71 @@
+@(countries: List[models.geo.Country])
+
+@import scala.collection.mutable.LinkedHashMap
+@import be.objectify.deadbolt.core.utils.TemplateUtils._
+@import be.objectify.deadbolt.java.DeadboltViewSupport._
+@import be.objectify.deadbolt.java.views.html._
+
+@user = @{
+	ctx.args.get("user").asInstanceOf[models.user.User]
+}
+
+@implicitScripts = {
+	<link href="@routes.Assets.at("stylesheets/tablesorter/theme.bootstrap.css")" rel="stylesheet">
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.pager.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.widgets.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/tables.js")"></script>
+}
+
+@main(
+	"nav.geo.country.list",
+	leftNav = LinkedHashMap(
+		"nav.geo.country.list" -> routes.CountryController.list
+	),
+	breadcrumbs = LinkedHashMap(
+		"nav.geo.country.list" -> routes.CountryController.list
+	)
+) {
+
+@if(!countries.isEmpty) {
+	<table class="table table-striped js-tablesorter">
+		<thead>
+			<th>@Messages("label.name")</th>
+			<th>@Messages("label.cities")</th>
+			<th class="sorter-false filter-false">@Messages("label.action")</th>
+		</thead>
+		<tbody>
+		@for(country <- countries) {
+			<tr>
+				<td>@country.name</td>
+				<td>@country.cities.size</td>
+				<td>
+					@restrict(la(as("admin"))) {
+						<a class="btn btn-default btn-xs" href='@{routes.CountryController.edit(country.id)}' title="@Messages("label.do.edit")">
+							<span class="glyphicon glyphicon-pencil"></span>
+						</a>
+						<a class="btn btn-default btn-xs js-ajax" title="@Messages("label.do.remove")"
+								data-action="remove"
+								data-method="POST"
+								data-url="@routes.CountryController.remove(country.id)"
+								data-confirm="@Messages("label.are.you.sure.you.want.to.delete", country.name)">
+							<span class="glyphicon glyphicon-remove"></span>
+						</a>
+					}
+				</td>
+			</tr>
+		}
+		</tbody>
+		<tfoot>
+			@_tablePager(columns = 3)
+		</tfoot>
+	</table>
+} else {
+	@_foundNoneOf(classOf[models.geo.Country])
+}
+
+@restrict(la(as("admin"))) {
+	@_btn(routes.CountryController.create, "label.do.create")
+}
+	
+}

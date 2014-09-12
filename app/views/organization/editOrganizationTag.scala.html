@@ -1,0 +1,47 @@
+@(editForm: play.data.Form[models.organization.tag.OrganizationTag],
+	tag: models.organization.tag.OrganizationTag)
+
+@import helper._
+@import scala.collection.mutable.LinkedHashMap
+
+@main(
+	if(editForm("id").value != null)
+		"nav.organization.tag.edit"
+	else
+		"nav.organization.tag.create",
+	leftNav = LinkedHashMap(
+		"nav.organization.tag.list" -> routes.OrganizationTagController.list
+	),
+	breadcrumbs = LinkedHashMap(
+		"nav.organization.tag.list" -> routes.OrganizationTagController.list,
+		if (tag != null) editForm("name").value -> routes.OrganizationTagController.edit(tag.id)
+		else "nav.organization.tag.create" -> routes.OrganizationTagController.create
+	)
+) {
+
+	<div class="row">
+
+		@helper.form(if(tag != null) routes.OrganizationTagController.doEdit(tag.id) else routes.OrganizationTagController.doCreate, 'class -> "form-horizontal") {
+
+			@if(editForm.hasGlobalErrors) { 
+				<div class="alert alert-danger">@editForm.globalError.message</div>
+			}
+
+			@if(tag != null) {
+				@_staticFormField("label.organization.count", tag.organizations.size)
+				@_staticFormField("label.event.count", tag.organizations.flatMap(_.events).toSet.size)
+				@_staticFormField("label.grand.event.count", tag.organizations.flatMap(_.grandEvents).toSet.size)
+			}
+
+			@inputText(
+				field = editForm("name"),
+				'_label -> "label.name"
+			)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+			<input type="submit" value="@{if(tag != null) {Messages("label.save")} else {Messages("label.create")}}" class="btn btn-primary">
+
+		}
+
+	</div>
+
+}

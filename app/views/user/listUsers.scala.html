@@ -1,0 +1,81 @@
+@(users: List[models.user.User])
+
+@import scala.collection.mutable.LinkedHashMap
+
+@scripts = {
+	<link href="@routes.Assets.at("lib/select2/select2.css")" rel="stylesheet">
+	<link href="@routes.Assets.at("lib/select2/select2-bootstrap.css")" rel="stylesheet">
+	<link href="@routes.Assets.at("stylesheets/tablesorter/theme.bootstrap.css")" rel="stylesheet">
+	<script type="text/javascript" src="@routes.Assets.at("lib/select2/select2.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("lib/select2/select2_locale_ru.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.pager.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.widgets.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.widgets-filter-formatter-select2.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/tablesorter/widget-columnSelector.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/tables.js")"></script>
+}
+
+@main(
+	"nav.user.list",
+	scripts = scripts,
+	leftNav = LinkedHashMap(
+		"nav.sys.settings" -> routes.SettingController.edit,
+		"nav.homePage.edit" -> routes.HomePageController.edit,
+		"nav.user.list" -> routes.UsersController.list,
+		"nav.file.list" -> routes.FileController.list,
+		"nav.stdPage.list" -> routes.StandardPageController.list
+	)
+) {
+
+@if(!users.isEmpty) {
+	<button class="column-selector btn btn-default">Выбор колонок</button>
+
+	<table class="table table-striped js-tablesorter">
+		<thead>
+			<th class="unselectable">@Messages("label.nick")</th>
+			<th>@Messages("label.email")</th>
+			<th>@Messages("label.name")</th>
+			<th>@Messages("label.status.blocked")</th>
+			<th class="js-select-filter" data-init-selection="@Messages("label.roles.user")">@Messages("label.roles")</th>
+			<th>@Messages("label.note")</th>
+			<th class="sorter-false filter-false unselectable">@Messages("label.action")</th>
+		</thead>
+		<tbody>
+			@for(user <- users) {
+				<tr>
+					<td>@user.nick</td>
+					<td>@user.email</td>
+					<td>@user.name</td>
+					<td>@Messages(if(user.blocked) "label.yes" else "label.no")</td>
+					<td>@user.roles.map{ role => @Messages("label.roles." + role)}.mkString(",")</td>
+					<td>@user.note</td>
+					<td>
+						<a class="btn btn-default btn-xs" href='@{routes.UsersController.edit(user.id)}' title="@Messages("label.do.edit")">
+							<span class="glyphicon glyphicon-pencil"></span>
+						</a>
+						<a class="btn btn-default btn-xs" href='@{routes.UsersController.changePassword(user.id)}' title="@Messages("label.do.change.password")">
+							<span class="glyphicon glyphicon-asterisk"></span>
+						</a>
+						<a class="btn btn-default btn-xs js-ajax" title="@Messages("label.do.remove")"
+								data-action="remove"
+								data-method="POST"
+								data-url="@routes.UsersController.remove(user.id)"
+								data-confirm="@Messages("label.are.you.sure.you.want.to.delete", user.somename)">
+							<span class="glyphicon glyphicon-remove"></span>
+						</a>
+					</td>
+				</tr>
+			}
+		</tbody>
+		<tfoot>
+			@_tablePager(9)
+		</tfoot>
+	</table>
+} else {
+	@_foundNoneOf(classOf[models.user.User])
+}
+
+	<a href="@routes.UsersController.create" class="btn btn-primary">@Messages("nav.user.create")</a>
+
+}

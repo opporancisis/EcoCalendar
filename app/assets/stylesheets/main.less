@@ -1,0 +1,95 @@
+@import "tango_palette.less";
+@import "variables.less";
+@import "legend.less";
+@import "mixins.less";
+@import "tables.less";
+@import "forms.less";
+@import "stdpages.less";
+@import "messages.less";
+
+/* Body padding required - http://getbootstrap.com/components/#navbar-fixed-top
+-------------------------------------------------------------------------------*/
+body {
+	padding-top: 70px;
+}
+
+@media screen and (min-width: @screen-sm-min) and (max-width: @screen-md-min) {
+	body {
+		padding-top: 120px;
+	}
+}
+
+/* Dropdown menu on hover, except for mobile view
+-------------------------------------------------*/
+/*
+@media screen and (min-width: @screen-sm-min) {
+	ul.nav li.dropdown:hover {
+		&> ul.dropdown-menu {
+		    display: block;    
+		}
+		&> a {
+			background-color: #e7e7e7;
+			color: #555;
+		}
+	}
+}
+*/
+
+/* FROM PLAY-AUTHENTICATE SAMPLES. TODO: review
+-----------------------------------------------------------------------------*/
+
+.providers {
+	margin: 5px 0;
+	list-style: none;
+	li {
+		display: inline;
+	}
+}
+
+.std-progress {
+	position: relative;
+	
+	.percent {
+		position: absolute;
+		text-align: center;
+		width: 100%;
+		display: block;
+		text-shadow: 0px 0px 3px #444;
+	}
+}
+
+.blogPost {
+	margin-top: 20px;
+	padding-bottom: 10px;
+	border-bottom: 1px dotted black;
+	.blogPostDate {
+		display: inline;
+		.blogPostDateModified {
+		}
+	}
+	.blogPostAuthor {
+		display: inline;
+		font-size: small;
+	}
+	.blogPostTitle {
+		font-size: 20pt;
+		font-weight: bold;
+	}
+	.blogPostContent {
+	}
+	.blogPostAttachments {
+		img {
+		}
+		a {
+		}
+	}
+}
+
+.message {
+	.subject.unread {
+		font-weight: bold;
+	}
+	.bodyPreview {
+		color: lightgray;
+	}
+}
