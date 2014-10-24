@@ -17,12 +17,12 @@ public class EventProgamItem extends Model {
 	public Long id;
 
 	/**
-	 * Minutes from 00:00 of the event day.
+	 * Timestamp in seconds.
 	 */
 	public LocalTime start;
 
 	/**
-	 * Minutes from 00:00 of the event day.
+	 * Timestamp in seconds.
 	 */
 	public LocalTime end;
 
@@ -30,4 +30,13 @@ public class EventProgamItem extends Model {
 
 	@ManyToOne
 	public EventDayProgram program;
+
+	public EventProgamItem(LocalTime start, LocalTime end, String description,
+			EventDayProgram program) {
+		this.start = start;
+		this.end = end;
+		this.description = description;
+		this.program = program;
+	}
+
 }

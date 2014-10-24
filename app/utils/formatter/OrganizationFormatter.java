@@ -1,8 +1,9 @@
-package models.organization;
+package utils.formatter;
 
 import java.text.ParseException;
 import java.util.Locale;
 
+import models.organization.Organization;
 import play.data.format.Formatters.SimpleFormatter;
 
 public class OrganizationFormatter extends SimpleFormatter<Organization> {

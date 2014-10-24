@@ -1,28 +1,38 @@
-@(field: Field, label: String = "CHANGEME", optionMap: Seq[(String,scala.Boolean)], isMultiple: Boolean, isRequired: Boolean = false, help: String = "")
+@(field: Field,
+	label: String,
+	optionMap: Seq[(String,scala.Boolean)] = null,
+	isMultiple: Boolean,
+	isRequired: Boolean = false,
+	help: String = "",
+	selectDataBind: String = null,
+	dataBind: String = null)
 
-  <div class="form-group@if(field.hasErrors){ has-error}">
-    <label class="col-sm-2 control-label" for="@field.id">@Messages(label).capitalize</label>
-    <div class="col-sm-10">
-      <select
-        class="form-control"
-        id="@field.id"
-        name="@if(isMultiple) {@(field.name + "[]")} else {@field.name}"
-        @if(isMultiple) {multiple="multiple"}
-        @if(isRequired) {required="required"}>
-        @if(!isMultiple) {<option class="blank" value="">@Messages("label.none.selected")</option>}
-        @for((optionName, isSelected) <- optionMap) {
-        	@defining(optionName.indexOf(":")) { collonIndex =>
-	        	@if(collonIndex != -1) {
-	          		<option value="@optionName.substring(0, collonIndex)" @if(isSelected) {selected}>@optionName.substring(collonIndex + 1)</option>
-	       		} else {
-	          		<option value="@optionName" @if(isSelected) {selected}>@optionName</option>
-	          	}
-          	}
-        }
-      </select>
-      <span class="help-block">@help</span>
-        @if(field.hasErrors){
-            <div class="help-block"><span class="glyphicon glyphicon-exclamation-sign"></span> @{field.error.map { error => Messages(error.message) }}</div>
-        }
-    </div>
-  </div>
+<div class="form-group@if(field.hasErrors){ has-error}"@if(dataBind != null){ data-bind="@dataBind"}>
+	<label class="col-sm-2 control-label" for="@field.id">@Messages(label).capitalize</label>
+	<div class="col-sm-10">
+		<select
+			class="form-control"
+			id="@field.id"
+			name="@if(isMultiple) {@(field.name + "[]")} else {@field.name}"
+			@if(isMultiple) {multiple="multiple"}
+			@if(isRequired) {required="required"}
+			@if(selectDataBind != null) {data-bind="@selectDataBind"}>
+			@if(selectDataBind == null) {
+				@if(!isMultiple) {<option class="blank" value="">@Messages("label.none.selected")</option>}
+				@for((optionName, isSelected) <- optionMap) {
+					@defining(optionName.indexOf(":")) { collonIndex =>
+						@if(collonIndex != -1) {
+							<option value="@optionName.substring(0, collonIndex)" @if(isSelected) {selected}>@optionName.substring(collonIndex + 1)</option>
+						} else {
+							<option value="@optionName" @if(isSelected) {selected}>@optionName</option>
+						}
+					}
+				}
+			}
+		</select>
+		<span class="help-block">@help</span>
+		@if(field.hasErrors){
+			<div class="help-block"><span class="glyphicon glyphicon-exclamation-sign"></span> @{field.error.map { error => Messages(error.message) }}</div>
+		}
+	</div>
+</div>

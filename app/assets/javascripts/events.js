@@ -7,8 +7,8 @@ $(document).ready(function() {
 				for (var r in responseData.events) {
 					var e = responseData.events[r];
 					data += '<tr><td>' + e.name + '</td><td>' +
-						e.startDay + ' ' + e.startTime + '</td><td>' +
-						e.endDay + ' ' + e.endTime + '</td><td><a href="' +
+						e.startDate + ' ' + e.startTime + '</td><td>' +
+						e.endDate + ' ' + e.endTime + '</td><td><a href="' +
 						jsRoutes.controllers.UserController.details(e.author.id).absoluteURL() +
 						'">' + e.author.name + '</a></td><td>';
 					if (e.parent) {
@@ -40,16 +40,16 @@ $(document).ready(function() {
 						}
 					}
 					data += '</td><td><a class="btn btn-default btn-xs" href="' +
-						jsRoutes.controllers.EventController.edit(event.id).absoluteURL() +
+						jsRoutes.controllers.EventController.edit(e.id).absoluteURL() +
 						'" title="' + Messages("label.do.edit") +
 						'"><span class="glyphicon glyphicon-pencil"></span></a><a class="btn btn-default btn-xs js-ajax" title="' +
 						Messages("label.do.remove") +
 						'" data-action="remove" data-method="POST" data-url="' +
-						jsRoutes.controllers.EventController.remove(event.id).absoluteURL() +
-						'"data-confirm="' + Messages("label.are.you.sure.you.want.to.delete", event.name) +
+						jsRoutes.controllers.EventController.remove(e.id).absoluteURL() +
+						'"data-confirm="' + Messages("label.are.you.sure.you.want.to.delete", e.name) +
 						'"><span class="glyphicon glyphicon-remove"></span></a></td></tr>';
 				}
-				$(".events .js-tablesorter>tbody").append(data)
+				$(".events.js-tablesorter>tbody").append(data)
 						.trigger('updateRows', [true, null]);
 			},
 			error: function(err) {

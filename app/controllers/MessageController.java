@@ -3,6 +3,7 @@ package controllers;
 import static security.MyDynamicResourceHandler.CHECK_AUTHORSHIP;
 
 import java.util.List;
+import java.util.function.Function;
 
 import models.message.Message;
 import models.user.User;
@@ -61,6 +62,22 @@ public class MessageController extends Controller {
 
 	@Transactional
 	public static Result removeMany() {
+		return processMessages((message) -> {
+			message.delete();
+			return null;
+		});
+	}
+
+	@Transactional
+	public static Result markAsReadMany() {
+		return processMessages((message) -> {
+			message.unread = false;
+			message.update();
+			return null;
+		});
+	}
+	
+	private static Result processMessages(Function<Message, Void> handler) {
 		JsonNode json = request().body().asJson();
 		if (json == null) {
 			return badRequest("Expecting Json data");
@@ -78,9 +95,9 @@ public class MessageController extends Controller {
 			}
 			Message message = Message.find.byId(id);
 			if (!user.equals(message.owner)) {
-				return badRequest("hacker? no way! you are trying to delete not your messages!");
+				return badRequest("hacker? no way! you are trying to access not your messages!");
 			}
-			message.delete();
+			handler.apply(message);
 		}
 		return ok();
 	}

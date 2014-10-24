@@ -10,7 +10,7 @@ import play.db.ebean.Model;
 import com.avaje.ebean.annotation.CreatedTimestamp;
 
 @Entity
-public class KaramChange extends Model {
+public class KarmaChange extends Model {
 
 	private static final long serialVersionUID = 1L;
 

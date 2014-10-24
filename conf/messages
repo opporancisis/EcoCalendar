@@ -46,10 +46,6 @@ nav.event.tag.list=категории событий
 nav.event.tag.create=создание категории событий
 nav.event.tag.edit=редактирование категории событий
 
-nav.organization.tag.list=категории организаций
-nav.organization.tag.create=создание категории организаций
-nav.organization.tag.edit=редактирование категории организаций
-
 nav.organization.list=организации
 nav.organization.create=создание организации
 nav.organization.edit=редактирование организации
@@ -62,15 +58,12 @@ nav.geo.city.list=города
 nav.geo.city.create=создание города
 nav.geo.city.edit=редактирование города
 
-nav.geo.map.list=карты
-nav.geo.map.create=создание карты
-nav.geo.map.edit=редактирование карты
-
 ################################################################################
 # Labels
 ################################################################################
 
 label.action=действие
+label.additional.info.link=ссылка на дополнительную информацию
 label.apply=применить
 label.are.you.sure=вы уверены?
 label.are.you.sure.you.want.to.delete=вы уверены, что хотите удалить {0}?
@@ -79,16 +72,17 @@ label.centerLatitude=центральная широта
 label.centerLongitude=центральная долгота
 label.changed=изменено
 label.city=город
+label.city.weight.help=Чем больше вес, тем выше находится город в выпадающих списках (например, в интерфейсе создания события)
 label.click.to.verify=перейдите по ссылке для верификации
 label.closed=закрытый
 label.country=страна
+label.country.with.cities.count=городов
 label.created=дата создания
 label.create=создать
 label.date=дата
 label.dates=даты
 label.defaultMapEngine=карта по-умолчанию
 label.defaultZoom=масштаб по-умолчанию
-label.deleted.user.nick=удаленный пользователь
 label.description=описание
 label.do.create=создать
 label.do.edit=редактировать
@@ -117,7 +111,6 @@ label.entity.plural.EventTag=категории событий
 label.entity.plural.GrandEvent=супер-события
 label.entity.plural.MapEngine=карты
 label.entity.plural.Organization=организации
-label.entity.plural.OrganizationTag=категории организаций
 label.entity.plural.StandardPage=страницы
 label.entity.plural.UploadedFile=файлы
 label.entity.plural.User=пользователи
@@ -149,6 +142,7 @@ label.organizations=организации
 label.phone=телефон
 label.please.select.a.value=Пожалуйста, выберите значение
 label.portal.title=заголовок портала
+label.post.release.link=ссылка на пост-релиз
 label.roles=роли
 label.save=сохранить
 label.settings.have.been.saved=настройки были сохранены
@@ -169,6 +163,7 @@ label.unspecified=Незадано
 label.updated=дата обновления
 label.url=ссылка
 label.value=значение
+label.weight=вес
 label.welcome=Добро пожаловать!
 label.welcome.to.portal=Добро пожаловать на сайт {0}!
 label.yes=да
@@ -237,6 +232,7 @@ error.need.file=Необходимо указать файл
 error.not.found.object=Объект "{0}" с идентификатором "{1}" не найден
 error.access.forbidden=У Вас недостаточно прав для просмотра данной страницы
 error.you.need.to.log.in.first.to.view=Вам необходимо сначала авторизоваться, чтобы открыть страницу {0}
+org.hibernate.validator.constraints.URL.message=Нужно указать адрес URL
 
 ### --- play-authenticate START
 

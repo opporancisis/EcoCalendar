@@ -24,9 +24,9 @@ import controllers.helpers.ContextAugmenter;
 import controllers.helpers.ContextAugmenterAction;
 
 @ContextAugmenter
-public class UsersController extends Controller {
+public class UserController extends Controller {
 
-	private static final ALogger log = Logger.of(UsersController.class);
+	private static final ALogger log = Logger.of(UserController.class);
 
 	private static final Form<User> EDIT_FORM = form(User.class);
 
@@ -50,7 +50,7 @@ public class UsersController extends Controller {
 		}
 		User user = filledForm.get();
 		user.save();
-		return redirect(routes.UsersController.list());
+		return redirect(routes.UserController.list());
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
@@ -97,7 +97,7 @@ public class UsersController extends Controller {
 					Messages.get("label.your.email.has.been.changed.you.need.relogon"));
 			return redirect(routes.HomePageController.index());
 		}
-		return redirect(routes.UsersController.list());
+		return redirect(routes.UserController.list());
 	}
 
 	@Transactional
@@ -141,7 +141,7 @@ public class UsersController extends Controller {
 		user.changePassword(new MyUsernamePasswordAuthUser(newPassword), true);
 		flash(Application.FLASH_MESSAGE_KEY,
 				Messages.get("playauthenticate.change_password.success"));
-		return redirect(routes.UsersController.list());
+		return redirect(routes.UserController.list());
 	}
 
 	@SubjectPresent

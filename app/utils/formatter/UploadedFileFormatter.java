@@ -1,8 +1,9 @@
-package models.file;
+package utils.formatter;
 
 import java.text.ParseException;
 import java.util.Locale;
 
+import models.file.UploadedFile;
 import play.data.format.Formatters.SimpleFormatter;
 
 public class UploadedFileFormatter extends SimpleFormatter<UploadedFile> {

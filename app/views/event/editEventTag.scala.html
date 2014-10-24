@@ -3,15 +3,13 @@
 
 @import helper._
 @import scala.collection.mutable.LinkedHashMap
+@import views.menu.SystemMenu._
 
 @main(
 	if(editForm("id").value != null)
 		"nav.event.tag.edit"
 	else
 		"nav.event.tag.create",
-	leftNav = LinkedHashMap(
-		"nav.event.tag.list" -> routes.EventTagController.list
-	),
 	breadcrumbs = LinkedHashMap(
 		"nav.event.tag.list" -> routes.EventTagController.list,
 		if (editForm("id").value != null) editForm("name").value -> routes.EventTagController.edit(editForm("id").value.toLong)
@@ -19,28 +17,24 @@
 	)
 ) {
 
-	<div class="row">
+@helper.form(if(editForm("id").value != null) routes.EventTagController.doEdit(editForm("id").value.toLong) else routes.EventTagController.doCreate, 'class -> "form-horizontal") {
 
-		@helper.form(if(editForm("id").value != null) routes.EventTagController.doEdit(editForm("id").value.toLong) else routes.EventTagController.doCreate, 'class -> "form-horizontal") {
+	@if(editForm.hasGlobalErrors) { 
+		<div class="alert alert-danger">@editForm.globalError.message</div>
+	}
 
-			@if(editForm.hasGlobalErrors) { 
-				<div class="alert alert-danger">@editForm.globalError.message</div>
-			}
+	@if(tag != null) {
+		@_staticFormField("label.event.count", tag.events.size)
+		@_staticFormField("label.grand.event.count", tag.grandEvents.size)
+	}
 
-			@if(tag != null) {
-				@_staticFormField("label.event.count", tag.events.size)
-				@_staticFormField("label.grand.event.count", tag.grandEvents.size)
-			}
+	@inputText(
+		field = editForm("name"),
+		'_label -> "label.name"
+	)(FieldConstructor(views.html.bootstrap.input.f), null)
 
-			@inputText(
-				field = editForm("name"),
-				'_label -> "label.name"
-			)(FieldConstructor(views.html.bootstrap.input.f), null)
+	@_submit(if(editForm("id").value != null) "label.save" else "label.create")
 
-			<input type="submit" value="@{if(editForm("id").value != null) {Messages("label.save")} else {Messages("label.create")}}" class="btn btn-primary">
-
-		}
-
-	</div>
+}
 
 }

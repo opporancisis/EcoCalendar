@@ -6,8 +6,9 @@
 @import be.objectify.deadbolt.java.views.html._
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
 @import be.objectify.deadbolt.java.DeadboltViewSupport._
+@import views.menu.SystemMenu._
 
-@scripts = {
+@implicitScripts = {
 	<link href="@routes.Assets.at("stylesheets/tablesorter/theme.bootstrap.css")" rel="stylesheet">
 	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.min.js")"></script>
 	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.pager.min.js")"></script>
@@ -16,15 +17,7 @@
 }
 
 @main(
-	"nav.file.list",
-	scripts = scripts,
-	leftNav = LinkedHashMap(
-		"nav.sys.settings" -> routes.SettingController.edit,
-		"nav.homePage.edit" -> routes.HomePageController.edit,
-		"nav.user.list" -> routes.UsersController.list,
-		"nav.file.list" -> routes.FileController.list,
-		"nav.stdPage.list" -> routes.StandardPageController.list
-	)
+	"nav.file.list"
 ) {
 
 @if(!files.isEmpty) {

@@ -8,3 +8,4 @@ workspace
 .cache
 .classpath
 .project
+/bin

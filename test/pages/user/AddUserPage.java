@@ -17,7 +17,7 @@ public class AddUserPage extends AbstractPage {
 
 	@Override
 	public String getUrl() {
-		return routes.UsersController.create().url();
+		return routes.UserController.create().url();
 	}
 	
 	@Override

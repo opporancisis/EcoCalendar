@@ -60,9 +60,13 @@ public class Application extends Controller {
 						routes.javascript.EventController.getEvents(),
 						routes.javascript.EventController.edit(),
 						routes.javascript.EventController.remove(),
-						routes.javascript.UsersController.details(),
+						routes.javascript.UserController.details(),
 						routes.javascript.GrandEventController.details(),
-						routes.javascript.OrganizationController.details())).as("text/javascript");
+						routes.javascript.OrganizationController.details(),
+						routes.javascript.FileController.doCreate(),
+						routes.javascript.MessageController.removeMany(),
+						routes.javascript.MessageController.markAsReadMany()))
+				.as("text/javascript");
 	}
 
 	public static Result doSignup() {

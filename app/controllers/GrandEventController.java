@@ -1,5 +1,6 @@
 package controllers;
 
+import be.objectify.deadbolt.java.actions.SubjectPresent;
 import models.event.GrandEvent;
 import models.event.tag.EventTag;
 import models.organization.Organization;
@@ -48,6 +49,7 @@ public class GrandEventController extends Controller {
 				Organization.find.all(), EventTag.find.all()));
 	}
 
+	@SubjectPresent
 	public static Result doCreate() {
 		Form<GrandEvent> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {

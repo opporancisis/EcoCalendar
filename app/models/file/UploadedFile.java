@@ -12,6 +12,7 @@ import play.data.format.Formatters;
 import play.db.ebean.Model;
 import utils.Config;
 import utils.formatter.AttachmentsListAnnotationFormatter;
+import utils.formatter.UploadedFileFormatter;
 
 @Entity
 public class UploadedFile extends Model {

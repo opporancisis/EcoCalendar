@@ -1,4 +1,9 @@
-@(title: String, scripts: Html = Html(""), leftNav: collection.Map[String, _] = null, breadcrumbs: collection.Map[String, _] = null)(content: Html)(implicit implicitScripts: Html = Html(""))
+@(title: String,
+	scripts: Html = play.twirl.api.Html(""),
+	leftNav: collection.Map[String, _] = null,
+	breadcrumbs: collection.Map[String, _] = null
+)(content: Html)(implicit implicitScripts: Html = play.twirl.api.Html(""),
+	implicitLeftNav: collection.Map[String, _] = null)
 
 @import scala.collection.mutable.LinkedHashMap
 @import com.feth.play.module.pa.views.html._
@@ -29,8 +34,8 @@
 		<script src="@routes.Assets.at("lib/jquery/jquery.min.js")"></script>
 		<script src="@routes.Assets.at("lib/underscorejs/underscore-min.js")" defer="defer"></script>
 		<script src="@routes.Assets.at("lib/bootstrap/js/bootstrap.min.js")" defer="defer"></script>
-		<script src="@routes.Assets.at("lib/momentjs/min/moment.min.js")" defer="defer"></script>
-		<script src="@routes.Assets.at("lib/momentjs/lang/ru.js")" defer="defer"></script>
+		<script src="@routes.Assets.at("lib/momentjs/moment.js")" defer="defer"></script>
+		@*<script src="@routes.Assets.at("lib/momentjs/lang/ru.js")" defer="defer"></script>*@
 		<script src="@routes.Application.jsRoutes" defer="defer"></script>
 		<script src="@routes.Assets.at("javascripts/jquery.bootstrap-growl.min.js")" defer="defer"></script>
 		<script src="@routes.Assets.at("javascripts/bootbox.min.js")" defer="defer"></script>
@@ -88,18 +93,16 @@
 								<ul class="dropdown-menu">
 									<li>@_link(routes.SettingController.edit, "nav.sys.settings")</li>
 									<li>@_link(routes.HomePageController.edit, "nav.homePage.edit")</li>
-									<li>@_link(routes.UsersController.list, "nav.user.list")</li>
+									<li>@_link(routes.UserController.list, "nav.user.list")</li>
 									<li>@_link(routes.FileController.list, "nav.file.list")</li>
 									<li>@_link(routes.StandardPageController.list, "nav.stdPage.list")</li>
 									<li class="divider"></li>
 									<li>@_link(routes.EventTagController.list, "nav.event.tag.list")</li>
 									<li class="divider"></li>
-									<li>@_link(routes.OrganizationTagController.list, "nav.organization.tag.list")</li>
 									<li>@_link(routes.OrganizationController.list, "nav.organization.list")</li>
 									<li class="divider"></li>
 									<li>@_link(routes.CountryController.list, "nav.geo.country.list")</li>
 									<li>@_link(routes.CityController.list, "nav.geo.city.list")</li>
-									<li>@_link(routes.MapEngineController.list, "nav.geo.map.list")</li>
 								</ul>
 							</li>
 						}
@@ -149,6 +152,13 @@
 						</li>
 						@if(leftNav != null) {
 							@for((label, path) <- leftNav) {
+								<li class="@("active".when(path.toString == request.path))">
+									<a href="@path">@Messages(label).capitalize</a>
+								</li>
+							}
+						}
+						@if(implicitLeftNav != null) {
+							@for((label, path) <- implicitLeftNav) {
 								<li class="@("active".when(path.toString == request.path))">
 									<a href="@path">@Messages(label).capitalize</a>
 								</li>

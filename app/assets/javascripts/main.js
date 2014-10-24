@@ -29,7 +29,8 @@
 			selectAllText: 'Выбрать всё',
 			filterPlaceholder: 'Поиск',
 			nonSelectedText: 'Ничего не выбрано',
-			nSelectedText: 'пункт(ов) выбрано'
+			nSelectedText: 'пункт(ов) выбрано',
+			numberDisplayed: 2
 		});
 	}
 

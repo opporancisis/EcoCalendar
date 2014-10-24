@@ -1,4 +1,4 @@
-package models.event.tag;
+package utils.formatter;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import models.event.tag.EventTag;
+import models.event.tag.EventTagsList;
 import play.data.format.Formatters;
 
 @SuppressWarnings("rawtypes")

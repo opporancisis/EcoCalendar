@@ -14,21 +14,22 @@
 		ln
 	}
 ) {
-	<div>
-	@Html(homePage.body)
-	</div>
 
-	@if(homePage.attachments != null && !homePage.attachments.isEmpty) {
-		<div>
-			@for(attachment <- homePage.attachments) {
-				@if(attachment.isImage) {
-					<img src="@routes.FileController.get(attachment.id)" />
-				} else {
-					<a href="@routes.FileController.get(attachment.id)">@attachment.name</a>
-				}
-				<br />
+<div>
+@play.twirl.api.Html(homePage.body)
+</div>
+
+@if(homePage.attachments != null && !homePage.attachments.isEmpty) {
+	<div>
+		@for(attachment <- homePage.attachments) {
+			@if(attachment.isImage) {
+				<img src="@routes.FileController.get(attachment.id)" />
+			} else {
+				<a href="@routes.FileController.get(attachment.id)">@attachment.name</a>
 			}
-		</div>
-	}
-	
+			<br />
+		}
+	</div>
+}
+
 }

@@ -1,8 +1,9 @@
-package models.event;
+package utils.formatter;
 
 import java.text.ParseException;
 import java.util.Locale;
 
+import models.event.GrandEvent;
 import play.data.format.Formatters.SimpleFormatter;
 
 public class GrandEventFormatter extends SimpleFormatter<GrandEvent> {

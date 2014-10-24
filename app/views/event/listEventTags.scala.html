@@ -3,6 +3,7 @@
 @import scala.collection.mutable.LinkedHashMap
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
 @import be.objectify.deadbolt.java.DeadboltViewSupport._
+@import views.menu.SystemMenu._
 
 @user = @{
 	ctx.args.get("user").asInstanceOf[models.user.User]
@@ -18,9 +19,6 @@
 
 @main(
 	"nav.event.tag.list",
-	leftNav = LinkedHashMap(
-		"nav.event.tag.list" -> routes.EventTagController.list
-	),
 	breadcrumbs = LinkedHashMap(
 		"nav.event.tag.list" -> routes.EventTagController.list
 	)

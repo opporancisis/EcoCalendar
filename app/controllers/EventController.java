@@ -11,23 +11,28 @@ import models.event.GrandEvent;
 import models.event.tag.EventTag;
 import models.geo.City;
 import models.geo.Country;
+import models.geo.GeoCoords;
 import models.organization.Organization;
+import models.user.User;
 import play.data.Form;
 import play.data.format.Formatters;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+import be.objectify.deadbolt.java.actions.SubjectPresent;
 
 import com.avaje.ebean.ExpressionList;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import controllers.helpers.ContextAugmenter;
+import controllers.helpers.ContextAugmenterAction;
 
 @ContextAugmenter
 public class EventController extends Controller {
 
 	private static final Form<Event> EDIT_FORM = Form.form(Event.class);
+	private static final Form<GeoCoords> COORDS_FORM = Form.form(GeoCoords.class);
 	private static final Form<EventsFilter> FILTER = Form.form(EventsFilter.class);
 
 	public static Result list() {
@@ -82,7 +87,9 @@ public class EventController extends Controller {
 					.put("startTime", Formatters.print(firstItemFirstDay.start))
 					.put("endTime", Formatters.print(lastItemLastDay.end));
 			o.putObject("author").put("id", event.author.id).put("name", event.author.nick);
-			o.putObject("parent").put("id", event.parent.id).put("name", event.parent.name);
+			if (event.parent != null) {
+				o.putObject("parent").put("id", event.parent.id).put("name", event.parent.name);
+			}
 			if (!event.organizations.isEmpty()) {
 				ArrayNode orgs = o.putArray("organizations");
 				for (Organization org : event.organizations) {
@@ -99,37 +106,47 @@ public class EventController extends Controller {
 		return ok(res);
 	}
 
+	@SubjectPresent
 	public static Result edit(long id) {
 		Event event = Event.find.byId(id);
 		if (event == null) {
 			return Application.notFoundObject(Event.class, id);
 		}
+		event.initTimetableJson();
 		List<GrandEvent> grandEvents = getActualGrandEvents();
 		if (event.parent != null && !grandEvents.contains(event.parent)) {
 			// grandEvents.
 		}
-		return ok(views.html.event.editEvent.render(EDIT_FORM.fill(event), event,
-				getActualGrandEvents(), EventTag.find.all(), Organization.find.all()));
+		event.coords.country = event.coords.city.country;
+		return ok(views.html.event.editEvent.render(EDIT_FORM.fill(event),
+				COORDS_FORM.fill(event.coords), event, getActualGrandEvents(), EventTag.find.all(),
+				Organization.find.all(), Country.all()));
 	}
 
+	@SubjectPresent
 	public static Result doEdit(long id) {
 		Form<Event> filledForm = EDIT_FORM.bindFromRequest();
-		if (filledForm.hasErrors()) {
+		Form<GeoCoords> filledCoords = COORDS_FORM.bindFromRequest();
+		if (filledForm.hasErrors() || filledCoords.hasErrors()) {
 			Event event = Event.find.byId(id);
 			if (event == null) {
 				return Application.notFoundObject(Event.class, id);
 			}
-			return badRequest(views.html.event.editEvent.render(filledForm, event,
-					getActualGrandEvents(), EventTag.find.all(), Organization.find.all()));
+			return badRequest(views.html.event.editEvent.render(filledForm, filledCoords, event,
+					getActualGrandEvents(), EventTag.find.all(), Organization.find.all(),
+					Country.all()));
 		}
 		Event event = filledForm.get();
-		event.update(id);
+		GeoCoords coords = filledCoords.get();
+		event.updateWithTimetableAndCoords(id, coords);
 		return redirect(routes.EventController.list());
 	}
 
+	@SubjectPresent
 	public static Result create() {
-		return ok(views.html.event.editEvent.render(EDIT_FORM, null, getActualGrandEvents(),
-				EventTag.find.all(), Organization.find.all()));
+		return ok(views.html.event.editEvent
+				.render(EDIT_FORM, COORDS_FORM, null, getActualGrandEvents(), EventTag.find.all(),
+						Organization.find.all(), Country.all()));
 	}
 
 	private static List<GrandEvent> getActualGrandEvents() {
@@ -137,17 +154,32 @@ public class EventController extends Controller {
 				.findList();
 	}
 
+	@SubjectPresent
 	public static Result doCreate() {
 		Form<Event> filledForm = EDIT_FORM.bindFromRequest();
-		if (filledForm.hasErrors()) {
-			return badRequest(views.html.event.editEvent.render(filledForm, null,
-					getActualGrandEvents(), EventTag.find.all(), Organization.find.all()));
+		Form<GeoCoords> filledCoords = COORDS_FORM.bindFromRequest();
+		if (filledForm.hasErrors() || filledCoords.hasErrors()) {
+			return badRequest(views.html.event.editEvent.render(filledForm, filledCoords, null,
+					getActualGrandEvents(), EventTag.find.all(), Organization.find.all(),
+					Country.all()));
 		}
+		User user = ContextAugmenterAction.getLoggedUser();
 		Event event = filledForm.get();
+		event.author = user;
+		event.published = user.hasEnoughPowerToPublishEvents();
+		event.coords = filledCoords.get();
+		event.processTimetable();
 		event.save();
+		if (!event.published) {
+			// TODO: send message to whom?
+		}
+		if (event.parent != null) {
+			// TODO: notify creator of grand event?
+		}
 		return redirect(routes.EventController.list());
 	}
 
+	@SubjectPresent
 	public static Result remove(long id) {
 		Event event = Event.find.byId(id);
 		if (event == null) {

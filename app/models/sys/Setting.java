@@ -20,7 +20,7 @@ public class Setting extends Model {
 	@Id
 	public Long id;
 
-	public Class<?> clazz;
+	public String clazz;
 
 	public String name;
 
@@ -38,7 +38,7 @@ public class Setting extends Model {
 
 	public String validate() {
 		try {
-			Formatters.parse(value, clazz);
+			Formatters.parse(value, Class.forName(clazz));
 			return null;
 		} catch (Exception e) {
 			return Messages.get("error.invalid");

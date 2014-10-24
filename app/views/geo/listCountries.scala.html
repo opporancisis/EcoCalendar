@@ -4,6 +4,7 @@
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
 @import be.objectify.deadbolt.java.DeadboltViewSupport._
 @import be.objectify.deadbolt.java.views.html._
+@import views.menu.SystemMenu._
 
 @user = @{
 	ctx.args.get("user").asInstanceOf[models.user.User]
@@ -19,9 +20,6 @@
 
 @main(
 	"nav.geo.country.list",
-	leftNav = LinkedHashMap(
-		"nav.geo.country.list" -> routes.CountryController.list
-	),
 	breadcrumbs = LinkedHashMap(
 		"nav.geo.country.list" -> routes.CountryController.list
 	)

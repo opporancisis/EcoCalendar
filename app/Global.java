@@ -3,21 +3,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.Date;
-import java.util.List;
-
-import models.event.tag.EventTag;
-import models.event.tag.EventTagFormatter;
-import models.event.tag.EventTagsListAnnotationFormatter;
-import models.file.UploadedFile;
-import models.file.UploadedFileFormatter;
-import models.organization.Organization;
-import models.organization.OrganizationFormatter;
-import models.organization.OrganizationsListAnnotationFormatter;
-import models.organization.tag.OrganizationTag;
-import models.organization.tag.OrganizationTagFormatter;
-import models.organization.tag.OrganizationTagsListAnnotationFormatter;
-import models.user.SecurityRole;
-import models.user.SecurityRole.SecurityRoleFormatter;
 
 import org.joda.time.DateTime;
 
@@ -30,12 +15,10 @@ import play.api.mvc.EssentialFilter;
 import play.data.format.Formats;
 import play.data.format.Formatters;
 import play.mvc.Call;
-import utils.formatter.AttachmentsListAnnotationFormatter;
 import utils.formatter.DateTimeFormatter;
 import utils.formatter.LocalDateFormatter;
 import utils.formatter.LocalDateTimeFormatter;
 import utils.formatter.LongFormatter;
-import utils.formatter.RolesListAnnotationFormatter;
 import utils.formatter.YearMonthFormatter;
 
 import com.feth.play.module.pa.PlayAuthenticate;

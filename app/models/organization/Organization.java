@@ -4,15 +4,16 @@ import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 
 import models.event.Event;
 import models.event.GrandEvent;
-import models.organization.tag.OrganizationTag;
-import models.organization.tag.OrganizationTags;
 import play.data.format.Formatters;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
+import utils.formatter.OrganizationFormatter;
+import utils.formatter.OrganizationsListAnnotationFormatter;
 
 @Entity
 public class Organization extends Model {
@@ -31,11 +32,8 @@ public class Organization extends Model {
 	public String name;
 
 	@Required
+	@Lob
 	public String description;
-
-	@ManyToMany
-	@OrganizationTags
-	public List<OrganizationTag> tags;
 
 	@ManyToMany
 	public List<Event> events;

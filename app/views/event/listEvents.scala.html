@@ -3,6 +3,7 @@
 @import scala.collection.mutable.LinkedHashMap
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
 @import be.objectify.deadbolt.java.DeadboltViewSupport._
+@import be.objectify.deadbolt.java.views.html._
 
 @user = @{
 	ctx.args.get("user").asInstanceOf[models.user.User]
@@ -45,7 +46,9 @@
 		@_tablePager(columns = 9)
 	</tfoot>
 </table>
-	
-	@_btn(routes.EventController.create, "label.do.create")
+
+	@subjectPresent() {
+		@_btn(routes.EventController.create, "label.do.create")
+	}
 	
 }

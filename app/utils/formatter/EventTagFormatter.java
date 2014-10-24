@@ -1,8 +1,9 @@
-package models.event.tag;
+package utils.formatter;
 
 import java.text.ParseException;
 import java.util.Locale;
 
+import models.event.tag.EventTag;
 import play.data.format.Formatters.SimpleFormatter;
 
 public class EventTagFormatter extends SimpleFormatter<EventTag> {

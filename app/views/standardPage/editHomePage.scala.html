@@ -1,14 +1,16 @@
-@(editForm: play.data.Form[models.standardPage.HomePage], files: List[models.file.UploadedFile])
+@(editForm: play.data.Form[models.standardPage.HomePage],
+	files: List[models.file.UploadedFile])
 
 @import helper._
 @import helpers.BootstrapHelper._
 @import scala.collection.mutable.LinkedHashMap
+@import views.menu.SystemMenu._
 
 @implicitScripts = {
 	<link rel="stylesheet" href="@routes.Assets.at("stylesheets/summernote.css")" />
 	<link rel="stylesheet" href="@routes.Assets.at("stylesheets/summernote-bs3.css")" />
 	<link rel="stylesheet" href="@routes.Assets.at("lib/font-awesome/css/font-awesome.min.css")" />
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/dynamicAttachments.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/addFile.js")"></script>
 	<script type="text/javascript" src="@routes.Assets.at("javascripts/summernote.min.js")"></script>
 	<script type="text/javascript" src="@routes.Assets.at("javascripts/summernote-ru-RU.js")"></script>
 	<script type="text/javascript">
@@ -20,48 +22,38 @@
 
 @main(
 	"nav.homePage.edit",
-	leftNav = LinkedHashMap(
-		"nav.sys.settings" -> routes.SettingController.edit,
-		"nav.homePage.edit" -> routes.HomePageController.edit,
-		"nav.user.list" -> routes.UsersController.list,
-		"nav.file.list" -> routes.FileController.list,
-		"nav.stdPage.list" -> routes.StandardPageController.list
-	),
 	breadcrumbs = LinkedHashMap(
 		"nav.homePage.edit" -> routes.HomePageController.edit
 	)
 ) {
 
-	<div class="row">
+@helper.form(routes.HomePageController.doEdit(), 'class -> "form-horizontal") {
 
-		@helper.form(routes.HomePageController.doEdit(), 'class -> "form-horizontal") {
+	@if(editForm.hasGlobalErrors) { 
+		<div class="alert alert-danger">@editForm.globalError.message</div>
+	}
 
-			@if(editForm.hasGlobalErrors) { 
-				<div class="alert alert-danger">@editForm.globalError.message</div>
-			}
+	@inputText(
+		field = editForm("title"),
+		'_label -> "label.title"
+	)(FieldConstructor(views.html.bootstrap.input.f), null)
 
-			@inputText(
-				field = editForm("title"),
-				'_label -> "label.title"
-			)(FieldConstructor(views.html.bootstrap.input.f), null)
+	@textarea(
+		field = editForm("body"),
+		args = 'rows -> 3, 'cols -> 50,
+		'_label -> "label.description"
+	)(FieldConstructor(views.html.bootstrap.textarea.f), null)
 
-			@textarea(
-				field = editForm("body"),
-				args = 'rows -> 3, 'cols -> 50,
-				'_label -> "label.description"
-			)(FieldConstructor(views.html.bootstrap.textarea.f), null)
+	@select(
+		field = editForm("attachments"),
+		options = files.map(a => a.id.toString -> a.name).toSeq,
+		'_label -> "label.file.files",
+		'multiple -> true,
+		'class -> "form-control"
+	)(FieldConstructor(views.html.bootstrap.field.f), null)
 
-			@bootstrap.selectB(
-				field = editForm("attachments"),
-				optionMap = files.map(a => a.id + ":" + a.name -> (editForm("attachments").value != null && editForm("attachments").value.split(",").contains("" + a.id).booleanValue)),
-				isMultiple = true,
-				label = "label.file.files"
-			)
+	@_submit("label.save")
 
-			<input type="submit" value="@Messages("label.save")" class="btn btn-primary">
-
-		}
-
-	</div>
+}
 
 }

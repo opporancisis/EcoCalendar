@@ -4,6 +4,7 @@
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
 @import be.objectify.deadbolt.java.DeadboltViewSupport._
 @import scala.collection.JavaConversions._
+@import views.menu.SystemMenu._
 
 @user = @{
 	ctx.args.get("user").asInstanceOf[models.user.User]
@@ -19,9 +20,6 @@
 
 @main(
 	"nav.organization.list",
-	leftNav = LinkedHashMap(
-		"nav.organization.list" -> routes.OrganizationController.list
-	),
 	breadcrumbs = LinkedHashMap(
 		"nav.organization.list" -> routes.OrganizationController.list
 	)
@@ -31,7 +29,6 @@
 	<table class="table table-striped js-tablesorter">
 		<thead>
 			<th>@Messages("label.name")</th>
-			<th>@Messages("label.tags")</th>
 			<th>@Messages("label.event.count")</th>
 			<th>@Messages("label.grand.event.count")</th>
 			<th class="sorter-false filter-false">@Messages("label.action")</th>
@@ -40,7 +37,6 @@
 			@for(org <- orgs) {
 				<tr>
 					<td>@org.name</td>
-					<td>@org.tags.map(_.name).mkString(", ")</td>
 					<td>@org.events.size</td>
 					<td>@org.grandEvents.size</td>
 					<td>

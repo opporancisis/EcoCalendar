@@ -3,6 +3,7 @@ package models.event;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -23,7 +24,7 @@ public class EventDayProgram extends Model {
 	@ManyToOne
 	public Event event;
 
-	@OneToMany
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "program")
 	public List<EventProgamItem> items;
 
 }

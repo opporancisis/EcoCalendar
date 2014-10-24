@@ -1,7 +1,6 @@
 package controllers;
 
 import models.organization.Organization;
-import models.organization.tag.OrganizationTag;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -21,8 +20,7 @@ public class OrganizationController extends Controller {
 		if (org == null) {
 			return Application.notFoundObject(Organization.class, id);
 		}
-		return ok(views.html.organization.editOrganization.render(EDIT_FORM.fill(org), org,
-				OrganizationTag.find.all()));
+		return ok(views.html.organization.editOrganization.render(EDIT_FORM.fill(org), org));
 	}
 
 	public static Result doEdit(long id) {
@@ -32,8 +30,7 @@ public class OrganizationController extends Controller {
 			if (org == null) {
 				return Application.notFoundObject(Organization.class, id);
 			}
-			return badRequest(views.html.organization.editOrganization.render(filledForm, org,
-					OrganizationTag.find.all()));
+			return badRequest(views.html.organization.editOrganization.render(filledForm, org));
 		}
 		Organization org = filledForm.get();
 		org.update(id);
@@ -41,15 +38,13 @@ public class OrganizationController extends Controller {
 	}
 
 	public static Result create() {
-		return ok(views.html.organization.editOrganization.render(EDIT_FORM, null,
-				OrganizationTag.find.all()));
+		return ok(views.html.organization.editOrganization.render(EDIT_FORM, null));
 	}
 
 	public static Result doCreate() {
 		Form<Organization> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
-			return badRequest(views.html.organization.editOrganization.render(filledForm, null,
-					OrganizationTag.find.all()));
+			return badRequest(views.html.organization.editOrganization.render(filledForm, null));
 		}
 		Organization org = filledForm.get();
 		org.save();

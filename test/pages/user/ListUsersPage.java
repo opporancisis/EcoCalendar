@@ -12,7 +12,7 @@ public class ListUsersPage extends AbstractPage {
 	
 	@Override
 	public String getUrl() {
-		return routes.UsersController.list().url();
+		return routes.UserController.list().url();
 	}
 	
 	@Override

@@ -1,8 +1,9 @@
 @(users: List[models.user.User])
 
 @import scala.collection.mutable.LinkedHashMap
+@import views.menu.SystemMenu._
 
-@scripts = {
+@implicitScripts = {
 	<link href="@routes.Assets.at("lib/select2/select2.css")" rel="stylesheet">
 	<link href="@routes.Assets.at("lib/select2/select2-bootstrap.css")" rel="stylesheet">
 	<link href="@routes.Assets.at("stylesheets/tablesorter/theme.bootstrap.css")" rel="stylesheet">
@@ -17,15 +18,7 @@
 }
 
 @main(
-	"nav.user.list",
-	scripts = scripts,
-	leftNav = LinkedHashMap(
-		"nav.sys.settings" -> routes.SettingController.edit,
-		"nav.homePage.edit" -> routes.HomePageController.edit,
-		"nav.user.list" -> routes.UsersController.list,
-		"nav.file.list" -> routes.FileController.list,
-		"nav.stdPage.list" -> routes.StandardPageController.list
-	)
+	"nav.user.list"
 ) {
 
 @if(!users.isEmpty) {
@@ -51,16 +44,16 @@
 					<td>@user.roles.map{ role => @Messages("label.roles." + role)}.mkString(",")</td>
 					<td>@user.note</td>
 					<td>
-						<a class="btn btn-default btn-xs" href='@{routes.UsersController.edit(user.id)}' title="@Messages("label.do.edit")">
+						<a class="btn btn-default btn-xs" href='@{routes.UserController.edit(user.id)}' title="@Messages("label.do.edit")">
 							<span class="glyphicon glyphicon-pencil"></span>
 						</a>
-						<a class="btn btn-default btn-xs" href='@{routes.UsersController.changePassword(user.id)}' title="@Messages("label.do.change.password")">
+						<a class="btn btn-default btn-xs" href='@{routes.UserController.changePassword(user.id)}' title="@Messages("label.do.change.password")">
 							<span class="glyphicon glyphicon-asterisk"></span>
 						</a>
 						<a class="btn btn-default btn-xs js-ajax" title="@Messages("label.do.remove")"
 								data-action="remove"
 								data-method="POST"
-								data-url="@routes.UsersController.remove(user.id)"
+								data-url="@routes.UserController.remove(user.id)"
 								data-confirm="@Messages("label.are.you.sure.you.want.to.delete", user.somename)">
 							<span class="glyphicon glyphicon-remove"></span>
 						</a>
@@ -76,6 +69,6 @@
 	@_foundNoneOf(classOf[models.user.User])
 }
 
-	<a href="@routes.UsersController.create" class="btn btn-primary">@Messages("nav.user.create")</a>
+	<a href="@routes.UserController.create" class="btn btn-primary">@Messages("nav.user.create")</a>
 
 }

@@ -1,18 +1,15 @@
 @(editForm: play.data.Form[models.organization.Organization],
-	org: models.organization.Organization,
-	tags: List[models.organization.tag.OrganizationTag])
+	org: models.organization.Organization)
 
 @import helper._
 @import scala.collection.mutable.LinkedHashMap
+@import views.menu.SystemMenu._
 
 @main(
 	if(org != null)
 		"nav.organization.edit"
 	else
 		"nav.organization.create",
-	leftNav = LinkedHashMap(
-		"nav.organization.list" -> routes.OrganizationController.list
-	),
 	breadcrumbs = LinkedHashMap(
 		"nav.organization.list" -> routes.OrganizationController.list,
 		if (org != null) editForm("name").value -> routes.OrganizationController.edit(org.id)
@@ -20,41 +17,29 @@
 	)
 ) {
 
-	<div class="row">
+@helper.form(if(org != null) routes.OrganizationController.doEdit(org.id) else routes.OrganizationController.doCreate, 'class -> "form-horizontal") {
 
-		@helper.form(if(org != null) routes.OrganizationController.doEdit(org.id) else routes.OrganizationController.doCreate, 'class -> "form-horizontal") {
+	@if(editForm.hasGlobalErrors) { 
+		<div class="alert alert-danger">@editForm.globalError.message</div>
+	}
 
-			@if(editForm.hasGlobalErrors) { 
-				<div class="alert alert-danger">@editForm.globalError.message</div>
-			}
+	@if(org != null) {
+		@_staticFormField("label.event.count", org.events.size)
+		@_staticFormField("label.grand.event.count", org.grandEvents.size)
+	}
 
-			@if(org != null) {
-				@_staticFormField("label.event.count", org.events.size)
-				@_staticFormField("label.grand.event.count", org.grandEvents.size)
-			}
+	@inputText(
+		field = editForm("name"),
+		'_label -> "label.name"
+	)(FieldConstructor(views.html.bootstrap.input.f), null)
 
-			@inputText(
-				field = editForm("name"),
-				'_label -> "label.name"
-			)(FieldConstructor(views.html.bootstrap.input.f), null)
+	@textarea(
+		field = editForm("description"),
+		args = 'rows -> 3, 'cols -> 50,
+		'_label -> "label.description"
+	)(FieldConstructor(views.html.bootstrap.textarea.f), null)
 
-			@bootstrap.selectB(
-				field = editForm("tags"),
-				optionMap = tags.map(a => a.id + ":" + a.name -> {val t = editForm("tags").value; t != null && t.split(",").contains("" + a.id).booleanValue}),
-				isMultiple = true,
-				label = "label.tags"
-			)
-
-			@textarea(
-				field = editForm("description"),
-				args = 'rows -> 3, 'cols -> 50,
-				'_label -> "label.description"
-			)(FieldConstructor(views.html.bootstrap.textarea.f), null)
-
-			<input type="submit" value="@{if(org != null) {Messages("label.save")} else {Messages("label.create")}}" class="btn btn-primary">
-
-		}
-
-	</div>
+	@_submit(if(org != null) "label.save" else "label.create")
+}
 
 }

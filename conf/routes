@@ -28,6 +28,7 @@ GET    /account/message                  controllers.MessageController.list
 GET    /account/message/:id              controllers.MessageController.read(id: Long)
 POST   /account/message/remove/:id       controllers.MessageController.remove(id:Long)
 POST   /account/message/removeMany       controllers.MessageController.removeMany
+POST   /account/message/markAsReadMany   controllers.MessageController.markAsReadMany
 
 GET    /login                            controllers.Application.login
 POST   /login                            controllers.Application.doLogin
@@ -58,15 +59,15 @@ POST   /login/password/forgot            controllers.Signup.doForgotPassword
 # Map static resources from the /public folder to the /assets URL path
 GET    /assets/*file                     controllers.Assets.at(path="/public", file)
 
-GET    /user/create                      controllers.UsersController.create
-POST   /user/create                      controllers.UsersController.doCreate
-GET    /user/edit/:id                    controllers.UsersController.edit(id:Long)
-POST   /user/edit/:id                    controllers.UsersController.doEdit(id:Long)
-POST   /user/remove/:id                  controllers.UsersController.remove(id:Long)
-GET    /user/passwd/:id                  controllers.UsersController.changePassword(id:Long)
-POST   /user/passwd/:id                  controllers.UsersController.doChangePassword(id:Long)
-GET    /user/:id                         controllers.UsersController.details(id: Long)
-GET    /user                             controllers.UsersController.list
+GET    /user/create                      controllers.UserController.create
+POST   /user/create                      controllers.UserController.doCreate
+GET    /user/edit/:id                    controllers.UserController.edit(id:Long)
+POST   /user/edit/:id                    controllers.UserController.doEdit(id:Long)
+POST   /user/remove/:id                  controllers.UserController.remove(id:Long)
+GET    /user/passwd/:id                  controllers.UserController.changePassword(id:Long)
+POST   /user/passwd/:id                  controllers.UserController.doChangePassword(id:Long)
+GET    /user/:id                         controllers.UserController.details(id: Long)
+GET    /user                             controllers.UserController.list
 
 GET    /alert/ws/:uuid                   controllers.CommunicationController.alerts(uuid: String)
 
@@ -79,8 +80,7 @@ GET    /file/:id                         controllers.FileController.get(id: Long
 GET    /file/preview/:id                 controllers.FileController.preview(id: Long)
 GET    /file                             controllers.FileController.list
 
-GET    /stdPage/up/:id                   controllers.StandardPageController.moveUp(id: Long)
-GET    /stdPage/down/:id                 controllers.StandardPageController.moveDown(id: Long)
+POST   /stdPage/move/:id/by/:by          controllers.StandardPageController.moveBy(id: Long, by: Long)
 GET    /stdPage/edit/:id                 controllers.StandardPageController.edit(id: Long)
 POST   /stdPage/edit/:id                 controllers.StandardPageController.doEdit(id: Long)
 GET    /stdPage/create                   controllers.StandardPageController.create
@@ -112,13 +112,6 @@ POST   /event/tag/edit/:id               controllers.EventTagController.doEdit(i
 POST   /event/tag/remove/:id             controllers.EventTagController.remove(id: Long)
 GET    /event/tag                        controllers.EventTagController.list
 
-GET    /organization/tag/create          controllers.OrganizationTagController.create
-POST   /organization/tag/create          controllers.OrganizationTagController.doCreate()
-GET    /organization/tag/edit/:id        controllers.OrganizationTagController.edit(id: Long)
-POST   /organization/tag/edit/:id        controllers.OrganizationTagController.doEdit(id: Long)
-POST   /organization/tag/remove/:id      controllers.OrganizationTagController.remove(id: Long)
-GET    /organization/tag                 controllers.OrganizationTagController.list
-
 GET    /organization/create              controllers.OrganizationController.create
 POST   /organization/create              controllers.OrganizationController.doCreate()
 GET    /organization/edit/:id            controllers.OrganizationController.edit(id: Long)
@@ -140,13 +133,6 @@ GET    /geo/city/edit/:id                controllers.CityController.edit(id: Lon
 POST   /geo/city/edit/:id                controllers.CityController.doEdit(id: Long)
 POST   /geo/city/remove/:id              controllers.CityController.remove(id: Long)
 GET    /geo/city                         controllers.CityController.list
-
-GET    /geo/map/create                   controllers.MapEngineController.create
-POST   /geo/map/create                   controllers.MapEngineController.doCreate()
-GET    /geo/map/edit/:id                 controllers.MapEngineController.edit(id: Long)
-POST   /geo/map/edit/:id                 controllers.MapEngineController.doEdit(id: Long)
-POST   /geo/map/remove/:id               controllers.MapEngineController.remove(id: Long)
-GET    /geo/map                          controllers.MapEngineController.list
 
 # ALLWAYS LAST LINE!!!!
 GET    /*path                            controllers.StandardPageController.getStdPage(path: String)

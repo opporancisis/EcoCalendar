@@ -10,6 +10,8 @@ import models.event.Event;
 import models.event.GrandEvent;
 import play.data.format.Formatters;
 import play.db.ebean.Model;
+import utils.formatter.EventTagFormatter;
+import utils.formatter.EventTagsListAnnotationFormatter;
 
 @Entity
 public class EventTag extends Model {

@@ -1,4 +1,4 @@
-package utils;
+package utils.ebean;
 
 import java.sql.Date;
 import java.sql.Types;

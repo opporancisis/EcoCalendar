@@ -11,9 +11,6 @@ import com.feth.play.module.pa.user.AuthUser;
 @Entity
 public class LinkedAccount extends Model {
 
-	/**
-*
-*/
 	private static final long serialVersionUID = 1L;
 
 	@Id

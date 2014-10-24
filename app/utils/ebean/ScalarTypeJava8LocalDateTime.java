@@ -1,4 +1,4 @@
-package utils;
+package utils.ebean;
 
 import java.sql.Timestamp;
 import java.sql.Types;

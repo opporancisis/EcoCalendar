@@ -115,35 +115,17 @@ public class StandardPageController extends Controller {
 
 	@Transactional
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result moveUp(long id) {
+	public static Result moveBy(long id, long by) {
 		StandardPage page = StandardPage.find.byId(id);
 		if (page == null) {
 			return Application.notFoundObject(StandardPage.class, id);
 		}
-		StandardPage previous = StandardPage.find.query().where()
-				.eq("orderInd", page.orderInd - 1).findUnique();
-		if (previous != null) {
-			previous.orderInd = page.orderInd;
-			page.orderInd = page.orderInd - 1;
-			previous.update();
-			page.update(id);
-		}
-		return redirect(routes.StandardPageController.list());
-	}
-
-	@Transactional
-	@Restrict(@Group(RoleName.ADMIN))
-	public static Result moveDown(long id) {
-		StandardPage page = StandardPage.find.byId(id);
-		if (page == null) {
-			return Application.notFoundObject(StandardPage.class, id);
-		}
-		StandardPage next = StandardPage.find.query().where()
-				.eq("orderInd", page.orderInd + 1).findUnique();
-		if (next != null) {
-			next.orderInd = page.orderInd;
-			page.orderInd = page.orderInd + 1;
-			next.update();
+		StandardPage moved = StandardPage.find.query().where()
+				.eq("orderInd", page.orderInd + by).findUnique();
+		if (moved != null) {
+			moved.orderInd = page.orderInd;
+			page.orderInd += by;
+			moved.update();
 			page.update(id);
 		}
 		return redirect(routes.StandardPageController.list());

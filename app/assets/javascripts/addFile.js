@@ -5,7 +5,7 @@ $(document).ready(function() {
 		.append($("<span/>").addClass("glyphicon glyphicon-plus"))
 		.click(function(event) {
 			event.preventDefault();
-			app.ui.dialogForm("/file/add", {
+			app.ui.dialogForm(jsRoutes.controllers.FileController.doCreate().url, {
 				dataType: "json",
 				success: function(data, status, xhr, form) {
 					$("<option/>").text(data.name).val(data.id).appendTo(select);

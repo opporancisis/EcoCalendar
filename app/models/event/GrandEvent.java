@@ -15,8 +15,10 @@ import models.event.tag.EventTagsList;
 import models.organization.Organization;
 import models.organization.Organizations;
 import models.user.User;
+import play.data.format.Formatters;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
+import utils.formatter.GrandEventFormatter;
 
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
@@ -25,6 +27,10 @@ import com.avaje.ebean.annotation.UpdatedTimestamp;
 public class GrandEvent extends Model {
 
 	private static final long serialVersionUID = 1L;
+
+	static {
+		Formatters.register(GrandEvent.class, new GrandEventFormatter());
+	}
 
 	@Id
 	public Long id;

@@ -1,6 +1,6 @@
 @(page: models.standardPage.StandardPage)
 
-@import scala.collection.mutable.LinkedHashMap; var disabledExist=false
+@import scala.collection.mutable.LinkedHashMap
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
 @import be.objectify.deadbolt.java.DeadboltViewSupport._
 
@@ -18,22 +18,25 @@
 	)
 ) {
 
-	<div class="row">
-		@if(page.description == null || page.description.isEmpty) {@Messages("label.no.content")} else {@Html(page.description)}
-	</div>
-	
-	@if(!page.attachments.isEmpty) {
-		<div class="row">
-			@for(attachment <- page.attachments) {
-				@if(attachment.isImage) {
-					<img src="@routes.FileController.get(attachment.id)" />
-				} else {
-					<a href="@routes.FileController.get(attachment.id)">@attachment.name</a>
-				}
-				<br />
-			}
-		</div>
+<div>
+	@if(page.description == null || page.description.isEmpty) {
+		@Messages("label.no.content")
+	} else {
+		@play.twirl.api.Html(page.description)
 	}
+</div>
 
+@if(!page.attachments.isEmpty) {
+	<div>
+		@for(attachment <- page.attachments) {
+			@if(attachment.isImage) {
+				<img src="@routes.FileController.get(attachment.id)" />
+			} else {
+				<a href="@routes.FileController.get(attachment.id)">@attachment.name</a>
+			}
+			<br />
+		}
+	</div>
 }
 
+}

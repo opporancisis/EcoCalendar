@@ -14,6 +14,8 @@ pipelineStages := Seq(uglify, digest, gzip)
 
 testOptions += Tests.Argument(TestFrameworks.JUnit, "-v")
 
+offline := true
+
 resolvers ++= Seq(
 	Resolver.url("Objectify Play Repository", url("http://schaloner.github.com/releases/"))(Resolver.ivyStylePatterns),
 	Resolver.url("Objectify Play Snapshot Repository", url("http://schaloner.github.com/snapshots/"))(Resolver.ivyStylePatterns),

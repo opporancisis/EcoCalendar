@@ -8,18 +8,16 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import models.geo.City;
 import models.geo.Country;
-import models.karma.Karma;
+import models.karma.KarmaChange;
 import models.message.Message;
 import models.sys.Setting;
 import models.sys.SettingName;
@@ -81,8 +79,22 @@ public class User extends Model implements Subject {
 
 	public Boolean phonePublic;
 
-	@OneToOne
-	public Karma karma;
+	/**
+	 * При создании пользователя (первой авторизации) карма = 0. С кармой < 50
+	 * события пользователя проходят премодерацию (администратором). При этом
+	 * модерируя администратор может прибавить кармы от 0 до 10. Например, ему
+	 * нравится событие, оно корректно оформленно, тогда он делает мероприятие
+	 * публичным (одобряет его) и прибавляет +10 в карму создателю. Если в
+	 * описании мероприятия есть неточности, но сделать его публичным уже можно,
+	 * то +5 в карму. Это для примера, но в конечном итоге все на субъективный
+	 * взгляд администратора. Если он считает ценным вклад создателя (созданное
+	 * мероприятие) и хочет, чтобы создатель быстрее набрал пороговую карму
+	 * (50), то он увеличивает ее на большое значение. Иначе - на меньшее.
+	 */
+	public Long karma;
+
+	@OneToMany(cascade = CascadeType.ALL)
+	public List<KarmaChange> karmaHistory;
 
 	@ManyToOne
 	public City city;
@@ -107,7 +119,7 @@ public class User extends Model implements Subject {
 
 	public boolean emailValidated;
 
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToMany
 	@RolesList
 	public List<SecurityRole> roles;
 
@@ -244,7 +256,7 @@ public class User extends Model implements Subject {
 
 	@Transactional
 	public static User create(final AuthUser authUser) {
-		final User user = new User();
+		User user = new User();
 		user.roles = Collections.singletonList(SecurityRole
 				.findByRoleName(models.user.RoleName.USER));
 		// user.permissions = new ArrayList<>();
@@ -254,7 +266,7 @@ public class User extends Model implements Subject {
 		user.linkedAccounts = Collections.singletonList(LinkedAccount.create(authUser));
 
 		if (authUser instanceof EmailIdentity) {
-			final EmailIdentity identity = (EmailIdentity) authUser;
+			EmailIdentity identity = (EmailIdentity) authUser;
 			// Remember, even when getting them from FB & Co., emails should be
 			// verified within the application as a security breach there might
 			// break your security as well!
@@ -263,17 +275,17 @@ public class User extends Model implements Subject {
 		}
 
 		if (authUser instanceof NameIdentity) {
-			final NameIdentity identity = (NameIdentity) authUser;
-			final String name = identity.getName();
+			NameIdentity identity = (NameIdentity) authUser;
+			String name = identity.getName();
 			if (name != null) {
 				user.nick = name;
 			}
 		}
 
 		if (authUser instanceof FirstLastNameIdentity) {
-			final FirstLastNameIdentity identity = (FirstLastNameIdentity) authUser;
-			final String firstName = identity.getFirstName();
-			final String lastName = identity.getLastName();
+			FirstLastNameIdentity identity = (FirstLastNameIdentity) authUser;
+			String firstName = identity.getFirstName();
+			String lastName = identity.getLastName();
 			if (lastName != null) {
 				user.nick = lastName;
 			}
@@ -366,5 +378,9 @@ public class User extends Model implements Subject {
 		}
 		delete();
 		return true;
+	}
+
+	public boolean hasEnoughPowerToPublishEvents() {
+		return isAdmin() || (karma != null && karma >= 50);
 	}
 }
