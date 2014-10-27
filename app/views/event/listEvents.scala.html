@@ -38,7 +38,7 @@
 			todayHighlight : true
 		});
 	});
-	var ids = ["@Html(events.map(_.id).mkString("\",\""))"];
+	var ids = [@play.twirl.api.Html(events.map("\"" + _.id + "\"").mkString(","))];
 	</script>
 }
 
