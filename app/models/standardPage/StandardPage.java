@@ -8,7 +8,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
 import models.file.UploadedFile;
-import models.file.UploadedFiles;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,7 +36,6 @@ public class StandardPage extends Model {
 	public String description;
 
 	@ManyToMany
-	@UploadedFiles
 	public List<UploadedFile> attachments;
 
 	public static final Finder<Long, StandardPage> find = new Finder<>(

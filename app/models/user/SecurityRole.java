@@ -25,7 +25,6 @@ import javax.persistence.Id;
 import play.data.format.Formatters;
 import play.data.format.Formatters.SimpleFormatter;
 import play.db.ebean.Model;
-import utils.formatter.RolesListAnnotationFormatter;
 import be.objectify.deadbolt.core.models.Role;
 
 /**
@@ -38,7 +37,6 @@ public class SecurityRole extends Model implements Role {
 
 	static {
 		Formatters.register(SecurityRole.class, new SecurityRoleFormatter());
-		Formatters.register(List.class, new RolesListAnnotationFormatter());
 	}
 
 	@Id

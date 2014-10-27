@@ -13,7 +13,6 @@ import play.data.format.Formatters;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
 import utils.formatter.OrganizationFormatter;
-import utils.formatter.OrganizationsListAnnotationFormatter;
 
 @Entity
 public class Organization extends Model {
@@ -22,7 +21,6 @@ public class Organization extends Model {
 
 	static {
 		Formatters.register(Organization.class, new OrganizationFormatter());
-		Formatters.register(List.class, new OrganizationsListAnnotationFormatter());
 	}
 
 	@Id
@@ -31,6 +29,7 @@ public class Organization extends Model {
 	@Required
 	public String name;
 
+	// TODO: make rich-edit control for description
 	@Required
 	@Lob
 	public String description;

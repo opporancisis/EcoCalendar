@@ -1,0 +1,69 @@
+@(events: Map[utils.DatesInterval, models.event.Event],
+	startDate: java.time.LocalDate,
+	endDate: java.time.LocalDate)
+
+@import scala.collection.mutable.LinkedHashMap
+@import be.objectify.deadbolt.core.utils.TemplateUtils._
+@import be.objectify.deadbolt.java.DeadboltViewSupport._
+@import be.objectify.deadbolt.java.views.html._
+
+@user = @{
+	ctx.args.get("user").asInstanceOf[models.user.User]
+}
+
+@implicitScripts = {
+	<script>
+	</script>
+}
+
+@ddMMMM = @{java.time.format.DateTimeFormatter.ofPattern("dd MMMM")}
+@dd = @{java.time.format.DateTimeFormatter.ofPattern("dd")}
+
+@main(
+	"nav.event.export.vk",
+	leftNav = LinkedHashMap(
+		"nav.event.list" -> routes.EventController.list
+	),
+	breadcrumbs = LinkedHashMap(
+		"nav.event.list" -> routes.EventController.list,
+		"nav.event.export.vk" -> routes.EventController.exportEvents
+	)
+) {
+<div class="well well-sm">
+Эко-события на
+@if(startDate.getMonthValue() == endDate.getMonthValue()) {
+	@dd.format(startDate) - @ddMMMM.format(endDate)
+} else {
+	@ddMMMM.format(startDate) - @ddMMMM.format(endDate)
+}
+.
+<br /><br />
+
+@for((interval, e) <- events) {
+
+	*
+	@if(interval.from.equals(interval.till)) {
+		@ddMMMM.format(interval.from), @Messages("label.week.day." + interval.from.getDayOfWeek), @Formatters.print(e.days.get(0).firstItem.start) - @Formatters.print(e.days.get(0).lastItem.end)
+	} else {
+		@if(interval.from.getMonthValue() == interval.till.getMonthValue()) {
+			@dd.format(interval.from) - @ddMMMM.format(interval.till)
+		} else {
+			@ddMMMM.format(interval.from) - @ddMMMM.format(interval.till)
+		}
+		, @Messages("label.week.day." + interval.from.getDayOfWeek) -  @Messages("label.week.day." + interval.till.getDayOfWeek)
+	}
+	<br />
+	@e.name
+	<br />
+	@e.description
+	<br />
+	@if(e.additionalInfoLink != null && !e.additionalInfoLink.isEmpty) {
+		Подробнее: <a href="@e.additionalInfoLink">@e.additionalInfoLink</a>
+		<br />
+	}
+	@{val contact = e.contact(); if(contact != null) {Html(Messages("label.event.contact.info", contact) + "<br />")} else null}
+	<br />
+}
+</div>
+
+}

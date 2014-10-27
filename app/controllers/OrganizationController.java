@@ -61,6 +61,10 @@ public class OrganizationController extends Controller {
 	}
 
 	public static Result details(long id) {
-		return TODO;
+		Organization org = Organization.find.byId(id);
+		if (org == null) {
+			return Application.notFoundObject(Organization.class, id);
+		}
+		return ok(views.html.organization.showOrganization.render(org));
 	}
 }

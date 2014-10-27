@@ -51,6 +51,9 @@
 		
 		// Custom select
 		$("select.form-control").multiselect();
+
+		// Bootstrap tooltips
+		$("[title]").tooltip();
 	});
 	
 	// Close bootbox dialog on Esc

@@ -1,12 +1,15 @@
 package models.event;
 
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.persistence.CascadeType;
@@ -19,16 +22,20 @@ import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
 import models.event.tag.EventTag;
-import models.event.tag.EventTagsList;
 import models.geo.GeoCoords;
 import models.organization.Organization;
-import models.organization.Organizations;
 import models.user.User;
 
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.URL;
 
+import play.data.format.Formatters;
+import play.data.format.Formatters.SimpleFormatter;
 import play.data.validation.Constraints.Required;
+import play.data.validation.ValidationError;
 import play.db.ebean.Model;
+import play.i18n.Messages;
 import play.libs.Json;
 
 import com.avaje.ebean.annotation.CreatedTimestamp;
@@ -40,6 +47,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 public class Event extends Model {
 
 	private static final long serialVersionUID = 1L;
+	
+	static {
+		Formatters.register(Event.class, new EventFormatter());
+	}
 
 	@Id
 	public Long id;
@@ -52,6 +63,12 @@ public class Event extends Model {
 
 	@ManyToOne
 	public User author;
+
+	public Boolean useAuthorNameAndPhone;
+
+	public String contactName;
+
+	public String contactPhone;
 
 	public Boolean published;
 
@@ -79,12 +96,10 @@ public class Event extends Model {
 	@OneToMany(cascade = CascadeType.ALL)
 	public List<EventDayProgram> days;
 
-	@ManyToMany(cascade = CascadeType.ALL)
-	@EventTagsList
+	@ManyToMany(mappedBy = "events")
 	public List<EventTag> tags;
 
-	@ManyToMany(cascade = CascadeType.ALL)
-	@Organizations
+	@ManyToMany(mappedBy = "events")
 	public List<Organization> organizations;
 
 	public static Finder<Long, Event> find = new Finder<>(Long.class, Event.class);
@@ -98,7 +113,31 @@ public class Event extends Model {
 	}
 
 	public EventDayProgram lastDay() {
-		return days.get(days.size() - 1);
+		EventDayProgram edp = null;
+		for (EventDayProgram day : days) {
+			if (edp == null) {
+				edp = day;
+				continue;
+			}
+			if (edp.date.isBefore(day.date)) {
+				edp = day;
+			}
+		}
+		return edp;
+	}
+
+	public EventDayProgram firstDay() {
+		EventDayProgram edp = null;
+		for (EventDayProgram day : days) {
+			if (edp == null) {
+				edp = day;
+				continue;
+			}
+			if (edp.date.isAfter(day.date)) {
+				edp = day;
+			}
+		}
+		return edp;
 	}
 
 	public void initTimetableJson() {
@@ -115,10 +154,33 @@ public class Event extends Model {
 		timetableJson = arr.toString();
 	}
 
-	public String processTimetable() {
+	public List<ValidationError> validate() {
+		List<ValidationError> errors = processTimetable();
+		if (errors != null) {
+			return errors;
+		}
+		if (parent != null) {
+			if (parent.startDate.isAfter(firstDay().date)) {
+				errors = new ArrayList<>();
+				errors.add(new ValidationError("", Messages.get(
+						"label.event.error.parentStartDateIsAfter", parent.startDate)));
+			}
+			if (parent.endDate.isBefore(lastDay().date)) {
+				if (errors == null) {
+					errors = new ArrayList<>();
+				}
+				errors.add(new ValidationError("", Messages.get(
+						"label.event.error.parentEndDateIsBefore", parent.endDate)));
+			}
+		}
+		return errors;
+	}
+
+	private List<ValidationError> processTimetable() {
 		JsonNode timetableArr = Json.parse(timetableJson);
 		if (!timetableArr.isArray() || timetableArr.size() == 0) {
-			return "incorrect timetable data format";
+			return Arrays.<ValidationError> asList(new ValidationError("", Messages
+					.get("error.incorrect.timetable.data.format")));
 		}
 		Map<LocalDate, EventDayProgram> items = new HashMap<>();
 		for (JsonNode elem : timetableArr) {
@@ -141,9 +203,48 @@ public class Event extends Model {
 	}
 
 	public void updateWithTimetableAndCoords(long id, GeoCoords newCoords) {
-		processTimetable();
 		update(id);
 		newCoords.update(this.coords.id);
+	}
 
+	public String contact() {
+		if (BooleanUtils.isTrue(useAuthorNameAndPhone)) {
+			if (StringUtils.isBlank(author.phone)) {
+				return null;
+			}
+			if (StringUtils.isNotBlank(author.name)) {
+				return author.name + ", " + author.phone;
+			} else {
+				return author.phone;
+			}
+		} else {
+			if (StringUtils.isBlank(contactPhone)) {
+				return null;
+			}
+			if (StringUtils.isNotBlank(contactName)) {
+				return contactName + ", " + contactPhone;
+			} else {
+				return contactPhone;
+			}
+		}
+	}
+
+	public static class EventFormatter extends SimpleFormatter<Event> {
+
+		@Override
+		public Event parse(String text, Locale locale) throws ParseException {
+			long id;
+			try {
+				id = Long.parseLong(text);
+			} catch (NumberFormatException e) {
+				throw new ParseException(text, 0);
+			}
+			return Event.find.byId(id);
+		}
+
+		@Override
+		public String print(Event t, Locale locale) {
+			return "" + t.id;
+		}
 	}
 }

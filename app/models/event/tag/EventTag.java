@@ -11,7 +11,6 @@ import models.event.GrandEvent;
 import play.data.format.Formatters;
 import play.db.ebean.Model;
 import utils.formatter.EventTagFormatter;
-import utils.formatter.EventTagsListAnnotationFormatter;
 
 @Entity
 public class EventTag extends Model {
@@ -20,7 +19,6 @@ public class EventTag extends Model {
 
 	static {
 		Formatters.register(EventTag.class, new EventTagFormatter());
-		Formatters.register(List.class, new EventTagsListAnnotationFormatter());
 	}
 
 	@Id

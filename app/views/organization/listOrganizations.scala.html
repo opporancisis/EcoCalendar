@@ -16,6 +16,11 @@
 	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.pager.min.js")"></script>
 	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.widgets.min.js")"></script>
 	<script type="text/javascript" src="@routes.Assets.at("javascripts/tables.js")"></script>
+	<link href="@routes.Assets.at("lib/select2/select2.css")" rel="stylesheet">
+	<link href="@routes.Assets.at("lib/select2/select2-bootstrap.css")" rel="stylesheet">
+	<script type="text/javascript" src="@routes.Assets.at("lib/select2/select2.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("lib/select2/select2_locale_ru.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/tablesorter/widget-columnSelector.js")"></script>
 }
 
 @main(
@@ -26,11 +31,14 @@
 ) {
 
 @if(!orgs.isEmpty) {
+	<button class="column-selector btn btn-default">@Messages("label.choose.columns")</button>
+	<br /><br />
 	<table class="table table-striped js-tablesorter">
 		<thead>
 			<th>@Messages("label.name")</th>
 			<th>@Messages("label.event.count")</th>
 			<th>@Messages("label.grand.event.count")</th>
+			<th>@Messages("label.description")</th>
 			<th class="sorter-false filter-false">@Messages("label.action")</th>
 		</thead>
 		<tbody>
@@ -39,7 +47,11 @@
 					<td>@org.name</td>
 					<td>@org.events.size</td>
 					<td>@org.grandEvents.size</td>
+					<td>@org.description</td>
 					<td>
+						<a class="btn btn-default btn-xs" href='@{routes.OrganizationController.details(org.id)}' title="@Messages("label.do.edit")">
+							<span class="glyphicon glyphicon-eye-open"></span>
+						</a>
 						<a class="btn btn-default btn-xs" href='@{routes.OrganizationController.edit(org.id)}' title="@Messages("label.do.edit")">
 							<span class="glyphicon glyphicon-pencil"></span>
 						</a>

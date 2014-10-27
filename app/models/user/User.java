@@ -43,12 +43,8 @@ import com.feth.play.module.pa.user.EmailIdentity;
 import com.feth.play.module.pa.user.FirstLastNameIdentity;
 import com.feth.play.module.pa.user.NameIdentity;
 
-/**
- * Initial version based on work by Steve Chaloner (steve@objectify.be) for
- * Deadbolt2
- */
 @Entity
-@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = { "NICK" }))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "NICK" }))
 public class User extends Model implements Subject {
 
 	private static final long serialVersionUID = 1L;
@@ -73,11 +69,7 @@ public class User extends Model implements Subject {
 
 	public String name;
 
-	public Boolean namePublic;
-
 	public String phone;
-
-	public Boolean phonePublic;
 
 	/**
 	 * При создании пользователя (первой авторизации) карма = 0. С кармой < 50
@@ -120,7 +112,6 @@ public class User extends Model implements Subject {
 	public boolean emailValidated;
 
 	@ManyToMany
-	@RolesList
 	public List<SecurityRole> roles;
 
 	@OneToMany(cascade = CascadeType.ALL)

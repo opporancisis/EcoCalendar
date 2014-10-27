@@ -15,6 +15,11 @@
 	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.pager.min.js")"></script>
 	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.widgets.min.js")"></script>
 	<script type="text/javascript" src="@routes.Assets.at("javascripts/tables.js")"></script>
+	<link href="@routes.Assets.at("lib/select2/select2.css")" rel="stylesheet">
+	<link href="@routes.Assets.at("lib/select2/select2-bootstrap.css")" rel="stylesheet">
+	<script type="text/javascript" src="@routes.Assets.at("lib/select2/select2.min.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("lib/select2/select2_locale_ru.js")"></script>
+	<script type="text/javascript" src="@routes.Assets.at("javascripts/tablesorter/widget-columnSelector.js")"></script>
 }
 
 @main(
@@ -28,12 +33,14 @@
 ) {
 
 @if(!events.isEmpty) {
+	<button class="column-selector btn btn-default">@Messages("label.choose.columns")</button>
+	<br /><br />
 	<table class="events table table-striped js-tablesorter">
 		<thead>
 			<th>@Messages("label.name")</th>
 			<th>@Messages("label.start")</th>
 			<th>@Messages("label.end")</th>
-			<th>@Messages("label.events")</th>
+			<th>@Messages("label.entity.plural.Event")</th>
 			<th>@Messages("label.author")</th>
 			<th>@Messages("label.organizations")</th>
 			<th>@Messages("label.tags")</th>
@@ -47,11 +54,11 @@
 				<td>@Formatters.print(event.endDate)</td>
 				<td>@event.events.size</td>
 				<td>@event.author.nick</td>
-				<td>@event.organizations.map(_.name).mkString(", ")</td>
+				<td>@play.twirl.api.Html(event.organizations.map(o => "<a href=\"" + routes.OrganizationController.details(o.id) + "\">" + o.name + "</a>").mkString(", "))</td>
 				<td>@event.tags.map(_.name).mkString(", ")</td>
 				<td>
 					@restrict(la(as("admin"))) {
-						<a class="btn btn-default btn-xs" href='@{routes.GrandEventController.edit(event.id)}' title="@Messages("label.do.edit")">
+						<a class="btn btn-default btn-xs" href='@routes.GrandEventController.edit(event.id)' title="@Messages("label.do.edit")">
 							<span class="glyphicon glyphicon-pencil"></span>
 						</a>
 						<a class="btn btn-default btn-xs js-ajax" title="@Messages("label.do.remove")"
@@ -67,7 +74,7 @@
 		}
 		</tbody>
 		<tfoot>
-			@_tablePager(columns = 7)
+			@_tablePager(columns = 8)
 		</tfoot>
 	</table>
 } else {

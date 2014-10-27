@@ -39,14 +39,14 @@ public class UserController extends Controller {
 
 	@Restrict(@Group(RoleName.ADMIN))
 	public static Result create() {
-		return ok(views.html.user.editUser.render(EDIT_FORM));
+		return ok(views.html.user.editUser.render(EDIT_FORM, null));
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
 	public static Result doCreate() {
-		final Form<User> filledForm = EDIT_FORM.bindFromRequest();
+		Form<User> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
-			return badRequest(views.html.user.editUser.render(filledForm));
+			return badRequest(views.html.user.editUser.render(filledForm, null));
 		}
 		User user = filledForm.get();
 		user.save();
@@ -60,8 +60,7 @@ public class UserController extends Controller {
 			return Application.notFoundObject(User.class, id);
 		}
 		Form<User> filledForm = EDIT_FORM.fill(user);
-		filledForm.data().put("originalName", user.somename());
-		return ok(views.html.user.editUser.render(filledForm));
+		return ok(views.html.user.editUser.render(filledForm, user));
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
@@ -73,7 +72,6 @@ public class UserController extends Controller {
 		Form<User> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			filledForm.data().put("id", Long.toString(id));
-			filledForm.data().put("originalName", oldUser.somename());
 			try {
 				filledForm.data().put("roles",
 						Formatters.print(User.class.getField("roles"), oldUser.roles));
@@ -81,7 +79,7 @@ public class UserController extends Controller {
 				throw new Error();
 			}
 			filledForm.data().put("lastLogin", Formatters.print(oldUser.lastLogin));
-			return badRequest(views.html.user.editUser.render(filledForm));
+			return badRequest(views.html.user.editUser.render(filledForm, oldUser));
 		}
 		User user = filledForm.get();
 		boolean emailChanged = !StringUtils.equalsIgnoreCase(oldUser.email, user.email);

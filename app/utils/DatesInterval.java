@@ -18,8 +18,12 @@ public class DatesInterval {
 
 	public DatesInterval() {
 		from = LocalDate.now();
-		from = from.minusDays(7);
-		till = LocalDate.now();
+		till = from.plusDays(7);
+	}
+
+	public DatesInterval(LocalDate from, LocalDate till) {
+		this.from = from;
+		this.till = till;
 	}
 
 	public static Form<DatesInterval> fill(DatesInterval value) {
@@ -38,4 +42,36 @@ public class DatesInterval {
 		}
 		return null;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((from == null) ? 0 : from.hashCode());
+		result = prime * result + ((till == null) ? 0 : till.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DatesInterval other = (DatesInterval) obj;
+		if (from == null) {
+			if (other.from != null)
+				return false;
+		} else if (!from.equals(other.from))
+			return false;
+		if (till == null) {
+			if (other.till != null)
+				return false;
+		} else if (!till.equals(other.till))
+			return false;
+		return true;
+	}
+
 }

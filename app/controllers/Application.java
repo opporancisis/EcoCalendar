@@ -57,7 +57,6 @@ public class Application extends Controller {
 	public static Result jsRoutes() {
 		return ok(
 				Routes.javascriptRouter("jsRoutes", routes.javascript.Signup.forgotPassword(),
-						routes.javascript.EventController.getEvents(),
 						routes.javascript.EventController.edit(),
 						routes.javascript.EventController.remove(),
 						routes.javascript.UserController.details(),

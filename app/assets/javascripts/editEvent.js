@@ -3,27 +3,25 @@ $(document).ready(function() {
 
 	var myMap, point, _cal, pageModel;
 
-	if (typeof ymaps == 'undefined') {
-		$('body').prepend('<div class="alert alert-danger">Не удалось запустить янедкс-карты. Убедитесь, что у Вас последняя версия браузера. Или проверьте связь с Интернетом.</div>');
-		return;
-	}
-
 	pageModel = new PageModel();
 	ko.applyBindings(pageModel);
 
-	ymaps.ready(initMap);
+	if (typeof ymaps == 'undefined') {
+		bootbox.alert(Messages("error.yandex.maps"));
+	} else {
+		ymaps.ready(initMap);
+	}
 
 	initCalendar();
 	
 	$('input[type="submit"]').click(function() {
-		$('body > .alert.alert-danger').remove();
 		var data = _cal.fullCalendar('clientEvents');
 		if (!data.length) {
-			$('body').prepend('<div class="alert alert-danger">Необходимо указать пункты программы мероприятия в календаре</div>');
+			bootbox.alert(Messages("error.need.program.items"));
 			return false;
 		}
 		if (!point) {
-			$('body').prepend('<div class="alert alert-danger">Необходимо указать местоположение на карте</div>');
+			bootbox.alert(Messages("error.need.map.point"));
 			return false;
 		}
 		var events = [];
@@ -98,6 +96,8 @@ $(document).ready(function() {
 		self.latitude = ko.observable(initialLatitude);
 		self.longitude = ko.observable(initialLongitude);
 		self.timetable = ko.observable();
+		self.useAuthorNameAndPhone = ko.observable(true);
+		
 	}
 
 	function newItemDialog(start, end) {
@@ -132,6 +132,7 @@ $(document).ready(function() {
 				}
 			}
 		});
+		$('#itemTitle').focus();
 	}
 	
 	function changeItemDialog(calEvent) {
@@ -170,6 +171,7 @@ $(document).ready(function() {
 				}
 			}
 		});
+		$('#itemTitle').focus();
 	}
 	
 	function initCalendar() {

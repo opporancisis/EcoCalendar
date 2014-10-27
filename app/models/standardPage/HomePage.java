@@ -8,10 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
 import models.file.UploadedFile;
-import models.file.UploadedFiles;
 import models.sys.Setting;
 import models.sys.SettingName;
-import play.data.validation.Constraints.Min;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
 import play.i18n.Messages;
@@ -31,7 +29,6 @@ public class HomePage extends Model {
 	public String body;
 
 	@ManyToMany
-	@UploadedFiles
 	public List<UploadedFile> attachments;
 
 	public static final Finder<Long, HomePage> find = new Finder<>(Long.class,

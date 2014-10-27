@@ -2,29 +2,25 @@ package controllers;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import models.event.Event;
-import models.event.EventDayProgram;
-import models.event.EventProgamItem;
 import models.event.GrandEvent;
 import models.event.tag.EventTag;
-import models.geo.City;
 import models.geo.Country;
 import models.geo.GeoCoords;
 import models.organization.Organization;
 import models.user.User;
 import play.data.Form;
-import play.data.format.Formatters;
-import play.libs.Json;
+import play.i18n.Messages;
 import play.mvc.Controller;
 import play.mvc.Result;
+import utils.DatesInterval;
 import be.objectify.deadbolt.java.actions.SubjectPresent;
-
-import com.avaje.ebean.ExpressionList;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import controllers.EventController.ExportForm;
 import controllers.helpers.ContextAugmenter;
 import controllers.helpers.ContextAugmenterAction;
 
@@ -33,77 +29,27 @@ public class EventController extends Controller {
 
 	private static final Form<Event> EDIT_FORM = Form.form(Event.class);
 	private static final Form<GeoCoords> COORDS_FORM = Form.form(GeoCoords.class);
-	private static final Form<EventsFilter> FILTER = Form.form(EventsFilter.class);
+	private static final Form<ExportForm> EXPORT_FORM = Form.form(ExportForm.class);
 
-	public static Result list() {
-		return ok(views.html.event.listEvents.render());
+	private static Result list(Form<DatesInterval> intervalForm) {
+		DatesInterval f = intervalForm.get();
+		List<Event> events = Event.find.query().where().ge("days.date", f.from)
+				.le("days.date", f.till).findList();
+		return ok(views.html.event.listEvents.render(events, intervalForm));
+
 	}
 
-	public static Result getEvents() {
-		Form<EventsFilter> filledForm = FILTER.bindFromRequest();
-		if (filledForm.hasErrors()) {
-			return badRequest(filledForm.errorsAsJson());
-		}
-		EventsFilter filter = filledForm.get();
-		ExpressionList<Event> query = Event.find.query().where();
-		if (filter.start != null) {
-			query.ge("days.date", filter.start);
-		}
-		if (filter.end != null) {
-			query.le("days.date", filter.end);
-		}
-		if (filter.city != null) {
-			query.eq("coords.city", filter.city);
-		} else if (filter.country != null) {
-			query.eq("coords.city.country", filter.city);
-		}
+	public static Result list() {
+		return list(DatesInterval.fill(new DatesInterval()));
+	}
 
-		if (!filter.organizations.isEmpty()) {
-			query.disjunction();
-			for (Organization org : filter.organizations) {
-				query.eq("organizations", org);
-			}
-			query.endJunction();
+	public static Result doChangeInterval() {
+		Form<DatesInterval> filledForm = DatesInterval.bindFromRequest();
+		if (filledForm.hasErrors()) {
+			return badRequest(views.html.event.listEvents.render(Collections.<Event> emptyList(),
+					filledForm));
 		}
-		if (!filter.tags.isEmpty()) {
-			query.disjunction();
-			for (EventTag tag : filter.tags) {
-				query.eq("tags", tag);
-			}
-			query.endJunction();
-		}
-		List<Event> events = query.findList();
-		ObjectNode res = Json.newObject();
-		ArrayNode arr = res.putArray("events");
-		for (Event event : events) {
-			EventDayProgram firstDay = event.days.get(0);
-			EventDayProgram lastDay = event.days.get(event.days.size() - 1);
-			EventProgamItem firstItemFirstDay = firstDay.items.get(0);
-			EventProgamItem lastItemLastDay = lastDay.items.get(lastDay.items.size() - 1);
-			ObjectNode o = arr.addObject().put("id", event.id).put("name", event.name)
-					.put("city", event.coords.city.name)
-					.put("startDate", Formatters.print(firstDay.date))
-					.put("endDate", Formatters.print(lastDay.date))
-					.put("startTime", Formatters.print(firstItemFirstDay.start))
-					.put("endTime", Formatters.print(lastItemLastDay.end));
-			o.putObject("author").put("id", event.author.id).put("name", event.author.nick);
-			if (event.parent != null) {
-				o.putObject("parent").put("id", event.parent.id).put("name", event.parent.name);
-			}
-			if (!event.organizations.isEmpty()) {
-				ArrayNode orgs = o.putArray("organizations");
-				for (Organization org : event.organizations) {
-					orgs.addObject().put("id", org.id).put("name", org.name);
-				}
-			}
-			if (!event.tags.isEmpty()) {
-				ArrayNode tags = o.putArray("tags");
-				for (EventTag tag : event.tags) {
-					tags.addObject().put("id", tag.id).put("name", tag.name);
-				}
-			}
-		}
-		return ok(res);
+		return list(filledForm);
 	}
 
 	@SubjectPresent
@@ -168,13 +114,14 @@ public class EventController extends Controller {
 		event.author = user;
 		event.published = user.hasEnoughPowerToPublishEvents();
 		event.coords = filledCoords.get();
-		event.processTimetable();
+		if (event.parent != null) {
+			// TODO: notify creator of grand event about new event
+			// TODO: take action upon GE settings: include sub-event
+			// automatically, or let GE-creator review (post or pre moderation)
+		}
 		event.save();
 		if (!event.published) {
 			// TODO: send message to whom?
-		}
-		if (event.parent != null) {
-			// TODO: notify creator of grand event?
 		}
 		return redirect(routes.EventController.list());
 	}
@@ -189,18 +136,57 @@ public class EventController extends Controller {
 		return ok();
 	}
 
-	public static class EventsFilter {
+	public static Result exportEvents() {
+		Form<ExportForm> filledForm = EXPORT_FORM.bindFromRequest();
+		if (filledForm.hasErrors()) {
+			flash(Application.FLASH_ERROR_KEY, Messages.get("error.event.export.unknown.error"));
+			return redirect(routes.EventController.list());
+		}
+		List<Event> events = filledForm.get().events;
+		if (events == null || events.isEmpty()) {
+			return badRequest("no events specified");
+		}
+		Map<DatesInterval, Event> map = new TreeMap<>(new Comparator<DatesInterval>() {
+			public int compare(DatesInterval i1, DatesInterval i2) {
+				if (i1.from.isBefore(i2.from)) {
+					return -1;
+				} else if (i1.from.isAfter(i2.from)) {
+					return 1;
+				} else {
+					assert i1.from.equals(i2.from);
+					// place 1-day events at the top
+					if (i1.from.equals(i1.till) && !i2.from.equals(i2.till)) {
+						return -1;
+					} else if (!i1.from.equals(i1.till) && i2.from.equals(i2.till)) {
+						return 1;
+					} else {
+						return 0;
+					}
+				}
+			}
+		});
+		LocalDate startDate = null;
+		LocalDate endDate = null;
+		for (Event event : events) {
+			LocalDate efd = event.firstDay().date;
+			LocalDate eld = event.lastDay().date;
+			map.put(new DatesInterval(efd, eld), event);
+			if (startDate == null) {
+				startDate = efd;
+				endDate = eld;
+				continue;
+			}
+			if (startDate.isAfter(efd)) {
+				startDate = efd;
+			}
+			if (endDate.isBefore(eld)) {
+				endDate = eld;
+			}
+		}
+		return ok(views.html.event.export.render(map, startDate, endDate));
+	}
 
-		public LocalDate start;
-
-		public LocalDate end;
-
-		public Country country;
-
-		public City city;
-
-		public List<Organization> organizations = Collections.emptyList();
-
-		public List<EventTag> tags = Collections.emptyList();
+	public static class ExportForm {
+		public List<Event> events;
 	}
 }

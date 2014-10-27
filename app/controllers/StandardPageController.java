@@ -48,7 +48,6 @@ public class StandardPageController extends Controller {
 				return Application.notFoundObject(StandardPage.class, id);
 			}
 			filledForm.data().put("id", Long.toString(id));
-			filledForm.data().put("originalName", standardPage.title);
 			return badRequest(views.html.standardPage.editStandardPage.render(
 					filledForm, UploadedFile.find.all()));
 		}

@@ -9,7 +9,7 @@
     <div class="col-lg-10">
 		@elements.input
         @if(elements.args.get('help)){
-            <p class="help-block">@elements.args.get('help)</p>
+            <p class="help-block">@Messages(elements.args.get('help).get.toString).capitalize</p>
         }
         @if(elements.hasErrors){
             <div class="help-block"><span class="glyphicon glyphicon-exclamation-sign"></span> @elements.errors.mkString(", ")</div>

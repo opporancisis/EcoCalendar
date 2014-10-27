@@ -26,6 +26,9 @@ create table country (
 create table event (
   id                        bigint not null,
   author_id                 bigint,
+  use_author_name_and_phone boolean,
+  contact_name              varchar(255),
+  contact_phone             varchar(255),
   published                 boolean,
   parent_id                 bigint,
   coords_id                 bigint,
@@ -73,6 +76,7 @@ create table grand_event (
   id                        bigint not null,
   author_id                 bigint,
   published                 boolean,
+  pre_moderation            boolean,
   name                      varchar(255),
   description               varchar(255),
   start_date                date,
@@ -173,15 +177,13 @@ create table uploaded_file (
   constraint pk_uploaded_file primary key (id))
 ;
 
-create table users (
+create table user (
   id                        bigint not null,
   email                     varchar(255),
   email_public              boolean,
   nick                      varchar(255),
   name                      varchar(255),
-  name_public               boolean,
   phone                     varchar(255),
-  phone_public              boolean,
   karma                     bigint,
   city_id                   bigint,
   country_for_unknown_city_id bigint,
@@ -190,8 +192,8 @@ create table users (
   last_login                timestamp,
   blocked                   boolean,
   email_validated           boolean,
-  constraint uq_users_1 unique (NICK),
-  constraint pk_users primary key (id))
+  constraint uq_user_1 unique (NICK),
+  constraint pk_user primary key (id))
 ;
 
 create table user_permission (
@@ -200,18 +202,6 @@ create table user_permission (
   constraint pk_user_permission primary key (id))
 ;
 
-
-create table event_event_tag (
-  event_id                       bigint not null,
-  event_tag_id                   bigint not null,
-  constraint pk_event_event_tag primary key (event_id, event_tag_id))
-;
-
-create table event_organization (
-  event_id                       bigint not null,
-  organization_id                bigint not null,
-  constraint pk_event_organization primary key (event_id, organization_id))
-;
 
 create table event_tag_event (
   event_tag_id                   bigint not null,
@@ -223,18 +213,6 @@ create table event_tag_grand_event (
   event_tag_id                   bigint not null,
   grand_event_id                 bigint not null,
   constraint pk_event_tag_grand_event primary key (event_tag_id, grand_event_id))
-;
-
-create table grand_event_event_tag (
-  grand_event_id                 bigint not null,
-  event_tag_id                   bigint not null,
-  constraint pk_grand_event_event_tag primary key (grand_event_id, event_tag_id))
-;
-
-create table grand_event_organization (
-  grand_event_id                 bigint not null,
-  organization_id                bigint not null,
-  constraint pk_grand_event_organization primary key (grand_event_id, organization_id))
 ;
 
 create table home_page_uploaded_file (
@@ -261,16 +239,16 @@ create table standard_page_uploaded_file (
   constraint pk_standard_page_uploaded_file primary key (standard_page_id, uploaded_file_id))
 ;
 
-create table users_security_role (
-  users_id                       bigint not null,
+create table user_security_role (
+  user_id                        bigint not null,
   security_role_id               bigint not null,
-  constraint pk_users_security_role primary key (users_id, security_role_id))
+  constraint pk_user_security_role primary key (user_id, security_role_id))
 ;
 
-create table users_user_permission (
-  users_id                       bigint not null,
+create table user_user_permission (
+  user_id                        bigint not null,
   user_permission_id             bigint not null,
-  constraint pk_users_user_permission primary key (users_id, user_permission_id))
+  constraint pk_user_user_permission primary key (user_id, user_permission_id))
 ;
 create sequence city_seq;
 
@@ -308,13 +286,13 @@ create sequence token_action_seq;
 
 create sequence uploaded_file_seq;
 
-create sequence users_seq;
+create sequence user_seq;
 
 create sequence user_permission_seq;
 
 alter table city add constraint fk_city_country_1 foreign key (country_id) references country (id) on delete restrict on update restrict;
 create index ix_city_country_1 on city (country_id);
-alter table event add constraint fk_event_author_2 foreign key (author_id) references users (id) on delete restrict on update restrict;
+alter table event add constraint fk_event_author_2 foreign key (author_id) references user (id) on delete restrict on update restrict;
 create index ix_event_author_2 on event (author_id);
 alter table event add constraint fk_event_parent_3 foreign key (parent_id) references grand_event (id) on delete restrict on update restrict;
 create index ix_event_parent_3 on event (parent_id);
@@ -326,30 +304,22 @@ alter table event_progam_item add constraint fk_event_progam_item_program_6 fore
 create index ix_event_progam_item_program_6 on event_progam_item (program_id);
 alter table geo_coords add constraint fk_geo_coords_city_7 foreign key (city_id) references city (id) on delete restrict on update restrict;
 create index ix_geo_coords_city_7 on geo_coords (city_id);
-alter table grand_event add constraint fk_grand_event_author_8 foreign key (author_id) references users (id) on delete restrict on update restrict;
+alter table grand_event add constraint fk_grand_event_author_8 foreign key (author_id) references user (id) on delete restrict on update restrict;
 create index ix_grand_event_author_8 on grand_event (author_id);
-alter table karma_change add constraint fk_karma_change_users_9 foreign key (user_id) references users (id) on delete restrict on update restrict;
-create index ix_karma_change_users_9 on karma_change (user_id);
-alter table linked_account add constraint fk_linked_account_user_10 foreign key (user_id) references users (id) on delete restrict on update restrict;
+alter table karma_change add constraint fk_karma_change_user_9 foreign key (user_id) references user (id) on delete restrict on update restrict;
+create index ix_karma_change_user_9 on karma_change (user_id);
+alter table linked_account add constraint fk_linked_account_user_10 foreign key (user_id) references user (id) on delete restrict on update restrict;
 create index ix_linked_account_user_10 on linked_account (user_id);
-alter table message add constraint fk_message_owner_11 foreign key (owner_id) references users (id) on delete restrict on update restrict;
+alter table message add constraint fk_message_owner_11 foreign key (owner_id) references user (id) on delete restrict on update restrict;
 create index ix_message_owner_11 on message (owner_id);
-alter table token_action add constraint fk_token_action_targetUser_12 foreign key (target_user_id) references users (id) on delete restrict on update restrict;
+alter table token_action add constraint fk_token_action_targetUser_12 foreign key (target_user_id) references user (id) on delete restrict on update restrict;
 create index ix_token_action_targetUser_12 on token_action (target_user_id);
-alter table users add constraint fk_users_city_13 foreign key (city_id) references city (id) on delete restrict on update restrict;
-create index ix_users_city_13 on users (city_id);
-alter table users add constraint fk_users_countryForUnknownCit_14 foreign key (country_for_unknown_city_id) references country (id) on delete restrict on update restrict;
-create index ix_users_countryForUnknownCit_14 on users (country_for_unknown_city_id);
+alter table user add constraint fk_user_city_13 foreign key (city_id) references city (id) on delete restrict on update restrict;
+create index ix_user_city_13 on user (city_id);
+alter table user add constraint fk_user_countryForUnknownCity_14 foreign key (country_for_unknown_city_id) references country (id) on delete restrict on update restrict;
+create index ix_user_countryForUnknownCity_14 on user (country_for_unknown_city_id);
 
 
-
-alter table event_event_tag add constraint fk_event_event_tag_event_01 foreign key (event_id) references event (id) on delete restrict on update restrict;
-
-alter table event_event_tag add constraint fk_event_event_tag_event_tag_02 foreign key (event_tag_id) references event_tag (id) on delete restrict on update restrict;
-
-alter table event_organization add constraint fk_event_organization_event_01 foreign key (event_id) references event (id) on delete restrict on update restrict;
-
-alter table event_organization add constraint fk_event_organization_organiz_02 foreign key (organization_id) references organization (id) on delete restrict on update restrict;
 
 alter table event_tag_event add constraint fk_event_tag_event_event_tag_01 foreign key (event_tag_id) references event_tag (id) on delete restrict on update restrict;
 
@@ -358,14 +328,6 @@ alter table event_tag_event add constraint fk_event_tag_event_event_02 foreign k
 alter table event_tag_grand_event add constraint fk_event_tag_grand_event_even_01 foreign key (event_tag_id) references event_tag (id) on delete restrict on update restrict;
 
 alter table event_tag_grand_event add constraint fk_event_tag_grand_event_gran_02 foreign key (grand_event_id) references grand_event (id) on delete restrict on update restrict;
-
-alter table grand_event_event_tag add constraint fk_grand_event_event_tag_gran_01 foreign key (grand_event_id) references grand_event (id) on delete restrict on update restrict;
-
-alter table grand_event_event_tag add constraint fk_grand_event_event_tag_even_02 foreign key (event_tag_id) references event_tag (id) on delete restrict on update restrict;
-
-alter table grand_event_organization add constraint fk_grand_event_organization_g_01 foreign key (grand_event_id) references grand_event (id) on delete restrict on update restrict;
-
-alter table grand_event_organization add constraint fk_grand_event_organization_o_02 foreign key (organization_id) references organization (id) on delete restrict on update restrict;
 
 alter table home_page_uploaded_file add constraint fk_home_page_uploaded_file_ho_01 foreign key (home_page_id) references home_page (id) on delete restrict on update restrict;
 
@@ -383,13 +345,13 @@ alter table standard_page_uploaded_file add constraint fk_standard_page_uploaded
 
 alter table standard_page_uploaded_file add constraint fk_standard_page_uploaded_fil_02 foreign key (uploaded_file_id) references uploaded_file (id) on delete restrict on update restrict;
 
-alter table users_security_role add constraint fk_users_security_role_users_01 foreign key (users_id) references users (id) on delete restrict on update restrict;
+alter table user_security_role add constraint fk_user_security_role_user_01 foreign key (user_id) references user (id) on delete restrict on update restrict;
 
-alter table users_security_role add constraint fk_users_security_role_securi_02 foreign key (security_role_id) references security_role (id) on delete restrict on update restrict;
+alter table user_security_role add constraint fk_user_security_role_securit_02 foreign key (security_role_id) references security_role (id) on delete restrict on update restrict;
 
-alter table users_user_permission add constraint fk_users_user_permission_user_01 foreign key (users_id) references users (id) on delete restrict on update restrict;
+alter table user_user_permission add constraint fk_user_user_permission_user_01 foreign key (user_id) references user (id) on delete restrict on update restrict;
 
-alter table users_user_permission add constraint fk_users_user_permission_user_02 foreign key (user_permission_id) references user_permission (id) on delete restrict on update restrict;
+alter table user_user_permission add constraint fk_user_user_permission_user__02 foreign key (user_permission_id) references user_permission (id) on delete restrict on update restrict;
 
 # --- !Downs
 
@@ -401,9 +363,9 @@ drop table if exists country;
 
 drop table if exists event;
 
-drop table if exists event_event_tag;
+drop table if exists event_tag_event;
 
-drop table if exists event_organization;
+drop table if exists organization_event;
 
 drop table if exists event_day_program;
 
@@ -411,17 +373,13 @@ drop table if exists event_progam_item;
 
 drop table if exists event_tag;
 
-drop table if exists event_tag_event;
-
 drop table if exists event_tag_grand_event;
 
 drop table if exists geo_coords;
 
 drop table if exists grand_event;
 
-drop table if exists grand_event_event_tag;
-
-drop table if exists grand_event_organization;
+drop table if exists organization_grand_event;
 
 drop table if exists home_page;
 
@@ -435,10 +393,6 @@ drop table if exists message;
 
 drop table if exists organization;
 
-drop table if exists organization_event;
-
-drop table if exists organization_grand_event;
-
 drop table if exists security_role;
 
 drop table if exists setting;
@@ -451,11 +405,11 @@ drop table if exists token_action;
 
 drop table if exists uploaded_file;
 
-drop table if exists users;
+drop table if exists user;
 
-drop table if exists users_security_role;
+drop table if exists user_security_role;
 
-drop table if exists users_user_permission;
+drop table if exists user_user_permission;
 
 drop table if exists user_permission;
 
@@ -497,7 +451,7 @@ drop sequence if exists token_action_seq;
 
 drop sequence if exists uploaded_file_seq;
 
-drop sequence if exists users_seq;
+drop sequence if exists user_seq;
 
 drop sequence if exists user_permission_seq;
 

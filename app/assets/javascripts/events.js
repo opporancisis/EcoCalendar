@@ -1,62 +1,61 @@
 $(document).ready(function() {
-	function reloadEvents() {
-		jsRoutes.controllers.EventController
-				.getEvents().ajax({
-			success: function(responseData) {
-				var data = '';
-				for (var r in responseData.events) {
-					var e = responseData.events[r];
-					data += '<tr><td>' + e.name + '</td><td>' +
-						e.startDate + ' ' + e.startTime + '</td><td>' +
-						e.endDate + ' ' + e.endTime + '</td><td><a href="' +
-						jsRoutes.controllers.UserController.details(e.author.id).absoluteURL() +
-						'">' + e.author.name + '</a></td><td>';
-					if (e.parent) {
-						data += '<a href="' +
-						jsRoutes.controllers.GrandEventController.details(e.parent.id).absoluteURL() +
-						'">' + e.parent.name + '</a>';
-					}
-					data += '</td><td>' + e.city + '</td><td>';
-					if (e.organizations) {
-						for (var orgInd = 0; orgInd < e.organizations.length; orgInd++) {
-							var org = e.organizations[orgInd];
-							if (orgInd > 0) {
-								data += ', ';
-							}
-							data += '<a href="' +
-							jsRoutes.controllers.OrganizationController.details(org.id).absoluteURL() +
-							'">' + org.name + '</a>';
-						}
-					}
-					data += '</td><td>';
-					if (e.tags) {
-						for (var tagInd = 0; tagInd < e.tags.length; tagInd++) {
-							var tag = e.tags[tagInd];
-							if (tagInd > 0) {
-								data += ', ';
-							}
-							data += '<a href="javascript:void(0);" onclick="alert(\'What should be shown after click on tag?\')">' +
-								tag.name + '</a>';
-						}
-					}
-					data += '</td><td><a class="btn btn-default btn-xs" href="' +
-						jsRoutes.controllers.EventController.edit(e.id).absoluteURL() +
-						'" title="' + Messages("label.do.edit") +
-						'"><span class="glyphicon glyphicon-pencil"></span></a><a class="btn btn-default btn-xs js-ajax" title="' +
-						Messages("label.do.remove") +
-						'" data-action="remove" data-method="POST" data-url="' +
-						jsRoutes.controllers.EventController.remove(e.id).absoluteURL() +
-						'"data-confirm="' + Messages("label.are.you.sure.you.want.to.delete", e.name) +
-						'"><span class="glyphicon glyphicon-remove"></span></a></td></tr>';
-				}
-				$(".events.js-tablesorter>tbody").append(data)
-						.trigger('updateRows', [true, null]);
-			},
-			error: function(err) {
-				$.error("Error: " + err);
-			}
-		});
-	}
+	ko.applyBindings(new PageModel());
 
-	reloadEvents();
+	function PageModel() {
+		var self = this;
+		self.events = ids;
+		self.selectedEvents = ko.observableArray([]);
+		self.allSelected = ko.computed(function() {
+			return self.selectedEvents().length == self.events.length;
+		});
+		self.remove = function() {
+			bootbox.confirm("Вы уверены что хотите удалить " +
+					self.selectedEvents().length + " событие(ий)?", function(ok) {
+				if (!ok) return;
+				$.ajax({
+						type: "POST",
+						url: jsRoutes.controllers.EventController.removeMany().url,
+						data: JSON.stringify(self.selectedEvents()),
+						dataType: "json",
+						contentType: "application/json"})
+					.then(function() {	
+						$(".table.events")
+							.find("[data-id]:has(:checked)").remove()
+							.trigger("updateRows", [false, null]);
+					});
+			});
+		}
+		self.toggleAll = function() {
+			if (self.allSelected()) {
+				self.selectedEvents.removeAll();
+			} else {
+				self.selectedEvents.removeAll();
+				self.events.forEach(function(item) {
+					self.selectedEvents.push(item);
+				});
+			}
+		}
+		self.exportEvents = function() {
+			$('#exportForm').submit();
+		}
+	}
+	
+	function getSelectedMessages() {
+		var table = $(".table.events>tbody");
+
+		return {
+			size: function() {
+				return this.getElements().length;
+			},
+			getElements: function() {
+				return table.find("[data-id]:has(:checked)");
+			},
+			getIdentifiers: function() {
+				return this.getElements().map(function() {
+					return $(this).data("id");
+				}).toArray();
+			}
+		};
+	}
+	
 });

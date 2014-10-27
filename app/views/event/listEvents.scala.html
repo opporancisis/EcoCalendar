@@ -1,4 +1,6 @@
-@()
+@(events: List[models.event.Event],
+	intervalForm: play.data.Form[_]
+)
 
 @import scala.collection.mutable.LinkedHashMap
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
@@ -10,12 +12,34 @@
 }
 
 @implicitScripts = {
-	<link href="@routes.Assets.at("stylesheets/tablesorter/theme.bootstrap.css")" rel="stylesheet">
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.pager.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.widgets.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/tables.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/events.js")"></script>
+	@_css("lib/bootstrap-datepicker/css/datepicker3.css")
+	@_css("lib/select2/select2.css")
+	@_css("lib/select2/select2-bootstrap.css")
+	@_css("stylesheets/tablesorter/theme.bootstrap.css")
+	@_js("lib/select2/select2.min.js")
+	@_js("lib/select2/select2_locale_ru.js")
+	@_js("javascripts/jquery.tablesorter.min.js")
+	@_js("javascripts/jquery.tablesorter.pager.min.js")
+	@_js("javascripts/jquery.tablesorter.widgets.min.js")
+	@_js("javascripts/tablesorter/widget-columnSelector.js")
+	@_js("javascripts/tables.js")
+	@_js("javascripts/events.js")
+	@_js("lib/knockout/knockout.js")
+	@_js("lib/bootstrap-datepicker/js/bootstrap-datepicker.js")
+	@_js("lib/bootstrap-datepicker/js/locales/bootstrap-datepicker.ru.js")
+	
+	<script>
+	$(function() {
+		$('#datepicker').datepicker({
+			format : "dd.mm.yyyy",
+			todayBtn : "linked",
+			language : "ru",
+			autoclose : true,
+			todayHighlight : true
+		});
+	});
+	var ids = ["@Html(events.map(_.id).mkString("\",\""))"];
+	</script>
 }
 
 @main(
@@ -28,8 +52,35 @@
 	)
 ) {
 
+<div class="form-group well well-sm">
+	<button class="checkbox-toggle btn btn-default" title="Выделить / Снять выделение" data-bind="click: toggleAll"><span class="glyphicon glyphicon-unchecked" data-bind="css: {'glyphicon-check': allSelected(), 'glyphicon-unchecked': !allSelected()}"></span></button>
+	<button class="column-selector btn btn-default" title="@Messages("label.choose.columns")"><span class="glyphicon glyphicon-pushpin"></span></button>
+	<button class="remove btn btn-danger" title="@Messages("label.do.remove")" data-bind="visible: selectedEvents().length > 0, click: remove"><span class="glyphicon glyphicon-trash"></span></button>
+	<button class="export btn btn-info" title="@Messages("label.event.do.export.for.social.networks")" data-bind="visible: selectedEvents().length > 0, click: exportEvents"><span class="glyphicon glyphicon-export"></span></button>
+	@helper.form(
+			routes.EventController.doChangeInterval,
+			'class -> "form-horizontal form-group form-inline",
+			'style -> "display: inline"
+			) {
+		<span class="input-daterange input-group col-md-6" id="datepicker">
+			<span class="input-group-addon" style="border-left-width: 1px">@Messages("label.filter.since")</span>
+			<input type="text" class="input-sm form-control" name="from" value="@intervalForm("from").value" />
+			<span class="input-group-addon">@Messages("label.till")</span>
+			<input type="text" class="input-sm form-control" name="till" value="@intervalForm("till").value" />
+			<span class="input-group-btn">
+				<button class="btn btn-default btn-sm" type="submit">@Messages("label.apply")</button>
+			</span>
+		</span>
+	}
+</div>
+
+@helper.form(
+	routes.EventController.exportEvents,
+	'id -> "exportForm"
+) {
 <table class="events table table-striped js-tablesorter">
 	<thead>
+		<th class="sorter-false filter-false columnSelector-disable"></th>
 		<th>@Messages("label.name")</th>
 		<th>@Messages("label.start")</th>
 		<th>@Messages("label.end")</th>
@@ -41,14 +92,50 @@
 		<th class="sorter-false filter-false">@Messages("label.action")</th>
 	</thead>
 	<tbody>
+		@for(e <- events) {
+			<tr data-id="@e.id">
+				<td><input type="checkbox" name="events[]" value="@e.id" data-bind="checked: selectedEvents"></td>
+				<td>@e.name</td>
+				<td>@{val fd = e.firstDay; Formatters.print(fd.date) + " " + Formatters.print(fd.firstItem.start)}</td>
+				<td>@{val ld = e.lastDay;Formatters.print(ld.date) + " " + Formatters.print(ld.lastItem.end)}</td>
+				<td>
+					<a href="@routes.UserController.details(e.author.id)">@e.author.nick</a>
+				</td>
+				<td>
+					@if(e.parent != null) {
+						<a href="@routes.GrandEventController.details(e.parent.id)">@e.parent.name</a>
+					}
+				</td>
+				<td>@e.coords.city.name</td>
+				<td>
+					@Html(e.organizations.map(o => "<a href=\"" + routes.OrganizationController.details(o.id) + "\">" + o.name + "</a>").mkString(", "))
+				</td>
+				<td>
+					@Html(e.tags.map("<a href=\"javascript:void(0);\" onclick=\"alert(\'What should be shown after click on tag?\')\">" + _.name + "</a>").mkString(", "))
+				</td>
+				<td>
+					<a class="btn btn-default btn-xs" href='@{routes.EventController.edit(e.id)}' title="@Messages("label.do.edit")">
+						<span class="glyphicon glyphicon-pencil"></span>
+					</a>
+					<a class="btn btn-default btn-xs js-ajax" title="@Messages("label.do.remove")"
+							data-action="remove"
+							data-method="POST"
+							data-url="@routes.EventController.remove(e.id)"
+							data-confirm="@Messages("label.are.you.sure.you.want.to.delete", e.name)">
+						<span class="glyphicon glyphicon-remove"></span>
+					</a>
+				</td>
+			</tr>
+		}
 	</tbody>
 	<tfoot>
-		@_tablePager(columns = 9)
+		@_tablePager(columns = 10)
 	</tfoot>
 </table>
+}
 
-	@subjectPresent() {
-		@_btn(routes.EventController.create, "label.do.create")
-	}
+@subjectPresent() {
+	@_btn(routes.EventController.create, "label.do.create")
+}
 	
 }

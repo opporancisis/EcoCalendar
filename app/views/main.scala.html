@@ -89,7 +89,7 @@
 					<ul class="nav navbar-nav">
 						@restrict(la(as("admin"))) {
 							<li class="dropdown">
-								<a data-toggle="dropdown" data-hover="dropdown" class="dropdown-toggle" href="#">Система <b class="caret"></b></a>
+								<a data-toggle="dropdown" data-hover="dropdown" class="dropdown-toggle" href="#">@Messages("nav.top.sys.admin") <b class="caret"></b></a>
 								<ul class="dropdown-menu">
 									<li>@_link(routes.SettingController.edit, "nav.sys.settings")</li>
 									<li>@_link(routes.HomePageController.edit, "nav.homePage.edit")</li>
@@ -107,14 +107,14 @@
 							</li>
 						}
 						<li class="dropdown">
-							<a data-toggle="dropdown" data-hover="dropdown" class="dropdown-toggle" href="#">События <b class="caret"></b></a>
+							<a data-toggle="dropdown" data-hover="dropdown" class="dropdown-toggle" href="#">@Messages("nav.top.events") <b class="caret"></b></a>
 							<ul class="dropdown-menu">
 								<li>@_link(routes.EventController.list, "nav.event.list")</li>
 								<li>@_link(routes.GrandEventController.list, "nav.event.grand.list")</li>
 							</ul>
 						</li>
 						<li class="dropdown">
-							<a data-toggle="dropdown" data-hover="dropdown" class="dropdown-toggle" href="#">@Messages("nav.information").capitalize <b class="caret"></b></a>
+							<a data-toggle="dropdown" data-hover="dropdown" class="dropdown-toggle" href="#">@Messages("nav.top.information").capitalize <b class="caret"></b></a>
 							<ul class="dropdown-menu">
 								@for(page <- ctx.args.get("stdPages").asInstanceOf[List[models.standardPage.StandardPage]]) {
 									<li><a href="@page.reallink">@page.title</a></li>

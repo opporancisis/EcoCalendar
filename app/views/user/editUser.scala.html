@@ -1,4 +1,5 @@
-@(editForm: play.data.Form[models.user.User])
+@(editForm: play.data.Form[models.user.User],
+	editUser: models.user.User)
 
 @import helper._
 @import helpers.BootstrapHelper._
@@ -33,8 +34,10 @@
 		"nav.user.create",
 	breadcrumbs = LinkedHashMap(
 		"nav.user.list" -> routes.UserController.list,
-		if (editForm("id").value != null) editForm("surname").value -> routes.UserController.edit(editForm("id").value.toLong)
-		else "nav.user.create" -> routes.UserController.create
+		if (editUser != null)
+			editUser.somename -> routes.UserController.edit(editUser.id)
+		else
+			"nav.user.create" -> routes.UserController.create
 	)
 ) {
 
@@ -56,12 +59,14 @@
 
 	@inputText(
 		field = editForm("email"),
-		'_label -> "label.email"
+		'_label -> "label.email",
+		'help -> "label.user.email.tip"
 	)(FieldConstructor(views.html.bootstrap.input.f), null)
 
 	@inputText(
 		field = editForm("nick"),
-		'_label -> "label.nick"
+		'_label -> "label.nick",
+		'help -> "label.user.nick.tip"
 	)(FieldConstructor(views.html.bootstrap.input.f), null)
 
 	@select(
@@ -76,16 +81,23 @@
 	@inputText(
 		field = editForm("name"),
 		'_label -> "label.name",
-		'help -> "Будет видно только администратору"
+		'help -> "label.user.name.and.phone.tip"
+	)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+	@inputText(
+		field = editForm("phone"),
+		'_label -> "label.phone",
+		'help -> "label.user.name.and.phone.tip"
 	)(FieldConstructor(views.html.bootstrap.input.f), null)
 
 	@textarea(
 		field = editForm("note"),
 		args = 'rows -> 3, 'cols -> 50,
-		'_label -> "label.note"
+		'_label -> "label.note",
+		'help -> "label.user.note.tip"
 	)(FieldConstructor(views.html.bootstrap.textarea.f), null)
 
-	<input type="submit" value="@{if(editForm("id").value != null) {Messages("label.save")} else {Messages("label.create")}}" class="btn btn-primary">
+	@_submit(if(editForm("id").value != null) "label.save" else "label.create")
 
 }
 

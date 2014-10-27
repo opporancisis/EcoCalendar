@@ -73,7 +73,6 @@
 		options = tags.map(a => a.id.toString -> a.name).toSeq,
 		'_label -> "label.tags",
 		'multiple -> true,
-		'required -> true,
 		'class -> "form-control"
 	)(FieldConstructor(views.html.bootstrap.field.f), null)
 

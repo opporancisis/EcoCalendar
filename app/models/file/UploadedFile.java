@@ -1,7 +1,6 @@
 package models.file;
 
 import java.io.File;
-import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -11,7 +10,6 @@ import org.joda.time.DateTime;
 import play.data.format.Formatters;
 import play.db.ebean.Model;
 import utils.Config;
-import utils.formatter.AttachmentsListAnnotationFormatter;
 import utils.formatter.UploadedFileFormatter;
 
 @Entity
@@ -22,7 +20,6 @@ public class UploadedFile extends Model {
 	private static final File FILES_DIR = Config.getConfig("files");
 	static {
 		Formatters.register(UploadedFile.class, new UploadedFileFormatter());
-		Formatters.register(List.class, new AttachmentsListAnnotationFormatter());
 		if (!FILES_DIR.exists()) {
 			FILES_DIR.mkdirs();
 		}
@@ -39,11 +36,11 @@ public class UploadedFile extends Model {
 
 	public String mime;
 
-	public static final Finder<Long, UploadedFile> find = new Finder<>(
-			Long.class, UploadedFile.class);
+	public static final Finder<Long, UploadedFile> find = new Finder<>(Long.class,
+			UploadedFile.class);
 
 	private String getFileName() {
-		return String.format("%06d", id);
+		return String.format("%019d", id);
 	}
 
 	public File file() {

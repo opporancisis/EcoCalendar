@@ -41,6 +41,12 @@ public class GrandEventController extends Controller {
 		}
 		GrandEvent event = filledForm.get();
 		event.update(id);
+		// TODO: if (1) start/end date changed and (2) this GE has some events
+		// and (3) these events are out of start-end period, then:
+		// 1. exclude out-of-period events from GE
+		// 2. tell GE-editor about changes via flash message
+		// 3. notify creators of excluded events via email (if creator !=
+		// current GE-editor)
 		return redirect(routes.GrandEventController.list());
 	}
 
@@ -61,7 +67,8 @@ public class GrandEventController extends Controller {
 		// TODO:
 		// 1. count karma amount of creator
 		// 2. according to it set published field
-		// 3. if not published, then send admins/moderators invitation to review event
+		// 3. if not published, then send admins/moderators invitation to review
+		// event
 		event.save();
 		return redirect(routes.GrandEventController.list());
 	}

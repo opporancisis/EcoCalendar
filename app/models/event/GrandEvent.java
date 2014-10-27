@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
@@ -11,9 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import models.event.tag.EventTag;
-import models.event.tag.EventTagsList;
 import models.organization.Organization;
-import models.organization.Organizations;
 import models.user.User;
 import play.data.format.Formatters;
 import play.data.validation.Constraints.Required;
@@ -46,25 +45,38 @@ public class GrandEvent extends Model {
 
 	public Boolean published;
 
+	// TODO: make this logic work
+	/**
+	 * If it's true, then notify GE-creator about each new sub event and don't
+	 * enable sub-event until premoderation
+	 */
+	public Boolean preModeration;
+
 	@Required
 	public String name;
 
 	@Required
 	public String description;
 
+	/**
+	 * Strict time border for all sub-events. No sub-event can start before
+	 * startDate.
+	 */
 	public LocalDate startDate;
 
+	/**
+	 * Strict time border for all sub-events. No sub-event can finish after
+	 * endDate.
+	 */
 	public LocalDate endDate;
 
-	@OneToMany(mappedBy = "parent")
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "parent")
 	public List<Event> events;
 
-	@ManyToMany
-	@EventTagsList
+	@ManyToMany(mappedBy = "grandEvents")
 	public List<EventTag> tags;
 
-	@ManyToMany
-	@Organizations
+	@ManyToMany(mappedBy = "grandEvents")
 	public List<Organization> organizations;
 
 	public static Finder<Long, GrandEvent> find = new Finder<>(Long.class, GrandEvent.class);

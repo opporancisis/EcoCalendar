@@ -9,6 +9,10 @@
 @import helper._
 @import scala.collection.mutable.LinkedHashMap
 
+@user = @{
+	ctx.args.get("user").asInstanceOf[models.user.User]
+}
+
 @implicitScripts = {
 	<link href="@routes.Assets.at("stylesheets/fullcalendar.css")" rel="stylesheet">
 	<script type="text/javascript" src="@routes.Assets.at("javascripts/fullcalendar/fullcalendar.js")" defer="defer"></script>
@@ -17,7 +21,7 @@
 	<script type="text/javascript" src="http://api-maps.yandex.ru/2.1/?lang=ru_RU"></script>
 	<script type="text/javascript" src="@routes.Assets.at("lib/knockout/knockout.js")"></script>
 	<script>
-		var countriesMap = @Html(play.libs.Json.toJson(countries).toString());
+		var countriesMap = @play.twirl.api.Html(play.libs.Json.toJson(countries).toString());
 		var initialCountry@if(coordsForm("country").value != null) { = "@coordsForm("country").value"};
 		var initialCity@if(coordsForm("city").value != null) { = "@coordsForm("city").value"};
 		var initialLatitude = "@coordsForm("latitude").value";
@@ -44,7 +48,7 @@
 @helper.form(if(event != null) routes.EventController.doEdit(event.id) else routes.EventController.doCreate, 'class -> "form-horizontal") {
 
 	@if(editForm.hasGlobalErrors) { 
-		<div class="alert alert-danger">@editForm.globalError.message</div>
+		<div class="alert alert-danger">@play.twirl.api.Html(editForm.globalErrors.map(_.message).mkString("<br />"))</div>
 	}
 
 	<input type="hidden" name="latitude" data-bind="value: latitude" />
@@ -77,16 +81,6 @@
 		'_label -> "label.description"
 	)(FieldConstructor(views.html.bootstrap.textarea.f), null)
 
-	@inputText(
-		field = editForm("additionalInfoLink"),
-		'_label -> "label.additional.info.link"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
-
-	@inputText(
-		field = editForm("postReleaseLink"),
-		'_label -> "label.post.release.link"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
-
 	@select(
 		field = editForm("tags"),
 		options = tags.map(a => a.id.toString -> a.name).toSeq,
@@ -102,6 +96,42 @@
 		'multiple -> true,
 		'class -> "form-control"
 	)(FieldConstructor(views.html.bootstrap.field.f), null)
+
+	@inputText(
+		field = editForm("additionalInfoLink"),
+		'_label -> "label.additional.info.link"
+	)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+	@inputText(
+		field = editForm("postReleaseLink"),
+		'_label -> "label.post.release.link"
+	)(FieldConstructor(views.html.bootstrap.input.f), null)
+
+	@checkbox(
+		field = editForm("useAuthorNameAndPhone"),
+		'_label -> "label.event.useAuthorNameAndPhone",
+		Symbol("data-bind") -> "checked: useAuthorNameAndPhone"
+	)(FieldConstructor(views.html.bootstrap.checkboxB.f), null)
+
+	@views.html.bootstrap.inputText(
+		field = editForm("contactName"),
+		'_label -> "label.event.contactName",
+		'dataBind -> "visible: !useAuthorNameAndPhone()"
+	)(FieldConstructor(views.html.bootstrap.field.f), null)
+
+	<div data-bind="visible: useAuthorNameAndPhone">
+		@_staticFormField("label.event.contactName", user.name)
+	</div>
+
+	@views.html.bootstrap.inputText(
+		field = editForm("contactPhone"),
+		'_label -> "label.event.contactPhone",
+		'dataBind -> "visible: !useAuthorNameAndPhone()"
+	)(FieldConstructor(views.html.bootstrap.field.f), null)
+
+	<div data-bind="visible: useAuthorNameAndPhone">
+		@_staticFormField("label.event.contactPhone", user.phone)
+	</div>
 
 	@select(
 		field = coordsForm("country"),

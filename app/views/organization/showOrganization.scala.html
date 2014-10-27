@@ -1,0 +1,28 @@
+@(org: models.organization.Organization)
+
+@import helper._
+@import scala.collection.mutable.LinkedHashMap
+@import views.menu.SystemMenu._
+
+@main(
+	Messages("nav.organization.show", org.name),
+	breadcrumbs = LinkedHashMap(
+		"nav.organization.list" -> routes.OrganizationController.list,
+		org.name -> routes.OrganizationController.details(org.id)
+	)
+) {
+
+@org.description
+
+@helper.form(routes.OrganizationController.details(org.id), 'class -> "form-horizontal") {
+
+	@_staticFormField("label.event.count", org.events.size)
+	@_staticFormField("label.grand.event.count", org.grandEvents.size)
+	
+	@for(ge <- org.grandEvents) {
+		@ge.name<br />
+	}
+
+}
+
+}

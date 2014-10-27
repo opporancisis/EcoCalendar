@@ -5,11 +5,14 @@
 **************************************************@
 
 <div class="form-group@if(elements.hasErrors){ has-error}">
-    <label for="@elements.field.name" class="col-lg-2 control-label">@Messages(elements.label.toString).capitalize</label>
-    <div class="col-lg-10">
-        <textarea class="form-control" id="@elements.field.name" name="@elements.field.name"
-                  rows="@if(elements.args.get('rows)){@elements.args.get('rows)}else{5}"
-                  placeholder="@Messages(elements.label.toString).capitalize">@elements.field.value</textarea>
+    <div class="col-lg-offset-2 col-lg-10">
+        <div class="checkbox">
+            <label>
+				@elements.input
+				@Messages(elements.label.toString).capitalize
+                <input type="hidden" name="@elements.field.name" value="false" />
+            </label>
+        </div>
         @if(elements.args.get('help)){
             <p class="help-block">@Messages(elements.args.get('help).get.toString).capitalize</p>
         }
@@ -18,3 +21,4 @@
         }
     </div>
 </div>
+
