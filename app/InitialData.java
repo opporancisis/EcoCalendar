@@ -32,7 +32,7 @@ public class InitialData {
 		User.find.query().where().eq("nick", "admin").findUnique()
 				.changePassword(new MyUsernamePasswordAuthUser("napaAdmin150"), true);
 
-		User.find.query().where().eq("nick", "defaultUser").findUnique()
+		User.find.query().where().eq("nick", "demo").findUnique()
 				.changePassword(new MyUsernamePasswordAuthUser("ecoEvent450"), true);
 
 	}

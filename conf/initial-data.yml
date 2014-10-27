@@ -25,8 +25,8 @@ users:
     - !!models.user.User
         roles:
             - *userRole
-        nick:             defaultUser
-        email:            defaultUser@ecocalendar.ru
+        nick:             demo
+        email:            demo@ecocalendar.ru
         emailValidated:   TRUE
         blocked:          FALSE
 
