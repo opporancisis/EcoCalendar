@@ -32,7 +32,7 @@ public class UserController extends Controller {
 
 	@Restrict(@Group(RoleName.ADMIN))
 	public static Result list() {
-		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
+		Application.noCache(response());
 		return ok(views.html.user.listUsers.render(User.find.query().where()
 				.ne("id", Setting.getLong(SettingName.DELETED_USER_ID)).findList()));
 	}
@@ -114,7 +114,7 @@ public class UserController extends Controller {
 
 	@Restrict(@Group(RoleName.ADMIN))
 	public static Result changePassword(long id) {
-		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
+		Application.noCache(response());
 		User user = User.find.byId(id);
 		if (user == null) {
 			return Application.notFoundObject(User.class, id);
@@ -124,7 +124,7 @@ public class UserController extends Controller {
 
 	@Restrict(@Group(RoleName.ADMIN))
 	public static Result doChangePassword(long id) {
-		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
+		Application.noCache(response());
 		User user = User.find.byId(id);
 		if (user == null) {
 			return Application.notFoundObject(User.class, id);

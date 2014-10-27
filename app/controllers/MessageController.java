@@ -29,7 +29,7 @@ public class MessageController extends Controller {
 			+ Message.CLAZZ;
 
 	public static Result list() {
-		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
+		Application.noCache(response());
 		List<Message> messages = Message.find.query().where()
 				.eq("owner", ContextAugmenterAction.getLoggedUser()).findList();
 		return ok(views.html.message.listMessages.render(messages));

@@ -9,6 +9,7 @@ import play.Routes;
 import play.data.Form;
 import play.i18n.Lang;
 import play.mvc.Controller;
+import play.mvc.Http.Response;
 import play.mvc.Result;
 import providers.MyUsernamePasswordAuthProvider;
 import providers.MyUsernamePasswordAuthProvider.MyLogin;
@@ -38,7 +39,7 @@ public class Application extends Controller {
 	}
 
 	public static Result doLogin() {
-		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
+		noCache(response());
 		final Form<MyLogin> filledForm = MyUsernamePasswordAuthProvider.LOGIN_FORM
 				.bindFromRequest();
 		if (filledForm.hasErrors()) {
@@ -69,7 +70,7 @@ public class Application extends Controller {
 	}
 
 	public static Result doSignup() {
-		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
+		noCache(response());
 		final Form<MySignup> filledForm = MyUsernamePasswordAuthProvider.SIGNUP_FORM
 				.bindFromRequest();
 		if (filledForm.hasErrors()) {
@@ -83,7 +84,7 @@ public class Application extends Controller {
 		}
 	}
 
-	public static String formatTimestamp(final long t) {
+	public static String formatTimestamp(long t) {
 		return new SimpleDateFormat("yyyy-dd-MM HH:mm:ss").format(new Date(t));
 	}
 
@@ -97,6 +98,10 @@ public class Application extends Controller {
 
 	public static Result jsMessages() {
 		return ok(MESSAGES.generate("window.Messages"));
+	}
+
+	public static void noCache(Response response) {
+		com.feth.play.module.pa.controllers.Authenticate.noCache(response);
 	}
 
 }
