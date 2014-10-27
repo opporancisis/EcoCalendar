@@ -8,6 +8,7 @@
 
 @import helper._
 @import scala.collection.mutable.LinkedHashMap
+@import helpers.BootstrapHelper._
 
 @user = @{
 	ctx.args.get("user").asInstanceOf[models.user.User]
@@ -27,6 +28,7 @@
 		var initialLatitude = "@coordsForm("latitude").value";
 		var initialLongitude = "@coordsForm("longitude").value";
 		var initialTimetable = "@editForm("timetableJson").value";
+		var useAuthorContactInfo = @Option(editForm("useAuthorContactInfo").value).getOrElse("true");
 	</script>
 }
 
@@ -61,112 +63,158 @@
 		@_staticFormField("label.author", event.author.nick)
 	}
 
-	
-	@inputText(
-		field = editForm("name"),
-		'_label -> "label.name"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+	<div class="panel panel-default">
+		<div class="panel-heading">@Messages("label.event.general.info.settings")</div>
+  		<div class="panel-body">
 
-	@select(
-		field = editForm("parent"),
-		options = grandEvents.map(a => a.id.toString -> a.name).toSeq,
-		'_label -> "label.grand.event",
-		'class -> "form-control",
-		'_default -> Messages("label.none.selected")
-	)(FieldConstructor(views.html.bootstrap.field.f), null)
+			@views.html.bootstrap.inputText(
+				field = editForm("name"),
+				'_label -> "label.label",
+				'required -> true
+			)
 
-	@textarea(
-		field = editForm("description"),
-		args = 'rows -> 3, 'cols -> 50,
-		'_label -> "label.description"
-	)(FieldConstructor(views.html.bootstrap.textarea.f), null)
+			@views.html.bootstrap.textarea(
+				field = editForm("description"),
+				args = 'rows -> 3, 'cols -> 50,
+				'_label -> "label.description",
+				'required -> true
+			)
 
-	@select(
-		field = editForm("tags"),
-		options = tags.map(a => a.id.toString -> a.name).toSeq,
-		'_label -> "label.tags",
-		'multiple -> true,
-		'class -> "form-control"
-	)(FieldConstructor(views.html.bootstrap.field.f), null)
+			@select(
+				field = editForm("parent"),
+				options = grandEvents.map(a => a.id.toString -> a.name).toSeq,
+				'_label -> "label.grand.event",
+				'class -> "form-control",
+				'_default -> Messages("label.none.selected"),
+				'help -> Messages("label.event.parent.tip")
+			)
 
-	@select(
-		field = editForm("organizations"),
-		options = organizations.map(a => a.id.toString -> a.name).toSeq,
-		'_label -> "label.organizations",
-		'multiple -> true,
-		'class -> "form-control"
-	)(FieldConstructor(views.html.bootstrap.field.f), null)
+			@select(
+				field = editForm("tags"),
+				options = tags.map(a => a.id.toString -> a.name).toSeq,
+				'_label -> "label.tags",
+				'multiple -> true,
+				'class -> "form-control"
+			)
 
-	@inputText(
-		field = editForm("additionalInfoLink"),
-		'_label -> "label.additional.info.link"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+			@select(
+				field = editForm("organizations"),
+				options = organizations.map(a => a.id.toString -> a.name).toSeq,
+				'_label -> "label.organizations",
+				'multiple -> true,
+				'class -> "form-control"
+			)
 
-	@inputText(
-		field = editForm("postReleaseLink"),
-		'_label -> "label.post.release.link"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+			@views.html.bootstrap.inputText(
+				field = editForm("additionalInfoLink"),
+				'_label -> "label.link",
+				'help -> "label.event.additional.info.link.tip"
+			)
 
-	@checkbox(
-		field = editForm("useAuthorNameAndPhone"),
-		'_label -> "label.event.useAuthorNameAndPhone",
-		Symbol("data-bind") -> "checked: useAuthorNameAndPhone"
-	)(FieldConstructor(views.html.bootstrap.checkboxB.f), null)
+			@views.html.bootstrap.inputText(
+				field = editForm("postReleaseLink"),
+				'_label -> "label.event.post.release",
+				'help -> "label.event.post.release.tip"
+			)
 
-	@views.html.bootstrap.inputText(
-		field = editForm("contactName"),
-		'_label -> "label.event.contactName",
-		'dataBind -> "visible: !useAuthorNameAndPhone()"
-	)(FieldConstructor(views.html.bootstrap.field.f), null)
-
-	<div data-bind="visible: useAuthorNameAndPhone">
-		@_staticFormField("label.event.contactName", user.name)
+		</div>
 	</div>
 
-	@views.html.bootstrap.inputText(
-		field = editForm("contactPhone"),
-		'_label -> "label.event.contactPhone",
-		'dataBind -> "visible: !useAuthorNameAndPhone()"
-	)(FieldConstructor(views.html.bootstrap.field.f), null)
+	<div class="panel panel-default">
+		<div class="panel-heading">@Messages("label.event.contact.info.settings")</div>
+  		<div class="panel-body">
 
-	<div data-bind="visible: useAuthorNameAndPhone">
-		@_staticFormField("label.event.contactPhone", user.phone)
+			@checkbox(
+				field = editForm("useAuthorContactInfo"),
+				'_label -> "label.event.useAuthorContactInfo",
+				Symbol("data-bind") -> "checked: useAuthorContactInfo",
+				'help -> "label.event.contactInfo.tip"
+			)(FieldConstructor(views.html.bootstrap.checkboxB.f), null)
+		
+			@views.html.bootstrap.inputText(
+				field = editForm("contactName"),
+				'_label -> "label.name",
+				'dataBind -> "visible: !useAuthorContactInfo()",
+				'help -> "label.event.contactName.tip"
+			)
+		
+			<div data-bind="visible: useAuthorContactInfo">
+				@_staticFormField("label.name", if(user.name == null || user.name.isEmpty) play.twirl.api.Html("<i>" + Messages("label.not.specified") + "</i>") else user.name)
+			</div>
+		
+			@views.html.bootstrap.inputText(
+				field = editForm("contactPhone"),
+				'_label -> "label.phone",
+				'dataBind -> "visible: !useAuthorContactInfo()"
+			)
+		
+			<div data-bind="visible: useAuthorContactInfo">
+				@_staticFormField("label.phone", if(user.phone == null || user.phone.isEmpty) play.twirl.api.Html("<i>" + Messages("label.not.specified") + "</i>") else user.phone)
+			</div>
+
+			@views.html.bootstrap.inputText(
+				field = editForm("contactProfile"),
+				'_label -> "nav.profile",
+				'dataBind -> "visible: !useAuthorContactInfo()",
+				'help -> "label.profile.tip"
+			)
+		
+			<div data-bind="visible: useAuthorContactInfo">
+				@_staticFormField("label.profile", if(user.profileLink == null || user.profileLink.isEmpty) play.twirl.api.Html("<i>" + Messages("label.not.specified") + "</i>") else user.profileLink)
+			</div>
+
+		</div>
 	</div>
 
-	@select(
-		field = coordsForm("country"),
-		options = Seq.empty[(String, String)],
-		'_label -> "label.country",
-		'class -> "form-control",
-		'_default -> Messages("label.none.selected"),
-		Symbol("data-bind") -> ("options: availableCountries, " +
-			"optionsText: function(item) {return item.name + ' (" + Messages("label.country.with.cities.count") + ": ' + item.cities.length + ')'}, " + 
-			"optionsValue: 'id', " + 
-			"value: selectedCountry, " +
-			"optionsCaption: '" + Messages("label.none.selected") + "', " +
-			"multiselect: true")
-	)(FieldConstructor(views.html.bootstrap.field.f), null)
+	<div class="panel panel-default">
+		<div class="panel-heading">@Messages("label.event.geo.settings")</div>
+  		<div class="panel-body">
 
-	@select(
-		field = coordsForm("city"),
-		options = Seq.empty[(String, String)],
-		'_label -> "label.city",
-		'class -> "form-control",
-		'_default -> Messages("label.none.selected"),
-		'dataBind -> "visible: selectedCountry",
-		Symbol("data-bind") -> ("options: availableCities, "+
-			"optionsText: 'name', " +
-			"optionsValue: 'id', " +
-			"value: selectedCity, " +
-			"optionsCaption: '" + Messages("label.none.selected") + "', " +
-			"multiselect: true")
-	)(FieldConstructor(views.html.bootstrap.field.f), null)
+			@select(
+				field = coordsForm("country"),
+				options = Seq.empty[(String, String)],
+				'_label -> "label.country",
+				'class -> "form-control",
+				'_default -> Messages("label.none.selected"),
+				Symbol("data-bind") -> ("options: availableCountries, " +
+					"optionsText: function(item) {return item.name + ' (" + Messages("label.country.with.cities.count") + ": ' + item.cities.length + ')'}, " + 
+					"optionsValue: 'id', " + 
+					"value: selectedCountry, " +
+					"optionsCaption: '" + Messages("label.none.selected") + "', " +
+					"multiselect: true"),
+				'required -> true
+			)
+		
+			@select(
+				field = coordsForm("city"),
+				options = Seq.empty[(String, String)],
+				'_label -> "label.city",
+				'class -> "form-control",
+				'_default -> Messages("label.none.selected"),
+				'dataBind -> "visible: selectedCountry",
+				Symbol("data-bind") -> ("options: availableCities, "+
+					"optionsText: 'name', " +
+					"optionsValue: 'id', " +
+					"value: selectedCity, " +
+					"optionsCaption: '" + Messages("label.none.selected") + "', " +
+					"multiselect: true"),
+				'required -> true
+			)
+		
+			<br />
+			<div id="map" style="width: 100%; height: 400px;"></div>
 
-	<br /><br />
-	<div id="map" style="width: 100%; height: 400px;"></div>
+		</div>
+	</div>
 
-	<br /><br />
-	<div id='calendar'></div>
+	<div class="panel panel-default">
+		<div class="panel-heading">@Messages("label.event.program.settings")</div>
+  		<div class="panel-body">
+
+			<div id='calendar'></div>
+
+		</div>
+	</div>
 
 	<br /><br />
 	@_submit(if(event != null) {"label.save"} else {"label.create"})

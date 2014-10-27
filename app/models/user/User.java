@@ -23,6 +23,7 @@ import models.sys.Setting;
 import models.sys.SettingName;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.URL;
 import org.joda.time.DateTime;
 
 import play.data.validation.Constraints.Email;
@@ -62,6 +63,7 @@ public class User extends Model implements Subject {
 	// @Column(unique = true)
 	public String email;
 
+	// TODO: what's the workflow?
 	public Boolean emailPublic;
 
 	@Pattern(NICK_PAT)
@@ -70,6 +72,9 @@ public class User extends Model implements Subject {
 	public String name;
 
 	public String phone;
+
+	@URL
+	public String profileLink;
 
 	/**
 	 * При создании пользователя (первой авторизации) карма = 0. С кармой < 50
@@ -88,12 +93,15 @@ public class User extends Model implements Subject {
 	@OneToMany(cascade = CascadeType.ALL)
 	public List<KarmaChange> karmaHistory;
 
+	// TODO: let user specify his city in profile settings
 	@ManyToOne
 	public City city;
 
+	// TODO: let user specify his country in profile settings
 	@ManyToOne
 	public Country countryForUnknownCity;
 
+	// TODO: let user specify unknown for portal city as his own
 	/**
 	 * Если при регистрации человек не находит в списке своего города, то он(а)
 	 * заполняет это поле. В случае появления модератора для этого города (т.е.

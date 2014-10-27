@@ -1,4 +1,4 @@
-@(events: Map[utils.DatesInterval, models.event.Event],
+@(events: Map[utils.DatesInterval, List[models.event.Event]],
 	startDate: java.time.LocalDate,
 	endDate: java.time.LocalDate,
 	lang: Lang)
@@ -15,6 +15,41 @@
 @implicitScripts = {
 	<script>
 	</script>
+}
+
+@isBlank(str: String) = @{
+	var rp = "\\s+".r;
+	str match {
+		case null | "" | rp() => true
+		case _ => false
+	}
+}
+
+@makeProfileLink(profile: String, name: String) = @{
+	val vkReg = "http(s)?://vk.com/([\\w\\d_]+)".r;
+	profile match {
+		case vkReg(s,id) => s"@$id" + (if(name != null && !name.isEmpty) " (" + name + ")" else "")
+		case _ => profile + (if(name != null && !name.isEmpty) ", " + name else "")
+	}
+}
+
+@constructContactInfo(name: String, phone: String, profileLink: String) = @{
+	var contact: String = null;
+	if(isBlank(phone) && isBlank(profileLink)) {
+		// do nothing. it's useless to give only name
+	} else if(!isBlank(phone) && isBlank(profileLink)) {
+		contact = phone;
+		if(!isBlank(name)) {
+			contact = name + ", " + contact;
+		}
+	} else {
+		// not blank profile!
+		contact = makeProfileLink(profileLink, name);
+		if(!isBlank(phone)) {
+			contact += ", " + phone;
+		}
+	}
+	contact
 }
 
 @ddMMMM = @{java.time.format.DateTimeFormatter.ofPattern("dd MMMM", lang.toLocale)}
@@ -44,30 +79,41 @@
 .
 <br /><br />
 
-@for((interval, e) <- events) {
-
-	*
-	@if(interval.from.equals(interval.till)) {
-		@ddMMMM.format(interval.from), @Messages("label.week.day." + interval.from.getDayOfWeek), @Formatters.print(e.days.get(0).firstItem.start) - @Formatters.print(e.days.get(0).lastItem.end)
-	} else {
-		@if(interval.from.getMonthValue() == interval.till.getMonthValue()) {
-			@dd.format(interval.from) - @ddMMMM.format(interval.till)
+@for((interval, list) <- events) {
+	@for(e <- list) {
+		*
+		@if(interval.from.equals(interval.till)) {
+			@ddMMMM.format(interval.from), @Messages("label.week.day." + interval.from.getDayOfWeek), @Formatters.print(e.days.get(0).firstItem.start) - @Formatters.print(e.days.get(0).lastItem.end)
 		} else {
-			@ddMMMM.format(interval.from) - @ddMMMM.format(interval.till)
+			@if(interval.from.getMonthValue() == interval.till.getMonthValue()) {
+				@dd.format(interval.from) - @ddMMMM.format(interval.till)
+			} else {
+				@ddMMMM.format(interval.from) - @ddMMMM.format(interval.till)
+			}
+			, @Messages("label.week.day." + interval.from.getDayOfWeek) -  @Messages("label.week.day." + interval.till.getDayOfWeek)
 		}
-		, @Messages("label.week.day." + interval.from.getDayOfWeek) -  @Messages("label.week.day." + interval.till.getDayOfWeek)
-	}
-	<br />
-	@e.name
-	<br />
-	@e.description
-	<br />
-	@if(e.additionalInfoLink != null && !e.additionalInfoLink.isEmpty) {
-		Подробнее: <a href="@e.additionalInfoLink" target="_blank">@e.additionalInfoLink</a>
+		<br />
+		@e.name
+		<br />
+		@e.description
+		<br />
+		@if(e.additionalInfoLink != null && !e.additionalInfoLink.isEmpty) {
+			Подробнее: <a href="@e.additionalInfoLink" target="_blank">@e.additionalInfoLink</a>
+			<br />
+		}
+		@{
+			var contact : String = null;
+			if(e.useAuthorContactInfo != null && e.useAuthorContactInfo) {
+				contact = constructContactInfo(e.author.name, e.author.phone, e.author.profileLink);
+			} else {
+				contact = constructContactInfo(e.contactName, e.contactPhone, e.contactProfile);
+			}
+			if(contact != null) {
+				Html(Messages("label.event.contact.info", contact) + "<br />")
+			}
+		}
 		<br />
 	}
-	@{val contact = e.contact(); if(contact != null) {Html(Messages("label.event.contact.info", contact) + "<br />")} else null}
-	<br />
 }
 </div>
 

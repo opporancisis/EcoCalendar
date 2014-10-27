@@ -1,6 +1,7 @@
 package controllers;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -40,6 +41,7 @@ public class EventController extends Controller {
 	}
 
 	public static Result list() {
+		Application.noCache(response());
 		return list(DatesInterval.fill(new DatesInterval()));
 	}
 
@@ -65,8 +67,8 @@ public class EventController extends Controller {
 		}
 		event.coords.country = event.coords.city.country;
 		return ok(views.html.event.editEvent.render(EDIT_FORM.fill(event),
-				COORDS_FORM.fill(event.coords), event, getActualGrandEvents(), EventTag.find.all(),
-				Organization.find.all(), Country.all()));
+				COORDS_FORM.fill(event.coords), event, getActualGrandEvents(),
+				EventTag.findAllOrdered(), Organization.find.all(), Country.all()));
 	}
 
 	@SubjectPresent
@@ -79,7 +81,7 @@ public class EventController extends Controller {
 				return Application.notFoundObject(Event.class, id);
 			}
 			return badRequest(views.html.event.editEvent.render(filledForm, filledCoords, event,
-					getActualGrandEvents(), EventTag.find.all(), Organization.find.all(),
+					getActualGrandEvents(), EventTag.findAllOrdered(), Organization.find.all(),
 					Country.all()));
 		}
 		Event event = filledForm.get();
@@ -90,9 +92,9 @@ public class EventController extends Controller {
 
 	@SubjectPresent
 	public static Result create() {
-		return ok(views.html.event.editEvent
-				.render(EDIT_FORM, COORDS_FORM, null, getActualGrandEvents(), EventTag.find.all(),
-						Organization.find.all(), Country.all()));
+		return ok(views.html.event.editEvent.render(EDIT_FORM, COORDS_FORM, null,
+				getActualGrandEvents(), EventTag.findAllOrdered(), Organization.find.all(),
+				Country.all()));
 	}
 
 	private static List<GrandEvent> getActualGrandEvents() {
@@ -106,7 +108,7 @@ public class EventController extends Controller {
 		Form<GeoCoords> filledCoords = COORDS_FORM.bindFromRequest();
 		if (filledForm.hasErrors() || filledCoords.hasErrors()) {
 			return badRequest(views.html.event.editEvent.render(filledForm, filledCoords, null,
-					getActualGrandEvents(), EventTag.find.all(), Organization.find.all(),
+					getActualGrandEvents(), EventTag.findAllOrdered(), Organization.find.all(),
 					Country.all()));
 		}
 		User user = ContextAugmenterAction.getLoggedUser();
@@ -136,6 +138,13 @@ public class EventController extends Controller {
 		return ok();
 	}
 
+	// TODO: let users to complain about events. each complain will temporarily
+	// reduce karma, but karma reduction will be compensated after complaint
+	// success check.
+	public static Result complain() {
+		return TODO;
+	}
+
 	public static Result exportEvents() {
 		Form<ExportForm> filledForm = EXPORT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
@@ -146,7 +155,7 @@ public class EventController extends Controller {
 		if (events == null || events.isEmpty()) {
 			return badRequest("no events specified");
 		}
-		Map<DatesInterval, Event> map = new TreeMap<>(new Comparator<DatesInterval>() {
+		Map<DatesInterval, List<Event>> map = new TreeMap<>(new Comparator<DatesInterval>() {
 			public int compare(DatesInterval i1, DatesInterval i2) {
 				if (i1.from.isBefore(i2.from)) {
 					return -1;
@@ -170,7 +179,13 @@ public class EventController extends Controller {
 		for (Event event : events) {
 			LocalDate efd = event.firstDay().date;
 			LocalDate eld = event.lastDay().date;
-			map.put(new DatesInterval(efd, eld), event);
+			DatesInterval interval = new DatesInterval(efd, eld);
+			List<Event> evs = map.get(interval);
+			if (evs == null) {
+				evs = new ArrayList<>();
+				map.put(interval, evs);
+			}
+			evs.add(event);
 			if (startDate == null) {
 				startDate = efd;
 				endDate = eld;

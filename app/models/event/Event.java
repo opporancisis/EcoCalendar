@@ -65,11 +65,13 @@ public class Event extends Model {
 	@ManyToOne
 	public User author;
 
-	public Boolean useAuthorNameAndPhone;
+	public Boolean useAuthorContactInfo;
 
 	public String contactName;
 
 	public String contactPhone;
+
+	public String contactProfile;
 
 	public Boolean published;
 
@@ -210,7 +212,7 @@ public class Event extends Model {
 	}
 
 	public String contact() {
-		if (BooleanUtils.isTrue(useAuthorNameAndPhone)) {
+		if (BooleanUtils.isTrue(useAuthorContactInfo)) {
 			if (StringUtils.isBlank(author.phone)) {
 				return null;
 			}

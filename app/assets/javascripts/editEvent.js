@@ -96,7 +96,7 @@ $(document).ready(function() {
 		self.latitude = ko.observable(initialLatitude);
 		self.longitude = ko.observable(initialLongitude);
 		self.timetable = ko.observable();
-		self.useAuthorNameAndPhone = ko.observable(true);
+		self.useAuthorContactInfo = ko.observable(useAuthorContactInfo);
 		
 	}
 

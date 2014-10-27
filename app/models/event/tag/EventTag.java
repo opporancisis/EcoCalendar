@@ -33,4 +33,8 @@ public class EventTag extends Model {
 	public List<GrandEvent> grandEvents;
 
 	public static Finder<Long, EventTag> find = new Finder<>(Long.class, EventTag.class);
+
+	public static List<EventTag> findAllOrdered() {
+		return find.query().order("name").findList();
+	}
 }
