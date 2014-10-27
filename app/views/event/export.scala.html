@@ -32,10 +32,14 @@
 ) {
 <div class="well well-sm">
 Эко-события на
-@if(startDate.getMonthValue() == endDate.getMonthValue()) {
-	@dd.format(startDate) - @ddMMMM.format(endDate)
+@if(startDate.equals(endDate)) {
+	@ddMMMM.format(startDate)
 } else {
-	@ddMMMM.format(startDate) - @ddMMMM.format(endDate)
+	@if(startDate.getMonthValue() == endDate.getMonthValue()) {
+		@dd.format(startDate) - @ddMMMM.format(endDate)
+	} else {
+		@ddMMMM.format(startDate) - @ddMMMM.format(endDate)
+	}
 }
 .
 <br /><br />
