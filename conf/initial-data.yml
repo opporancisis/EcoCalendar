@@ -1,50 +1,42 @@
 
-settings:
-
-    - !!models.sys.Setting
-        id:         1
-        name:       DELETED_USER_ID
-        clazz:      java.lang.Long
-        value:      1
-        editable:   FALSE
-
 roles:
 
-    - !!models.user.SecurityRole
-        id:        1
+    - &adminRole !!models.user.SecurityRole
         roleName:  admin
 
-    - !!models.user.SecurityRole
-        id:        2
+    - &userRole !!models.user.SecurityRole
         roleName:  user
 
 users:
 
     - !!models.user.User
-        id:               1
         nick:             удаленный пользователь
         emailValidated:   FALSE
         blocked:          TRUE
 
     - !!models.user.User
-        id:               2
         roles:
-            - !!models.user.SecurityRole
-                id: 1
+            - *adminRole
         nick:             admin
         email:            root@localhost
         emailValidated:   TRUE
         blocked:          FALSE
 
     - !!models.user.User
-        id:               3
         roles:
-            - !!models.user.SecurityRole
-                id: 2
+            - *userRole
         nick:             defaultUser
         email:            defaultUser@ecocalendar.ru
         emailValidated:   TRUE
         blocked:          FALSE
+
+settings:
+
+    - !!models.sys.Setting
+        name:       DELETED_USER_ID
+        clazz:      java.lang.Long
+        value:      1    # assuming that 1 is id of the first created user
+        editable:   FALSE
 
 standardPages:
 
@@ -67,28 +59,25 @@ standardPages:
 
 countries:
 
-    - !!models.geo.Country
-        id:              1
+    - &russia !!models.geo.Country
         name:            Россия
         centerLatitude:  60.0
         centerLongitude: 100.0
         defaultZoom:     2
 
-    - !!models.geo.Country
-        id:              2
+    - &ukraine !!models.geo.Country
         name:            Украина
         centerLatitude:  49.0
         centerLongitude: 32.0
         defaultZoom:     5
 
-    - !!models.geo.Country
-        id:              3
+    - &belarus !!models.geo.Country
         name:            Беларусь
         centerLatitude:  53.0
         centerLongitude: 28.0
         defaultZoom:     6
 
-    - !!models.geo.Country
+    - &uzbekistan !!models.geo.Country
         id:              4
         name:            Узбекистан
         centerLatitude:  41.0
@@ -98,84 +87,66 @@ countries:
 cities:
 
     - !!models.geo.City
-        id:         1
         name:       Москва
-        country:    !!models.geo.Country
-                        id: 1
+        country:    *russia
         centerLatitude:  55.75
         centerLongitude: 37.62
         defaultZoom:     10
         weight:          10
 
     - !!models.geo.City
-        id:         2
         name:       Санкт-Петербург
-        country:    !!models.geo.Country
-                        id: 1
+        country:    *russia
         centerLatitude:  59.93
         centerLongitude: 30.32
         defaultZoom:     10
         weight:          5
 
     - !!models.geo.City
-        id:         3
         name:       Великий Новгород
-        country:    !!models.geo.Country
-                        id: 1
+        country:    *russia
         centerLatitude:  58.52
         centerLongitude: 31.28
         defaultZoom:     12
 
     - !!models.geo.City
-        id:         4
         name:       Кириши
-        country:    !!models.geo.Country
-                        id: 1
+        country:    *russia
         centerLatitude:  59.46
         centerLongitude: 32.02
         defaultZoom:     12
 
     - !!models.geo.City
-        id:         5
         name:       Гатчина
-        country:    !!models.geo.Country
-                        id: 1
+        country:    *russia
         centerLatitude:  59.57
         centerLongitude: 30.13
         defaultZoom:     12
 
     - !!models.geo.City
-        id:         6
         name:       Ярославль
-        country:    !!models.geo.Country
-                        id: 1
+        country:    *russia
         centerLatitude:  57.62
         centerLongitude: 39.87
         defaultZoom:     11
 
     - !!models.geo.City
-        id:         7
         name:       Киев
-        country:    !!models.geo.Country
-                        id: 2
+        country:    *ukraine
         centerLatitude:  50.43
         centerLongitude: 30.52
         defaultZoom:     11
 
     - !!models.geo.City
-        id:         8
         name:       Одесса
-        country:    !!models.geo.Country
-                        id: 2
+        country:    *ukraine
         centerLatitude:  46.47
         centerLongitude: 30.73
         defaultZoom:     10
 
     - !!models.geo.City
-        id:         9
         name:       Минск
-        country:    !!models.geo.Country
-                        id: 3
+        country:    *belarus
         centerLatitude:  53.91
         centerLongitude: 27.55
         defaultZoom:     11
