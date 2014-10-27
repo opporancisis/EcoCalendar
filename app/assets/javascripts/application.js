@@ -27,7 +27,7 @@
 			setup = $.isFunction(setup) ? setup : $.noop;
 			
 			return $.get(url)
-				.done(function(data, status, jqxhr) {
+				.done(function(data) {
 					var doc = $($.parseHTML(data));
 					var title = doc.find("h1").text();
 					var dialogContent = doc.find(".form-horizontal");

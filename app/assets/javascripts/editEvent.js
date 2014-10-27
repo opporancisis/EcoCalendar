@@ -119,7 +119,7 @@ $(document).ready(function() {
 				success: {
 					className: "btn-success",
 					label: "Применить",
-					callback: function(e) {
+					callback: function() {
 						var title = $('#itemTitle').val();
 						if (title === "") return false;
 						var eventData = {
@@ -162,7 +162,7 @@ $(document).ready(function() {
 				success: {
 					className: "btn-success",
 					label: "Применить",
-					callback: function(e) {
+					callback: function() {
 						var title = $('#itemTitle').val();
 						if (title === "") return false;
 						calEvent.title = title;
@@ -210,7 +210,7 @@ $(document).ready(function() {
 				}
 				newItemDialog(start, end);
 			},
-			eventClick: function(calEvent, jsEvent, view) {
+			eventClick: function(calEvent) {
 				changeItemDialog(calEvent);
 			}
 		});

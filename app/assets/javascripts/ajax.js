@@ -58,7 +58,7 @@ $(document).ready(function() {
 		};
 		
 		function doRequest() {
-			$.ajax(options).done(function(data, status, xhr) {
+			$.ajax(options).done(function() {
 				if (action === "remove" && $item.length > 0) {
 					var $table = $item.closest("table");
 					if ($item.is("[data-id]")) {

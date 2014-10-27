@@ -40,22 +40,4 @@ $(document).ready(function() {
 		}
 	}
 	
-	function getSelectedMessages() {
-		var table = $(".table.events>tbody");
-
-		return {
-			size: function() {
-				return this.getElements().length;
-			},
-			getElements: function() {
-				return table.find("[data-id]:has(:checked)");
-			},
-			getIdentifiers: function() {
-				return this.getElements().map(function() {
-					return $(this).data("id");
-				}).toArray();
-			}
-		};
-	}
-	
 });

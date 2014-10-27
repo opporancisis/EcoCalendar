@@ -49,19 +49,16 @@ users:
 standardPages:
 
     - !!models.standardPage.StandardPage
-        id:         1
         orderInd:   1
         disabled:   FALSE
         title:      О Портале
 
     - !!models.standardPage.StandardPage
-        id:         2
         orderInd:   2
         disabled:   FALSE
         title:      Как помочь проекту
 
     - !!models.standardPage.StandardPage
-        id:         3
         orderInd:   3
         disabled:   FALSE
         title:      Наша команда
@@ -186,86 +183,73 @@ cities:
 organizations:
 
     - !!models.organization.Organization
-        id:            1
         name:          Экологическое движение «Мусора.Больше.Нет»
         description:   "Сеть инициативных групп. Миссия движения: формирование в России культуры безотходного производства и потребления (zero waste) ради защиты окружающей среды от загрязнения опасными отходами, сбережения невозобновляемых ресурсов и восстановления красоты природы."
 
     - !!models.organization.Organization
-        id:            2
         name:          Экологическое движение «Сделаем!»
         description:   "Гражданская инициатива, родившаяся в Эстонии в 2008 году, представляет собой стремительно развивающееся международное движение по проведению Всемирной уборки от мусора."
 
     - !!models.organization.Organization
-        id:            3
         name:          Экологическое движение «РазДельный Сбор»
         description:   "Сообщество людей, которые считают внедрение раздельного сбора отходов обязательным для развития общества ответственного производства и потребления, для улучшения состояния окружающей среды и качества жизни человека."
 
     - !!models.organization.Organization
-        id:            4
         name:          Центр защиты прав животных Вита
         description:   "Российская общественная организация, выступающая против жестокого обращения с животными, за права животных. Деятельность Центра затрагивает все 5 сфер использования человеком животных, эксплуатацию и убийство животных ради получения еды, научных данных, одежды, жестоких развлечений, а также выступает в защиту животных-компаньонов."
 
     - !!models.organization.Organization
-        id:            5
         name:          Международная организация Гринпис
         description:   "Независимая международная организация, цель которой сохранить природу и мир на планете."
 
     - !!models.organization.Organization
-        id:            6
         name:          «Красивый Петербург»
         description:   "Движение инициативных граждан за улучшение качества городской среды."
 
     - !!models.organization.Organization
-        id:            7
         name:          «Велосипедизация СПб»
         description:   "Общественный проект, целью которого является привлечение внимания к велосипеду, как виду городского транспорта, реализация проектов по велосипедизации города."
 
 eventTags:
 
     - !!models.event.tag.EventTag
-        id:    1
         name:  уборка
 
     - !!models.event.tag.EventTag
-        id:    2
         name:  раздельный сбор вторсырья
 
     - !!models.event.tag.EventTag
-        id:    3
         name:  лекция
 
     - !!models.event.tag.EventTag
-        id:    4
         name:  мастеркласс
 
     - !!models.event.tag.EventTag
-        id:    5
         name:  залоговая стоимость тары
 
     - !!models.event.tag.EventTag
-        id:    6
         name:  кинопоказ
 
     - !!models.event.tag.EventTag
-        id:    7
         name:  встреча активистов
 
     - !!models.event.tag.EventTag
-        id:    8
         name:  марш
 
     - !!models.event.tag.EventTag
-        id:    9
         name:  митинг
 
     - !!models.event.tag.EventTag
-        id:    10
         name:  фотопрогулка
 
     - !!models.event.tag.EventTag
-        id:    11
         name:  круглый стол
 
     - !!models.event.tag.EventTag
-        id:    12
+        name:  дискуссия
+
+    - !!models.event.tag.EventTag
         name:  конференция
+
+    - !!models.event.tag.EventTag
+        name:  книговорт
