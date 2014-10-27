@@ -183,7 +183,7 @@ public class EventController extends Controller {
 				endDate = eld;
 			}
 		}
-		return ok(views.html.event.export.render(map, startDate, endDate));
+		return ok(views.html.event.export.render(map, startDate, endDate, lang()));
 	}
 
 	public static class ExportForm {

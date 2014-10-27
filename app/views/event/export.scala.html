@@ -1,6 +1,7 @@
 @(events: Map[utils.DatesInterval, models.event.Event],
 	startDate: java.time.LocalDate,
-	endDate: java.time.LocalDate)
+	endDate: java.time.LocalDate,
+	lang: Lang)
 
 @import scala.collection.mutable.LinkedHashMap
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
@@ -16,7 +17,7 @@
 	</script>
 }
 
-@ddMMMM = @{java.time.format.DateTimeFormatter.ofPattern("dd MMMM")}
+@ddMMMM = @{java.time.format.DateTimeFormatter.ofPattern("dd MMMM", lang.toLocale)}
 @dd = @{java.time.format.DateTimeFormatter.ofPattern("dd")}
 
 @main(
@@ -58,7 +59,7 @@
 	@e.description
 	<br />
 	@if(e.additionalInfoLink != null && !e.additionalInfoLink.isEmpty) {
-		Подробнее: <a href="@e.additionalInfoLink">@e.additionalInfoLink</a>
+		Подробнее: <a href="@e.additionalInfoLink" target="_blank">@e.additionalInfoLink</a>
 		<br />
 	}
 	@{val contact = e.contact(); if(contact != null) {Html(Messages("label.event.contact.info", contact) + "<br />")} else null}

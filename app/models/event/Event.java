@@ -47,7 +47,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 public class Event extends Model {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	static {
 		Formatters.register(Event.class, new EventFormatter());
 	}
@@ -213,7 +213,7 @@ public class Event extends Model {
 				return null;
 			}
 			if (StringUtils.isNotBlank(author.name)) {
-				return author.name + ", " + author.phone;
+				return author.phone + ", " + author.name;
 			} else {
 				return author.phone;
 			}
@@ -222,7 +222,7 @@ public class Event extends Model {
 				return null;
 			}
 			if (StringUtils.isNotBlank(contactName)) {
-				return contactName + ", " + contactPhone;
+				return contactPhone + ", " + contactName;
 			} else {
 				return contactPhone;
 			}
