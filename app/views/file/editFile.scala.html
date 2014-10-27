@@ -7,28 +7,28 @@
 @import views.menu.SystemMenu._
 
 @main(
-	if(editForm("id").value != null)
+	if(file != null)
 		Messages("nav.file.edit", if(editForm("originalName").value != null) editForm("originalName").value else editForm("name").value)
 		else "nav.file.create"
 ) {
 
-@helper.form(if(editForm("id").value != null) routes.FileController.doEdit(editForm("id").value.toLong) else routes.FileController.doCreate, 'class -> "form-horizontal", 'enctype -> "multipart/form-data") {
+@helper.form(if(file != null) routes.FileController.doEdit(file.id) else routes.FileController.doCreate, 'class -> "form-horizontal", 'enctype -> "multipart/form-data") {
 
 	@if(editForm.hasGlobalErrors) { 
 		<div class="alert alert-danger">@editForm.globalError.message</div>
 	}
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("name"),
 		'_label -> "label.name"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+	)
 
 	@inputFile(
 		field = editForm("uploadedFile"),
 		'_label -> "label.file"
-	)(FieldConstructor(views.html.bootstrap.field.f), null)
+	)
 
-	<input type="submit" value="@{if(editForm("id").value != null) {Messages("label.save")} else {Messages("label.create")}}" class="btn btn-primary">
+	@_submit(if(file != null) "label.save" else "label.create")
 
 }
 

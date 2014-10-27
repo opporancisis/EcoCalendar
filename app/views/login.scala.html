@@ -2,6 +2,7 @@
 
 @import helper._
 @import scala.collection.mutable.LinkedHashMap
+@import helpers.BootstrapHelper._
 
 @main(
 	"playauthenticate.login.title",
@@ -10,7 +11,7 @@
 	)
 ) {
 
-<div id="login" class="row">
+<div id="login">
 	<div>
 		@* Display proprietary login form *@
 		@helper.form(routes.Application.doLogin, 'class -> "form-horizontal") {
@@ -21,12 +22,12 @@
 
 			@_emailPartial(loginForm)
 
-			@inputPassword(
+			@views.html.bootstrap.inputPassword(
 				loginForm("password"),
 				'_showConstraints -> false,
 				'inputType -> "password",
 				'_label -> Messages("playauthenticate.login.password.placeholder")
-			)(FieldConstructor(views.html.bootstrap.input.f), null)
+			)
 
 			<input type="submit" value="@Messages("playauthenticate.login.now")" class="btn btn-primary"><br/>
 			<br/>

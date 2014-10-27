@@ -42,21 +42,22 @@
 		)(FieldConstructor(views.html.bootstrap.checkbox.f), null)
 	}
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("title"),
 		'_label -> "label.title"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+	)
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("link"),
 		'_label -> "label.link"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+	)
 
-	@textarea(
+	@views.html.bootstrap.textarea(
 		field = editForm("description"),
 		args = 'rows -> 3, 'cols -> 50,
-		'_label -> "label.description"
-	)(FieldConstructor(views.html.bootstrap.textarea.f), null)
+		'_label -> "label.description",
+		'required -> true
+	)
 
 	@select(
 		field = editForm("attachments"),
@@ -64,7 +65,7 @@
 		'_label -> "label.file.files",
 		'multiple -> true,
 		'class -> "form-control"
-	)(FieldConstructor(views.html.bootstrap.field.f), null)
+	)
 
 	@_submit(if(editForm("id").value != null) "label.save" else "label.create")
 

@@ -67,7 +67,6 @@ nav.geo.city.edit=редактирование города
 ################################################################################
 
 label.action=действие
-label.additional.info.link=ссылка на дополнительную информацию
 label.apply=применить
 label.are.you.sure=вы уверены?
 label.are.you.sure.you.want.to.delete=вы уверены, что хотите удалить {0}?
@@ -130,6 +129,7 @@ label.grand.event.count=всего супер-событий
 label.home.not.configured=главная страница не настроена
 label.id=идентификатор
 label.item.number=№ п/п
+label.label=название
 label.last.login.time=время последнего входа в систему
 label.link=ссылка
 label.message=сообщение
@@ -138,6 +138,7 @@ label.name=имя
 label.nick=никнейм
 label.no=нет
 label.no.content=нет содержимого
+label.not.specified=не задано
 label.note=примечание
 label.none.selected=Ничего не выбрано
 label.open=открытый
@@ -147,7 +148,8 @@ label.organizations=организации
 label.phone=телефон
 label.please.select.a.value=Пожалуйста, выберите значение
 label.portal.title=заголовок портала
-label.post.release.link=ссылка на пост-релиз
+label.profile=профиль
+label.profile.tip=ссылка на профиль в одной из социальных сетей
 label.roles=роли
 label.save=сохранить
 label.settings.have.been.saved=настройки были сохранены
@@ -218,14 +220,22 @@ label.setting.VIDEO_CHUNKS_SEC=размер видео файлов (сек)
 ################################################################################
 # Events
 ################################################################################
-label.event.useAuthorNameAndPhone=Использовать свое имя и телефон как контактную информацию по событию
-label.event.contactName=Имя для связи
-label.event.contactPhone=Телефон для связи
+label.event.useAuthorContactInfo=Использовать свою контактную информацию для этого события
+label.event.contactName.tip=Имя человека, с которым можно связаться и уточнить детали мероприятия
 label.event.error.parentStartDateIsAfter=Программа вашего события начинается раньше даты начала супер-события - {0}
 label.event.error.parentEndDateIsBefore=Программа вашего события заканчивается позже даты окончания супер-события - {0}
 label.event.do.export.for.social.networks=экспортировать для социальных сетей
 error.event.export.unknown.error=Во время экспорта произошла неизвестная ошибка. Повторите попытку.
 label.event.contact.info=Контакт: {0}
+label.event.contact.info.settings=Контактная информация
+label.event.general.info.settings=Общая инфомация о событии
+label.event.parent.tip=В рамках какого большого события пройдет это.
+label.event.additional.info.link.tip=Укажите ссылку на дополнительную информацию о событии.
+label.event.post.release=пост-релиз
+label.event.post.release.tip=укажите ссылку на пост-релиз мероприятия (если оно уже прошло).
+label.event.contactInfo.tip=Внимание! Контактная информация будет публично доступна для всех.
+label.event.geo.settings=География мероприятия
+label.event.program.settings=Программа мероприятия
 
 ################################################################################
 # --- Constraints

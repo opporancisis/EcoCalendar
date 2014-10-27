@@ -33,16 +33,17 @@
 		<div class="alert alert-danger">@editForm.globalError.message</div>
 	}
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("title"),
 		'_label -> "label.title"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+	)
 
-	@textarea(
+	@views.html.bootstrap.textarea(
 		field = editForm("body"),
 		args = 'rows -> 3, 'cols -> 50,
-		'_label -> "label.description"
-	)(FieldConstructor(views.html.bootstrap.textarea.f), null)
+		'_label -> "label.description",
+		'required -> true
+	)
 
 	@select(
 		field = editForm("attachments"),
@@ -50,7 +51,7 @@
 		'_label -> "label.file.files",
 		'multiple -> true,
 		'class -> "form-control"
-	)(FieldConstructor(views.html.bootstrap.field.f), null)
+	)
 
 	@_submit("label.save")
 

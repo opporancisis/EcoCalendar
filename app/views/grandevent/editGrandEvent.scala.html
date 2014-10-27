@@ -5,6 +5,7 @@
 
 @import helper._
 @import scala.collection.mutable.LinkedHashMap
+@import helpers.BootstrapHelper._
 
 @implicitScripts = {
 	<link href="@routes.Assets.at("lib/bootstrap-datepicker/css/datepicker3.css")" rel="stylesheet">
@@ -45,28 +46,30 @@
 		@_staticFormField("label.author", event.author.nick)
 	}
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("name"),
-		'_label -> "label.name"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+		'_label -> "label.name",
+		'required -> true
+	)
 
-	@textarea(
+	@views.html.bootstrap.textarea(
 		field = editForm("description"),
 		args = 'rows -> 3, 'cols -> 50,
-		'_label -> "label.description"
-	)(FieldConstructor(views.html.bootstrap.textarea.f), null)
+		'_label -> "label.description",
+		'required -> true
+	)
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("startDate"),
 		args = 'required -> true,
 		'_label -> "label.start"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+	)
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("endDate"),
 		args = 'required -> true,
 		'_label -> "label.end"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+	)
 
 	@select(
 		field = editForm("tags"),
@@ -74,7 +77,7 @@
 		'_label -> "label.tags",
 		'multiple -> true,
 		'class -> "form-control"
-	)(FieldConstructor(views.html.bootstrap.field.f), null)
+	)
 
 	@select(
 		field = editForm("organizations"),
@@ -82,7 +85,7 @@
 		'_label -> "label.organizations",
 		'multiple -> true,
 		'class -> "form-control"
-	)(FieldConstructor(views.html.bootstrap.field.f), null)
+	)
 
 	@_submit(if(event != null) "label.save" else "label.create")
 

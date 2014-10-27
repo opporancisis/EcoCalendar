@@ -4,6 +4,7 @@
 @import helper._
 @import scala.collection.mutable.LinkedHashMap
 @import views.menu.SystemMenu._
+@import helpers.BootstrapHelper._
 
 @main(
 	if(country != null)
@@ -24,28 +25,32 @@
 	}
 
 	@if(country != null) {
-		@_staticFormField("label.cities", country.cities.size)
+		@_staticFormField("label.entity.plural.City", country.cities.size)
 	}
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("name"),
-		'_label -> "label.name"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+		'_label -> "label.name",
+		'required -> true
+	)
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("centerLatitude"),
-		'_label -> "label.centerLatitude"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+		'_label -> "label.centerLatitude",
+		'required -> true
+	)
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("centerLongitude"),
-		'_label -> "label.centerLongitude"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+		'_label -> "label.centerLongitude",
+		'required -> true
+	)
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("defaultZoom"),
-		'_label -> "label.defaultZoom"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+		'_label -> "label.defaultZoom",
+		'required -> true
+	)
 
 	@_submit(if(country != null) "label.save" else "label.create")
 }

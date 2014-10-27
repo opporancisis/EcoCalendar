@@ -5,6 +5,7 @@
 @import helper._
 @import scala.collection.mutable.LinkedHashMap
 @import views.menu.SystemMenu._
+@import helpers.BootstrapHelper._
 
 @main(
 	if(city != null)
@@ -29,37 +30,42 @@
 		options = countries.map(a => a.id.toString -> a.name).toSeq,
 		'_label -> "label.country",
 		'class -> "form-control",
-		'_default -> Messages("label.none.selected")
-	)(FieldConstructor(views.html.bootstrap.field.f), null)
+		'_default -> Messages("label.none.selected"),
+		'required -> true
+	)
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("name"),
-		'_label -> "label.name"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+		'_label -> "label.name",
+		'required -> true
+	)
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("centerLatitude"),
-		'_label -> "label.centerLatitude"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+		'_label -> "label.centerLatitude",
+		'required -> true
+	)
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("centerLongitude"),
-		'_label -> "label.centerLongitude"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+		'_label -> "label.centerLongitude",
+		'required -> true
+	)
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("defaultZoom"),
-		'_label -> "label.defaultZoom"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+		'_label -> "label.defaultZoom",
+		'required -> true
+	)
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("weight"),
 		'_label -> "label.weight",
-		'help -> Messages("label.city.weight.help")
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+		'help -> Messages("label.city.weight.help"),
+		'required -> true
+	)
 
-	<input type="submit" value="@Messages(if(city != null) "label.save" else "label.create")" class="btn btn-primary">
-
+	@_submit(if(city != null) "label.save" else "label.create")
 }
 
 }

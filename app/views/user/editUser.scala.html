@@ -57,17 +57,17 @@
 		'_label -> Messages("label.status.blocked")
 	)(FieldConstructor(views.html.bootstrap.checkbox.f), null)
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("email"),
 		'_label -> "label.email",
 		'help -> "label.user.email.tip"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+	)
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("nick"),
 		'_label -> "label.nick",
 		'help -> "label.user.nick.tip"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+	)
 
 	@select(
 		field = editForm("roles"),
@@ -76,26 +76,32 @@
 		'multiple -> true,
 		'required -> true,
 		'class -> "form-control"
-	)(FieldConstructor(views.html.bootstrap.field.f), null)
+	)
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("name"),
 		'_label -> "label.name",
 		'help -> "label.user.name.and.phone.tip"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+	)
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("phone"),
 		'_label -> "label.phone",
 		'help -> "label.user.name.and.phone.tip"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+	)
 
-	@textarea(
+	@views.html.bootstrap.inputText(
+		field = editForm("profileLink"),
+		'_label -> "label.profile",
+		'help -> "label.profile.tip"
+	)
+
+	@views.html.bootstrap.textarea(
 		field = editForm("note"),
 		args = 'rows -> 3, 'cols -> 50,
 		'_label -> "label.note",
 		'help -> "label.user.note.tip"
-	)(FieldConstructor(views.html.bootstrap.textarea.f), null)
+	)
 
 	@_submit(if(editForm("id").value != null) "label.save" else "label.create")
 

@@ -3,8 +3,8 @@
 @import helper._
 @import helpers.BootstrapHelper._
 
-@inputText(
+@views.html.bootstrap.inputText(
 	f("email"),
 	'_showConstraints -> constraints,
-	'_label -> Messages("playauthenticate.login.email.placeholder")
-)(FieldConstructor(views.html.bootstrap.input.f), null)
+	'_label -> "playauthenticate.login.email.placeholder"
+)

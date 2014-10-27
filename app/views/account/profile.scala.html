@@ -25,7 +25,7 @@
 	)
 ) {
 
-<div class="row panel">
+<div class="panel">
 
 	@helper.form(routes.Account.doChangeProfile, 'class -> "form-horizontal") {
    	
@@ -33,17 +33,17 @@
 			<div class="alert alert-danger">@editForm.globalError.message</div>
 		}
 
-		@inputText(
+		@views.html.bootstrap.inputText(
 			field = editForm("email"),
 			'_label -> "label.email"
-		)(FieldConstructor(views.html.bootstrap.input.f), null)
+		)
            
-		@inputText(
+		@views.html.bootstrap.inputText(
 			field = editForm("nick"),
 			'_label -> "label.nick"
-		)(FieldConstructor(views.html.bootstrap.input.f), null)
+		)
           	
-		<input type="submit" value="@Messages("label.save")" class="btn btn-primary">
+		@_submit("label.save")
 
 	}
 
@@ -57,18 +57,18 @@
 
 @if(viewRestrict(la(as("user")), null)) {
 <div class="panel">
-	<div class="row">
+	<div>
     	@Messages("label.user.your.registration.data"):
     </div>
     
-	<div class="row">
+	<div>
 	  <div class="col-md-4">@Messages("label.name")</div>
 	  <div class="col-md-8">@user.name</div>
 	</div>
 </div>
 }	
 
-	<div class="row panel">
+	<div class="panel">
     @defining(user.getProviders()) { providers =>
         @if(providers.size() > 0) {
 	        @if(providers.size() ==1) {

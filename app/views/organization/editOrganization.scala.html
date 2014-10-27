@@ -4,6 +4,7 @@
 @import helper._
 @import scala.collection.mutable.LinkedHashMap
 @import views.menu.SystemMenu._
+@import helpers.BootstrapHelper._
 
 @main(
 	if(org != null)
@@ -28,16 +29,18 @@
 		@_staticFormField("label.grand.event.count", org.grandEvents.size)
 	}
 
-	@inputText(
+	@views.html.bootstrap.inputText(
 		field = editForm("name"),
-		'_label -> "label.name"
-	)(FieldConstructor(views.html.bootstrap.input.f), null)
+		'_label -> "label.name",
+		'required -> true
+	)
 
-	@textarea(
+	@views.html.bootstrap.textarea(
 		field = editForm("description"),
 		args = 'rows -> 3, 'cols -> 50,
-		'_label -> "label.description"
-	)(FieldConstructor(views.html.bootstrap.textarea.f), null)
+		'_label -> "label.description",
+		'required -> true
+	)
 
 	@_submit(if(org != null) "label.save" else "label.create")
 }
