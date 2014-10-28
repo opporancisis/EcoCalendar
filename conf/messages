@@ -319,9 +319,9 @@ playauthenticate.signup.name=Your name
 playauthenticate.signup.now=Sign up now
 playauthenticate.signup.oauth=or sign up using one of the following providers:
 
-playauthenticate.verify.account.title=E-mail verification required
-playauthenticate.verify.account.before=Before setting a password, you need to
-playauthenticate.verify.account.first=first verify your e-mail address
+playauthenticate.verify.account.title=Требуется пройти верификацию е-почты
+playauthenticate.verify.account.before=Перед тем как поменять пароль Вам необходимо
+playauthenticate.verify.account.first=провести верификацию адреса е-почты
 
 playauthenticate.change.password.title=Вы можете сменить свой пароль
 playauthenticate.change.password.cta=Сменить пароль
@@ -346,8 +346,8 @@ playauthenticate.verify.email.cta=Электронное письмо было �
 playauthenticate.password.reset.title=Reset password
 playauthenticate.password.reset.cta=Reset my password
 
-playauthenticate.password.forgot.title=Forgot password
-playauthenticate.password.forgot.cta=Send reset instructions
+playauthenticate.password.forgot.title=Восстановление пароля
+playauthenticate.password.forgot.cta=Послать инструкции для восстановления пароля
 
 playauthenticate.oauth.access.denied.title=OAuth access denied
 playauthenticate.oauth.access.denied.explanation=If you want to use PlayAuthenticate with OAuth, you must accept the connection.

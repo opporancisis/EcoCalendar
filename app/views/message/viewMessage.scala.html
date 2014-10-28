@@ -1,8 +1,6 @@
 @(message: models.message.Message)
 
-@import helper._
 @import scala.collection.mutable.LinkedHashMap
-@import helper.twitterBootstrap._
 @import be.objectify.deadbolt.java.views.html._
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
 @import be.objectify.deadbolt.java.DeadboltViewSupport._
@@ -21,7 +19,7 @@
 	)
 ) {
 
-	<div class="row">
+	<div>
 		<h1>@message.subject</h1>
 		<div>@Html(message.body)</div>
 	</div>

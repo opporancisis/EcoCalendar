@@ -1,6 +1,5 @@
 @(editForm: play.data.Form[controllers.Account.ProfileChange])
 
-@import helper._
 @import helpers.BootstrapHelper._
 @import com.feth.play.module.pa.views.html._
 @import scala.collection.mutable.LinkedHashMap
@@ -27,18 +26,18 @@
 
 <div class="panel">
 
-	@helper.form(routes.Account.doChangeProfile, 'class -> "form-horizontal") {
+	@form(routes.Account.doChangeProfile) {
    	
 		@if(editForm.hasGlobalErrors) { 
 			<div class="alert alert-danger">@editForm.globalError.message</div>
 		}
 
-		@views.html.bootstrap.inputText(
+		@inputText(
 			field = editForm("email"),
 			'_label -> "label.email"
 		)
            
-		@views.html.bootstrap.inputText(
+		@inputText(
 			field = editForm("nick"),
 			'_label -> "label.nick"
 		)

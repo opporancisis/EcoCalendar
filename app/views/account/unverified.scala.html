@@ -1,7 +1,12 @@
+@()
 
-@main("playauthenticate.verify.account.title") {
+@main(
+	"playauthenticate.verify.account.title",
+	breadcrumbs = collection.Map(
+		"playauthenticate.verify.account.title" -> routes.Account.changePersonalPassword
+	)
+) {
 
-	<p>
-	@Messages("playauthenticate.verify.account.before") <a href="@routes.Account.verifyEmail">@Messages("playauthenticate.verify.account.first")</a>.<br/>
-	</p>
+@Messages("playauthenticate.verify.account.before") <a href="@routes.Account.verifyEmail">@Messages("playauthenticate.verify.account.first")</a>.<br/>
+
 }

@@ -6,7 +6,10 @@ version := "1.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava,SbtWeb)
 
-TwirlKeys.templateImports += "play.data.format.Formatters"
+TwirlKeys.templateImports ++= Seq(
+	"play.data.format.Formatters",
+	"views.html.bootstrap._"
+)
 
 LessKeys.compress in Assets := true
 

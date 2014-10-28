@@ -1,6 +1,5 @@
 @(loginForm: play.data.Form[_])
 
-@import helper._
 @import scala.collection.mutable.LinkedHashMap
 @import helpers.BootstrapHelper._
 
@@ -22,7 +21,7 @@
 
 			@_emailPartial(loginForm)
 
-			@views.html.bootstrap.inputPassword(
+			@inputPassword(
 				loginForm("password"),
 				'_showConstraints -> false,
 				'inputType -> "password",

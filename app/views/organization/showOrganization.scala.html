@@ -1,6 +1,5 @@
 @(org: models.organization.Organization)
 
-@import helper._
 @import scala.collection.mutable.LinkedHashMap
 @import views.menu.SystemMenu._
 
@@ -14,7 +13,7 @@
 
 @org.description
 
-@helper.form(routes.OrganizationController.details(org.id), 'class -> "form-horizontal") {
+@form(routes.OrganizationController.details(org.id)) {
 
 	@_staticFormField("label.event.count", org.events.size)
 	@_staticFormField("label.grand.event.count", org.grandEvents.size)

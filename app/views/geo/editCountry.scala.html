@@ -1,7 +1,6 @@
 @(editForm: play.data.Form[models.geo.Country],
 	country: models.geo.Country)
 
-@import helper._
 @import scala.collection.mutable.LinkedHashMap
 @import views.menu.SystemMenu._
 @import helpers.BootstrapHelper._
@@ -18,7 +17,7 @@
 	)
 ) {
 
-@helper.form(if(country != null) routes.CountryController.doEdit(country.id) else routes.CountryController.doCreate, 'class -> "form-horizontal") {
+@form(if(country != null) routes.CountryController.doEdit(country.id) else routes.CountryController.doCreate) {
 
 	@if(editForm.hasGlobalErrors) { 
 		<div class="alert alert-danger">@editForm.globalError.message</div>
@@ -28,25 +27,25 @@
 		@_staticFormField("label.entity.plural.City", country.cities.size)
 	}
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("name"),
 		'_label -> "label.name",
 		'required -> true
 	)
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("centerLatitude"),
 		'_label -> "label.centerLatitude",
 		'required -> true
 	)
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("centerLongitude"),
 		'_label -> "label.centerLongitude",
 		'required -> true
 	)
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("defaultZoom"),
 		'_label -> "label.defaultZoom",
 		'required -> true

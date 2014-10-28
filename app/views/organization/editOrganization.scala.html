@@ -1,7 +1,6 @@
 @(editForm: play.data.Form[models.organization.Organization],
 	org: models.organization.Organization)
 
-@import helper._
 @import scala.collection.mutable.LinkedHashMap
 @import views.menu.SystemMenu._
 @import helpers.BootstrapHelper._
@@ -18,7 +17,7 @@
 	)
 ) {
 
-@helper.form(if(org != null) routes.OrganizationController.doEdit(org.id) else routes.OrganizationController.doCreate, 'class -> "form-horizontal") {
+@form(if(org != null) routes.OrganizationController.doEdit(org.id) else routes.OrganizationController.doCreate) {
 
 	@if(editForm.hasGlobalErrors) { 
 		<div class="alert alert-danger">@editForm.globalError.message</div>
@@ -29,13 +28,13 @@
 		@_staticFormField("label.grand.event.count", org.grandEvents.size)
 	}
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("name"),
 		'_label -> "label.name",
 		'required -> true
 	)
 
-	@views.html.bootstrap.textarea(
+	@textarea(
 		field = editForm("description"),
 		args = 'rows -> 3, 'cols -> 50,
 		'_label -> "label.description",

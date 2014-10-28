@@ -1,18 +1,14 @@
 @(clazz: java.lang.Class[_], id: java.lang.Object)
 
-@import helper._
 @import scala.collection.mutable.LinkedHashMap
-@import helper.twitterBootstrap._
-@import be.objectify.deadbolt.java.views.html._
-@import be.objectify.deadbolt.core.utils.TemplateUtils._
-@import be.objectify.deadbolt.java.DeadboltViewSupport._
 
 @main(
-	"nav.404"
+	"nav.404",
+	breadcrumbs = LinkedHashMap()
 ) {
 
-	@Messages("error.not.found.object", Messages("label.entity." + clazz.getSimpleName), id)
-	<br /><br />
-	<a href="javascript:window.history.back()">@Messages("label.do.go.back")</a>
+@Messages("error.not.found.object", Messages("label.entity." + clazz.getSimpleName), id)
+<br /><br />
+<a href="javascript:window.history.back()">@Messages("label.do.go.back")</a>
 
 }

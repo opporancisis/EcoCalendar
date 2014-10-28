@@ -1,15 +1,10 @@
 @(settings: Map[String, models.sys.Setting])
 
-@import helper._
 @import helpers.BootstrapHelper._
 @import scala.collection.mutable.LinkedHashMap
 
-@scripts = {
-}
-
 @main(
 	"nav.sys.settings",
-	scripts = scripts,
 	breadcrumbs = LinkedHashMap(
 		"nav.sys.settings" -> routes.SettingController.edit
 	),
@@ -22,18 +17,18 @@
 	)
 ) {
 
-	<div class="row">
-		@helper.form(routes.SettingController.doEdit(), 'class -> "form-horizontal") {
+@form(routes.SettingController.doEdit()) {
 
-			@for(set <- models.sys.SettingName.values if set.isEditable) {
-				<div class="form-group">
-				    <label class="col-lg-2 control-label" for="@set.name">@Messages("label.setting." + set.name).capitalize</label>
-				    <div class="col-lg-10">
-				        <input type="text" placeholder="@Messages("label.setting." + set.name).capitalize" value="@{val s = settings.get(set.name); if(s != null) {s.value}}" name="@set.name" id="@set.name" class="form-control" />
-				    </div>
-				</div>
-			}
-			@_submit("label.save")           
-		}
-	</div>
+	@for(set <- models.sys.SettingName.values if set.isEditable) {
+		<div class="form-group">
+			<label class="col-lg-2 control-label" for="@set.name">@Messages("label.setting." + set.name).capitalize</label>
+			<div class="col-lg-10">
+				<input type="text" placeholder="@Messages("label.setting." + set.name).capitalize" value="@{val s = settings.get(set.name); if(s != null) {s.value}}" name="@set.name" id="@set.name" class="form-control" />
+			</div>
+		</div>
+	}
+
+	@_submit("label.save")           
+}
+
 }

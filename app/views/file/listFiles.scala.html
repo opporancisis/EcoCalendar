@@ -1,8 +1,6 @@
 @(files: List[models.file.UploadedFile])
 
-@import helper._
 @import scala.collection.mutable.LinkedHashMap
-@import helper.twitterBootstrap._
 @import be.objectify.deadbolt.java.views.html._
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
 @import be.objectify.deadbolt.java.DeadboltViewSupport._
@@ -60,8 +58,8 @@
 	@_foundNoneOf(classOf[models.file.UploadedFile])
 }
 
-	@if(viewRestrict(la(as("admin")), null)) {
-		<a href="@routes.FileController.create" class="btn btn-primary">@Messages("label.do.create")</a>
-	}
+@if(viewRestrict(la(as("admin")), null)) {
+	@_btn(routes.FileController.create, "label.do.create")
+}
 
 }

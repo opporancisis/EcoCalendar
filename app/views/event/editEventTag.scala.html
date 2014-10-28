@@ -1,7 +1,6 @@
 @(editForm: play.data.Form[models.event.tag.EventTag],
 	tag: models.event.tag.EventTag)
 
-@import helper._
 @import scala.collection.mutable.LinkedHashMap
 @import views.menu.SystemMenu._
 @import helpers.BootstrapHelper._
@@ -18,7 +17,7 @@
 	)
 ) {
 
-@helper.form(if(tag != null) routes.EventTagController.doEdit(tag.id) else routes.EventTagController.doCreate, 'class -> "form-horizontal") {
+@form(if(tag != null) routes.EventTagController.doEdit(tag.id) else routes.EventTagController.doCreate) {
 
 	@if(editForm.hasGlobalErrors) { 
 		<div class="alert alert-danger">@editForm.globalError.message</div>
@@ -29,7 +28,7 @@
 		@_staticFormField("label.grand.event.count", tag.grandEvents.size)
 	}
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("name"),
 		'_label -> "label.name",
 		'required -> true

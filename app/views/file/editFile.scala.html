@@ -1,7 +1,6 @@
 @(editForm: play.data.Form[models.file.UploadedFile],
 	file: models.file.UploadedFile)
 
-@import helper._
 @import helpers.BootstrapHelper._
 @import scala.collection.mutable.LinkedHashMap
 @import views.menu.SystemMenu._
@@ -12,13 +11,13 @@
 		else "nav.file.create"
 ) {
 
-@helper.form(if(file != null) routes.FileController.doEdit(file.id) else routes.FileController.doCreate, 'class -> "form-horizontal", 'enctype -> "multipart/form-data") {
+@form(if(file != null) routes.FileController.doEdit(file.id) else routes.FileController.doCreate, 'enctype -> "multipart/form-data") {
 
 	@if(editForm.hasGlobalErrors) { 
 		<div class="alert alert-danger">@editForm.globalError.message</div>
 	}
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("name"),
 		'_label -> "label.name"
 	)
