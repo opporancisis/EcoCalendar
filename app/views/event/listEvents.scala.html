@@ -117,13 +117,6 @@
 					<a class="btn btn-default btn-xs" href='@{routes.EventController.edit(e.id)}' title="@Messages("label.do.edit")">
 						<span class="glyphicon glyphicon-pencil"></span>
 					</a>
-					<a class="btn btn-default btn-xs js-ajax" title="@Messages("label.do.remove")"
-							data-action="remove"
-							data-method="POST"
-							data-url="@routes.EventController.remove(e.id)"
-							data-confirm="@Messages("label.are.you.sure.you.want.to.delete", e.name)">
-						<span class="glyphicon glyphicon-remove"></span>
-					</a>
 				</td>
 			</tr>
 		}
