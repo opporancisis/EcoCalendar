@@ -59,7 +59,7 @@ public class Application extends Controller {
 		return ok(
 				Routes.javascriptRouter("jsRoutes", routes.javascript.Signup.forgotPassword(),
 						routes.javascript.EventController.edit(),
-						routes.javascript.EventController.remove(),
+						routes.javascript.EventController.removeMany(),
 						routes.javascript.UserController.details(),
 						routes.javascript.GrandEventController.details(),
 						routes.javascript.OrganizationController.details(),

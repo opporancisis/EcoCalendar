@@ -7,20 +7,26 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Function;
 
 import models.event.Event;
 import models.event.GrandEvent;
 import models.event.tag.EventTag;
 import models.geo.Country;
 import models.geo.GeoCoords;
+import models.message.Message;
 import models.organization.Organization;
 import models.user.User;
 import play.data.Form;
+import play.db.ebean.Transactional;
 import play.i18n.Messages;
 import play.mvc.Controller;
 import play.mvc.Result;
 import utils.DatesInterval;
 import be.objectify.deadbolt.java.actions.SubjectPresent;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
 import controllers.EventController.ExportForm;
 import controllers.helpers.ContextAugmenter;
 import controllers.helpers.ContextAugmenterAction;
@@ -128,16 +134,6 @@ public class EventController extends Controller {
 		return redirect(routes.EventController.list());
 	}
 
-	@SubjectPresent
-	public static Result remove(long id) {
-		Event event = Event.find.byId(id);
-		if (event == null) {
-			return Application.notFoundObject(Event.class, id);
-		}
-		event.delete();
-		return ok();
-	}
-
 	// TODO: let users to complain about events. each complain will temporarily
 	// reduce karma, but karma reduction will be compensated after complaint
 	// success check.
@@ -199,6 +195,36 @@ public class EventController extends Controller {
 			}
 		}
 		return ok(views.html.event.export.render(map, startDate, endDate, lang()));
+	}
+
+	@Transactional
+	public static Result removeMany() {
+		return processMessages((event) -> {
+			event.delete();
+			return null;
+		});
+	}
+
+	private static Result processMessages(Function<Event, Void> handler) {
+		JsonNode json = request().body().asJson();
+		if (json == null) {
+			return badRequest("Expecting Json data");
+		}
+		if (!json.isArray()) {
+			return badRequest("root element must be array: " + json);
+		}
+		User user = ContextAugmenterAction.getLoggedUser();
+		for (JsonNode elem : json) {
+			long id = elem.asLong(-1);
+			if (id == -1) {
+				return badRequest("incorrect format. expected long, but get: " + elem);
+			}
+			Event event = Event.find.byId(id);
+			// TODO: check user permissions to delete this event. should be
+			// creator or admin or city moderator
+			handler.apply(event);
+		}
+		return ok();
 	}
 
 	public static class ExportForm {

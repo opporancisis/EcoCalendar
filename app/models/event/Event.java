@@ -100,10 +100,10 @@ public class Event extends Model {
 	@OneToMany(cascade = CascadeType.ALL)
 	public List<EventDayProgram> days;
 
-	@ManyToMany(mappedBy = "events")
+	@ManyToMany(mappedBy = "events", cascade = CascadeType.ALL)
 	public List<EventTag> tags;
 
-	@ManyToMany(mappedBy = "events")
+	@ManyToMany(mappedBy = "events", cascade = CascadeType.ALL)
 	public List<Organization> organizations;
 
 	public static Finder<Long, Event> find = new Finder<>(Long.class, Event.class);

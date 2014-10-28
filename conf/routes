@@ -101,7 +101,7 @@ GET    /event/create                     controllers.EventController.create
 POST   /event/create                     controllers.EventController.doCreate
 GET    /event/edit/:id                   controllers.EventController.edit(id: Long)
 POST   /event/edit/:id                   controllers.EventController.doEdit(id: Long)
-POST   /event/remove/:id                 controllers.EventController.remove(id: Long)
+POST   /event/removeMany                 controllers.EventController.removeMany
 POST   /event/export                     controllers.EventController.exportEvents()
 GET    /event                            controllers.EventController.list
 POST   /event                            controllers.EventController.doChangeInterval
