@@ -1,7 +1,6 @@
 @(editForm: play.data.Form[models.standardPage.StandardPage],
 	files: List[models.file.UploadedFile])
 
-@import helper._
 @import helpers.BootstrapHelper._
 @import scala.collection.mutable.LinkedHashMap
 @import views.menu.SystemMenu._
@@ -29,7 +28,7 @@
 	)
 ) {
 
-@helper.form(if(editForm("id").value != null) routes.StandardPageController.doEdit(editForm("id").value.toLong) else routes.StandardPageController.doCreate, 'class -> "form-horizontal") {
+@form(if(editForm("id").value != null) routes.StandardPageController.doEdit(editForm("id").value.toLong) else routes.StandardPageController.doCreate) {
 
 	@if(editForm.hasGlobalErrors) { 
 		<div class="alert alert-danger">@editForm.globalError.message</div>
@@ -38,21 +37,21 @@
 	@if(editForm("id").value != null) {
 		@checkbox(
 			field = editForm("disabled"),
-			'_label -> "label.stdPage.is.disabled"
-		)(FieldConstructor(views.html.bootstrap.checkbox.f), null)
+			'_text -> "label.stdPage.is.disabled"
+		)
 	}
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("title"),
 		'_label -> "label.title"
 	)
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("link"),
 		'_label -> "label.link"
 	)
 
-	@views.html.bootstrap.textarea(
+	@textarea(
 		field = editForm("description"),
 		args = 'rows -> 3, 'cols -> 50,
 		'_label -> "label.description",
@@ -61,10 +60,9 @@
 
 	@select(
 		field = editForm("attachments"),
-		options = files.map(a => a.id.toString -> a.name).toSeq,
+		'options -> files.map(a => a.id.toString -> a.name).toSeq,
 		'_label -> "label.file.files",
-		'multiple -> true,
-		'class -> "form-control"
+		'multiple -> true
 	)
 
 	@_submit(if(editForm("id").value != null) "label.save" else "label.create")

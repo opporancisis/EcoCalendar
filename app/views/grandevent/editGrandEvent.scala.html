@@ -3,7 +3,6 @@
 	organizations: List[models.organization.Organization],
 	tags: List[models.event.tag.EventTag])
 
-@import helper._
 @import scala.collection.mutable.LinkedHashMap
 @import helpers.BootstrapHelper._
 
@@ -34,7 +33,7 @@
 	)
 ) {
 
-@helper.form(if(event != null) routes.GrandEventController.doEdit(event.id) else routes.GrandEventController.doCreate, 'class -> "form-horizontal") {
+@form(if(event != null) routes.GrandEventController.doEdit(event.id) else routes.GrandEventController.doCreate) {
 
 	@if(editForm.hasGlobalErrors) { 
 		<div class="alert alert-danger">@editForm.globalError.message</div>
@@ -46,26 +45,26 @@
 		@_staticFormField("label.author", event.author.nick)
 	}
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("name"),
 		'_label -> "label.name",
 		'required -> true
 	)
 
-	@views.html.bootstrap.textarea(
+	@textarea(
 		field = editForm("description"),
 		args = 'rows -> 3, 'cols -> 50,
 		'_label -> "label.description",
 		'required -> true
 	)
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("startDate"),
 		args = 'required -> true,
 		'_label -> "label.start"
 	)
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("endDate"),
 		args = 'required -> true,
 		'_label -> "label.end"
@@ -73,18 +72,16 @@
 
 	@select(
 		field = editForm("tags"),
-		options = tags.map(a => a.id.toString -> a.name).toSeq,
+		'options -> tags.map(a => a.id.toString -> a.name).toSeq,
 		'_label -> "label.tags",
-		'multiple -> true,
-		'class -> "form-control"
+		'multiple -> true
 	)
 
 	@select(
 		field = editForm("organizations"),
-		options = organizations.map(a => a.id.toString -> a.name).toSeq,
+		'options -> organizations.map(a => a.id.toString -> a.name).toSeq,
 		'_label -> "label.organizations",
-		'multiple -> true,
-		'class -> "form-control"
+		'multiple -> true
 	)
 
 	@_submit(if(event != null) "label.save" else "label.create")

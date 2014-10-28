@@ -2,7 +2,7 @@
 	city: models.geo.City,
 	countries: List[models.geo.Country])
 
-@import helper._
+@import views.html.bootstrap._
 @import scala.collection.mutable.LinkedHashMap
 @import views.menu.SystemMenu._
 @import helpers.BootstrapHelper._
@@ -25,12 +25,10 @@
 		<div class="alert alert-danger">@editForm.globalError.message</div>
 	}
 
-	@select(
+	@views.html.bootstrap.select(
 		field = editForm("country"),
-		options = countries.map(a => a.id.toString -> a.name).toSeq,
+		'options -> countries.map(a => a.id.toString -> a.name).toSeq,
 		'_label -> "label.country",
-		'class -> "form-control",
-		'_default -> Messages("label.none.selected"),
 		'required -> true
 	)
 

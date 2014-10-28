@@ -1,7 +1,6 @@
 @(editForm: play.data.Form[models.user.User],
 	editUser: models.user.User)
 
-@import helper._
 @import helpers.BootstrapHelper._
 @import scala.collection.mutable.LinkedHashMap
 @import play.libs.Json
@@ -41,7 +40,7 @@
 	)
 ) {
 
-@helper.form(if(editForm("id").value != null) routes.UserController.doEdit(editForm("id").value.toLong) else routes.UserController.doCreate, 'class -> "form-horizontal") {
+@form(if(editForm("id").value != null) routes.UserController.doEdit(editForm("id").value.toLong) else routes.UserController.doCreate) {
 
 	@if(editForm.hasGlobalErrors) { 
 		<div class="alert alert-danger">@editForm.globalError.message</div>
@@ -54,16 +53,16 @@
 
 	@checkbox(
 		field = editForm("blocked"),
-		'_label -> Messages("label.status.blocked")
-	)(FieldConstructor(views.html.bootstrap.checkbox.f), null)
+		'_text -> Messages("label.status.blocked")
+	)
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("email"),
 		'_label -> "label.email",
 		'help -> "label.user.email.tip"
 	)
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("nick"),
 		'_label -> "label.nick",
 		'help -> "label.user.nick.tip"
@@ -71,32 +70,31 @@
 
 	@select(
 		field = editForm("roles"),
-		options = models.user.RoleName.asList().map(a => a -> Messages("label.roles." + a)).toSeq,
+		'options -> models.user.RoleName.asList().map(a => a -> Messages("label.roles." + a)).toSeq,
 		'_label -> "label.roles",
 		'multiple -> true,
-		'required -> true,
-		'class -> "form-control"
+		'required -> true
 	)
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("name"),
 		'_label -> "label.name",
 		'help -> "label.user.name.and.phone.tip"
 	)
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("phone"),
 		'_label -> "label.phone",
 		'help -> "label.user.name.and.phone.tip"
 	)
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("profileLink"),
 		'_label -> "label.profile",
 		'help -> "label.profile.tip"
 	)
 
-	@views.html.bootstrap.textarea(
+	@textarea(
 		field = editForm("note"),
 		args = 'rows -> 3, 'cols -> 50,
 		'_label -> "label.note",

@@ -6,7 +6,6 @@
 	organizations: List[models.organization.Organization],
 	countries: List[models.geo.Country])
 
-@import helper._
 @import scala.collection.mutable.LinkedHashMap
 @import helpers.BootstrapHelper._
 
@@ -47,7 +46,7 @@
 	)
 ) {
 
-@helper.form(if(event != null) routes.EventController.doEdit(event.id) else routes.EventController.doCreate, 'class -> "form-horizontal") {
+@form(if(event != null) routes.EventController.doEdit(event.id) else routes.EventController.doCreate) {
 
 	@if(editForm.hasGlobalErrors) { 
 		<div class="alert alert-danger">@play.twirl.api.Html(editForm.globalErrors.map(_.message).mkString("<br />"))</div>
@@ -67,13 +66,13 @@
 		<div class="panel-heading">@Messages("label.event.general.info.settings")</div>
   		<div class="panel-body">
 
-			@views.html.bootstrap.inputText(
+			@inputText(
 				field = editForm("name"),
 				'_label -> "label.label",
 				'required -> true
 			)
 
-			@views.html.bootstrap.textarea(
+			@textarea(
 				field = editForm("description"),
 				args = 'rows -> 3, 'cols -> 50,
 				'_label -> "label.description",
@@ -82,36 +81,32 @@
 
 			@select(
 				field = editForm("parent"),
-				options = grandEvents.map(a => a.id.toString -> a.name).toSeq,
+				'options -> grandEvents.map(a => a.id.toString -> a.name).toSeq,
 				'_label -> "label.grand.event",
-				'class -> "form-control",
-				'_default -> Messages("label.none.selected"),
-				'help -> Messages("label.event.parent.tip")
+				'help -> "label.event.parent.tip"
 			)
 
 			@select(
 				field = editForm("tags"),
-				options = tags.map(a => a.id.toString -> a.name).toSeq,
+				'options -> tags.map(a => a.id.toString -> a.name).toSeq,
 				'_label -> "label.tags",
-				'multiple -> true,
-				'class -> "form-control"
+				'multiple -> true
 			)
 
 			@select(
 				field = editForm("organizations"),
-				options = organizations.map(a => a.id.toString -> a.name).toSeq,
+				'options -> organizations.map(a => a.id.toString -> a.name).toSeq,
 				'_label -> "label.organizations",
-				'multiple -> true,
-				'class -> "form-control"
+				'multiple -> true
 			)
 
-			@views.html.bootstrap.inputText(
+			@inputText(
 				field = editForm("additionalInfoLink"),
 				'_label -> "label.link",
 				'help -> "label.event.additional.info.link.tip"
 			)
 
-			@views.html.bootstrap.inputText(
+			@inputText(
 				field = editForm("postReleaseLink"),
 				'_label -> "label.event.post.release",
 				'help -> "label.event.post.release.tip"
@@ -126,12 +121,12 @@
 
 			@checkbox(
 				field = editForm("useAuthorContactInfo"),
-				'_label -> "label.event.useAuthorContactInfo",
+				'_text -> "label.event.useAuthorContactInfo",
 				Symbol("data-bind") -> "checked: useAuthorContactInfo",
 				'help -> "label.event.contactInfo.tip"
-			)(FieldConstructor(views.html.bootstrap.checkboxB.f), null)
+			)
 		
-			@views.html.bootstrap.inputText(
+			@inputText(
 				field = editForm("contactName"),
 				'_label -> "label.name",
 				'dataBind -> "visible: !useAuthorContactInfo()",
@@ -142,7 +137,7 @@
 				@_staticFormField("label.name", if(user.name == null || user.name.isEmpty) play.twirl.api.Html("<i>" + Messages("label.not.specified") + "</i>") else user.name)
 			</div>
 		
-			@views.html.bootstrap.inputText(
+			@inputText(
 				field = editForm("contactPhone"),
 				'_label -> "label.phone",
 				'dataBind -> "visible: !useAuthorContactInfo()"
@@ -152,7 +147,7 @@
 				@_staticFormField("label.phone", if(user.phone == null || user.phone.isEmpty) play.twirl.api.Html("<i>" + Messages("label.not.specified") + "</i>") else user.phone)
 			</div>
 
-			@views.html.bootstrap.inputText(
+			@inputText(
 				field = editForm("contactProfile"),
 				'_label -> "nav.profile",
 				'dataBind -> "visible: !useAuthorContactInfo()",
@@ -172,10 +167,7 @@
 
 			@select(
 				field = coordsForm("country"),
-				options = Seq.empty[(String, String)],
 				'_label -> "label.country",
-				'class -> "form-control",
-				'_default -> Messages("label.none.selected"),
 				Symbol("data-bind") -> ("options: availableCountries, " +
 					"optionsText: function(item) {return item.name + ' (" + Messages("label.country.with.cities.count") + ": ' + item.cities.length + ')'}, " + 
 					"optionsValue: 'id', " + 
@@ -187,10 +179,7 @@
 		
 			@select(
 				field = coordsForm("city"),
-				options = Seq.empty[(String, String)],
 				'_label -> "label.city",
-				'class -> "form-control",
-				'_default -> Messages("label.none.selected"),
 				'dataBind -> "visible: selectedCountry",
 				Symbol("data-bind") -> ("options: availableCities, "+
 					"optionsText: 'name', " +
