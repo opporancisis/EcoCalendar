@@ -9,15 +9,15 @@
 	if(tag != null)
 		"nav.event.tag.edit"
 	else
-		"nav.event.tag.create",
+		"nav.event.tag.add",
 	breadcrumbs = LinkedHashMap(
 		"nav.event.tag.list" -> routes.EventTagController.list,
-		if (tag != null) tag.name -> routes.EventTagController.edit(tag.id)
-		else "nav.event.tag.create" -> routes.EventTagController.create
+		if (tag != null) tag.name -> routes.EventTagController.edit(tag)
+		else "nav.event.tag.add" -> routes.EventTagController.add
 	)
 ) {
 
-@form(if(tag != null) routes.EventTagController.doEdit(tag.id) else routes.EventTagController.doCreate) {
+@form(if(tag != null) routes.EventTagController.doEdit(tag) else routes.EventTagController.doAdd) {
 
 	@if(editForm.hasGlobalErrors) { 
 		<div class="alert alert-danger">@editForm.globalError.message</div>
@@ -34,7 +34,7 @@
 		'required -> true
 	)
 
-	@_submit(if(tag != null) "label.save" else "label.create")
+	@_submit(if(tag != null) "label.save" else "label.add")
 
 }
 

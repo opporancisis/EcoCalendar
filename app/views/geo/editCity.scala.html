@@ -2,68 +2,88 @@
 	city: models.geo.City,
 	countries: List[models.geo.Country])
 
-@import views.html.bootstrap._
 @import scala.collection.mutable.LinkedHashMap
 @import views.menu.SystemMenu._
 @import helpers.BootstrapHelper._
+
+@implicitScripts = {
+	@_js("javascripts/geoObjectSetupForm.js")
+	@_maps()
+	<script>
+		var initialLatitude = @{if(city != null) city.centerLatitude else "0"};
+		var initialLongitude = @{if(city != null) city.centerLongitude else "0"};
+		var initialZoom = @{if(city != null) city.defaultZoom else "0"};
+	</script>
+}
 
 @main(
 	if(city != null)
 		"nav.geo.city.edit"
 	else
-		"nav.geo.city.create",
+		"nav.geo.city.add",
 	breadcrumbs = LinkedHashMap(
 		"nav.geo.city.list" -> routes.CityController.list,
-		if (city != null) editForm("name").value -> routes.CityController.edit(city.id)
-		else "nav.geo.city.create" -> routes.CityController.create
+		if (city != null) editForm("name").value -> routes.CityController.edit(city)
+		else "nav.geo.city.add" -> routes.CityController.add
 	)
 ) {
 
-@helper.form(if(city != null) routes.CityController.doEdit(city.id) else routes.CityController.doCreate, 'class -> "form-horizontal") {
+@form(if(city != null) routes.CityController.doEdit(city) else routes.CityController.doAdd) {
 
 	@if(editForm.hasGlobalErrors) { 
 		<div class="alert alert-danger">@editForm.globalError.message</div>
 	}
 
-	@views.html.bootstrap.select(
+	@select(
 		field = editForm("country"),
 		'options -> countries.map(a => a.id.toString -> a.name).toSeq,
 		'_label -> "label.country",
 		'required -> true
 	)
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("name"),
 		'_label -> "label.name",
 		'required -> true
 	)
 
-	@views.html.bootstrap.inputText(
+	@inputText(
+		field = editForm("code"),
+		'_label -> "label.code",
+		'help -> "label.city.country.code.tip"
+	)
+
+	@inputText(
 		field = editForm("centerLatitude"),
 		'_label -> "label.centerLatitude",
-		'required -> true
+		'required -> true,
+		Symbol("data-bind") -> "value: latitude"
 	)
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("centerLongitude"),
 		'_label -> "label.centerLongitude",
-		'required -> true
+		'required -> true,
+		Symbol("data-bind") -> "value: longitude"
 	)
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("defaultZoom"),
 		'_label -> "label.defaultZoom",
-		'required -> true
+		'required -> true,
+		Symbol("data-bind") -> "value: zoom"
 	)
 
-	@views.html.bootstrap.inputText(
+	@inputText(
 		field = editForm("weight"),
 		'_label -> "label.weight",
 		'help -> Messages("label.city.weight.help"),
 		'required -> true
 	)
+	
+	<div id="map" style="width: 100%; height: 400px;"></div>
 
-	@_submit(if(city != null) "label.save" else "label.create")
+	@_submit(if(city != null) "label.save" else "label.add")
 }
 
 }

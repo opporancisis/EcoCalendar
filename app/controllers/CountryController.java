@@ -19,33 +19,25 @@ public class CountryController extends Controller {
 		return ok(views.html.geo.listCountries.render(Country.find.all()));
 	}
 
-	public static Result edit(long id) {
-		Country country = Country.find.byId(id);
-		if (country == null) {
-			return Application.notFoundObject(Country.class, id);
-		}
+	public static Result edit(Country country) {
 		return ok(views.html.geo.editCountry.render(EDIT_FORM.fill(country), country));
 	}
 
-	public static Result doEdit(long id) {
-		Country country = Country.find.byId(id);
-		if (country == null) {
-			return Application.notFoundObject(Country.class, id);
-		}
+	public static Result doEdit(Country oldCountry) {
 		Form<Country> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
-			return badRequest(views.html.geo.editCountry.render(filledForm, country));
+			return badRequest(views.html.geo.editCountry.render(filledForm, oldCountry));
 		}
-		Country updatedCountry = filledForm.get();
-		updatedCountry.update(id);
+		Country country = filledForm.get();
+		country.update(oldCountry.id);
 		return redirect(routes.CountryController.list());
 	}
 
-	public static Result create() {
+	public static Result add() {
 		return ok(views.html.geo.editCountry.render(EDIT_FORM, null));
 	}
 
-	public static Result doCreate() {
+	public static Result doAdd() {
 		Form<Country> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			return badRequest(views.html.geo.editCountry.render(filledForm, null));
@@ -55,11 +47,7 @@ public class CountryController extends Controller {
 		return redirect(routes.CountryController.list());
 	}
 
-	public static Result remove(long id) {
-		Country country = Country.find.byId(id);
-		if (country == null) {
-			return Application.notFoundObject(Country.class, id);
-		}
+	public static Result remove(Country country) {
 		country.delete();
 		return ok();
 	}

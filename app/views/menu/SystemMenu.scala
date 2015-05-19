@@ -10,8 +10,11 @@ object SystemMenu {
 	"nav.user.list" -> routes.UserController.list,
 	"nav.file.list" -> routes.FileController.list,
 	"nav.stdPage.list" -> routes.StandardPageController.list,
+  "a" -> null,
 	"nav.event.tag.list" -> routes.EventTagController.list,
+  "b" -> null,
 	"nav.organization.list" -> routes.OrganizationController.list,
+  "c" -> null,
 	"nav.geo.country.list" -> routes.CountryController.list,
 	"nav.geo.city.list" -> routes.CityController.list
   )

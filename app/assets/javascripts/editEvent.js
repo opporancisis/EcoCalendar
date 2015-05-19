@@ -1,40 +1,12 @@
 
 $(document).ready(function() {
 
-	var myMap, point, _cal, pageModel;
+	var myMap, pageModel;
 
 	pageModel = new PageModel();
 	ko.applyBindings(pageModel);
 
-	if (typeof ymaps == 'undefined') {
-		bootbox.alert(Messages("error.yandex.maps"));
-	} else {
-		ymaps.ready(initMap);
-	}
-
-	initCalendar();
-	
-	$('input[type="submit"]').click(function() {
-		var data = _cal.fullCalendar('clientEvents');
-		if (!data.length) {
-			bootbox.alert(Messages("error.need.program.items"));
-			return false;
-		}
-		if (!point) {
-			bootbox.alert(Messages("error.need.map.point"));
-			return false;
-		}
-		var events = [];
-		for (var i in data) {
-			var d = data[i];
-			events[i] = {
-				start: d.start.format(),
-				end: d.end.format(),
-				title: d.title
-			};
-		}
-		pageModel.timetable(JSON.stringify(events));
-	});
+	$("form.form-horizontal").bootstrapValidator(app.settings.bootstrapValidator);
 
 	function PageModel() {
 		for (var i = 0; i < countriesMap.length; i++) {
@@ -51,13 +23,12 @@ $(document).ready(function() {
 			});
 		}
 		var self = this;
-		self.country = ko.observable();
-		self.city = ko.observable();
 		self.availableCountries = ko.observableArray(countriesMap);
 		self.selectedCountry = ko.observable(initialCountry);
 		self.availableCities = ko.observableArray([]);
 		self.selectedCity = ko.observable(initialCity);
 		self.selectedCountry.subscribe(function(id) {
+			var start = new Date().getTime();
 			if (typeof id != 'undefined') {
 				for (var i = 0; i < countriesMap.length; i++) {
 					var country = countriesMap[i];
@@ -74,10 +45,12 @@ $(document).ready(function() {
 					}
 				}
 			} else {
-				// do nothing?
+				// TODO: destroy map?
 			}
+			console.log("selectedCountry.subscribe: " + (new Date().getTime() - start));
 		});
 		self.selectedCity.subscribe(function(id) {
+			var start = new Date().getTime();
 			if (!myMap) {
 				return;
 			}
@@ -92,170 +65,182 @@ $(document).ready(function() {
 					}
 				}
 			}
+			console.log("selectedCity.subscribe: " + (new Date().getTime() - start));
 		});
-		self.latitude = ko.observable(initialLatitude);
-		self.longitude = ko.observable(initialLongitude);
-		self.timetable = ko.observable();
 		self.useAuthorContactInfo = ko.observable(useAuthorContactInfo);
-		
+		self.moreGeneralSettings = ko.observable(moreGeneralSettings);
+		self.useContactInfo = ko.observable(useContactInfo);
+		self.extendedGeoSettings = ko.observable(extendedGeoSettings);
+		self.extendedGeoSettings.subscribe(function(extendedOn) {
+			var start = new Date().getTime();
+			if (extendedOn) {
+				if (typeof ymaps == 'undefined') {
+					bootbox.alert(Messages("error.yandex.maps"));
+				} else {
+					ymaps.ready(initMap);
+				}
+			} else {
+				myMap.destroy();
+			}
+			console.log("extendedGeoSettings.subscribe: " + (new Date().getTime() - start));
+		});
+		self.points = ko.observableArray(geoPoints);
 	}
 
-	function newItemDialog(start, end) {
-		bootbox.dialog({
-			title: "Создание пункта программы",
-			message: '<div class="row">  ' +
-            '<div class="col-md-12"> ' +
-            '<form class="form-horizontal" onsubmit="return false;"> ' +
-            '<div class="form-group"> ' +
-            '<label class="col-md-4 control-label" for="itemTitle">Заголовок</label> ' +
-            '<div class="col-md-4"> ' +
-            '<input id="itemTitle" name="itemTitle" type="text" placeholder="Заголовок" class="form-control input-md"> ' +
-            '<span class="help-block">заголовок пункта программы</span> </div> ' +
-            '</div> </form> </div>  </div>',
-			buttons: {
-				cancel: {
-					label: "Отмена"
-				},
-				success: {
-					className: "btn-success",
-					label: "Применить",
-					callback: function() {
-						var title = $('#itemTitle').val();
-						if (title === "") return false;
-						var eventData = {
-								title: title,
-								start: start,
-								end: end
-						};
-						_cal.fullCalendar('renderEvent', eventData, true); // stick? = true
-					}
-				}
-			}
-		});
-		$('#itemTitle').focus();
-	}
-	
-	function changeItemDialog(calEvent) {
-		bootbox.dialog({
-			title: "Изменение пункта программы",
-			message: '<div class="row">  ' +
-            '<div class="col-md-12"> ' +
-            '<form class="form-horizontal"> ' +
-            '<div class="form-group"> ' +
-            '<label class="col-md-4 control-label" for="itemTitle">Заголовок</label> ' +
-            '<div class="col-md-4"> ' +
-            '<input id="itemTitle" name="itemTitle" type="text" value="' + calEvent.title +
-            '" placeholder="Заголовок" class="form-control input-md"> ' +
-            '<span class="help-block">заголовок пункта программы</span> </div> ' +
-            '</div> </form> </div>  </div>',
-			buttons: {
-				cancel: {
-					label: "Отмена"
-				},
-				remove: {
-					className: "btn-danger",
-					label: "Удалить",
-					callback: function() {
-						_cal.fullCalendar('removeEvents', calEvent.id);
-					}
-				},
-				success: {
-					className: "btn-success",
-					label: "Применить",
-					callback: function() {
-						var title = $('#itemTitle').val();
-						if (title === "") return false;
-						calEvent.title = title;
-						_cal.fullCalendar('rerenderEvents');
-					}
-				}
-			}
-		});
-		$('#itemTitle').focus();
-	}
-	
-	function initCalendar() {
-		var events = [];
-		if (initialTimetable.length > 0) {
-			events = JSON.parse($('<div/>').html(initialTimetable).text());
-		}
-		_cal = $('#calendar').fullCalendar({
-			header: {
-				left: 'prev,next today',
-				center: 'title',
-				right: 'month,agendaWeek,agendaDay'
-			},
-			events: events,
-			weekNumbers: true,
-			editable: true,
-			eventLimit: true, // allow "more" link when too many events
-			lang: 'ru',
-			selectable: true,
-			select: function(start, end, jsEvent, view) {
-				if (view.name === "month") {
-					if (86400000 < end - start) {
-						_cal.fullCalendar( 'changeView', 'agendaWeek');
-					} else {
-						_cal.fullCalendar( 'changeView', 'agendaDay');
-					}
-					_cal.fullCalendar( 'gotoDate', moment.unix(start / 1000));
-					return;
-				} else if (view.name === "agendaWeek") {
-					var startMoment = moment.unix(start / 1000);
-					var endMoment = moment.unix(end / 1000);
-					if (startMoment.format('DD') != endMoment.format('DD')) {
-						_cal.fullCalendar('unselect');
-						return;
-					}
-				}
-				newItemDialog(start, end);
-			},
-			eventClick: function(calEvent) {
-				changeItemDialog(calEvent);
-			}
-		});
-		
-	}
 	function initMap() {
-		var zoom = 10;
-		if (navigator.geolocation) {
-	        navigator.geolocation.getCurrentPosition(function(position) {
-	        	realInit(position.coords.latitude, position.coords.longitude);
-	        });
-	    } else {
-        	realInit(55.76, 37.64);
-	    }
+//		if (navigator.geolocation) {
+//	        navigator.geolocation.getCurrentPosition(function(position) {
+//	        	realInit(position.coords.latitude, position.coords.longitude);
+//	        });
+//	    } else {
+//        	realInit(55.76, 37.64);
+//	    }
 
-		function realInit(latitude, longitude) {
+		var cityGeoData = countriesById[pageModel.selectedCountry()][pageModel.selectedCity()];
+		realInit(cityGeoData.la, cityGeoData.lo, cityGeoData.z);
+		function realInit(latitude, longitude, zoom) {
     	    myMap = new ymaps.Map("map", {
     	        center: [latitude, longitude],
     	        zoom: zoom
     	    });
-    	    var lat = pageModel.latitude(), lng = pageModel.longitude();
-    	    if (lat && lng) {
-    		    point = new ymaps.Placemark([lat, lng], {}, {
-    	    	            draggable: true
-    		            });
-    		    myMap.geoObjects.add(point);
-				myMap.setCenter([lat, lng], zoom);
+    	    
+    	    if (geoPoints.length == 1) {
+    	    	myMap.setCenter([geoPoints[0], getPoints[1]], zoom);
+    	    } else if (geoPoints.length > 1) {
+	    	    var maxLo = -180, minLo = 180, maxLa = -90, minLa = 90;
+	    	    for (var i = 0; i < geoPoints.length; i++) {
+	    	    	var obj = geoPoints[i];
+	    	    	var point = new ymaps.Placemark([obj.latitude, obj.longitude], {}, {
+	    	            draggable: true
+		            });
+	    		    myMap.geoObjects.add(point);
+	    		    if (maxLa < obj.latitude) {
+	    		    	maxLa = obj.latitude;
+	    		    }
+	    		    if (minLa > obj.latitude) {
+	    		    	minLa = obj.latitude;
+	    		    }
+	    		    if (maxLo < obj.longitude) {
+	    		    	maxLo = obj.longitude;
+	    		    }
+	    		    if (minLo > obj.longitude) {
+	    		    	minLo = obj.longitude;
+	    		    }
+	    	    }
+	    	    myMap.setBounds([maxLa, minLo], [minLa, maxLo], {
+	    	    	checkZoomRange: true,
+	    	    	callback: function(err) {
+	    	    		if (err) {
+	    	    			console.log(err);
+							// Не удалось показать заданный регион
+							// ...
+	    	    		}
+	    	    	}
+				});
     	    }
     		myMap.events.add(['click'], function (e) {
     		    // Получение координат щелчка
     		    var coords = e.get('coords');
     		    console.log('coords: ' + coords.join(', '));
     		    if (e.get('type') == 'click') {
-	    		    if (point) {
-	    		    	myMap.geoObjects.remove(point);
-	    		    }
-	    		    point = new ymaps.Placemark(coords, {}, {
-		    	        // TODO: how to properly handle point movement?    
-	    		    	//draggable: true
+//	    		    if (point) {
+//	    		    	myMap.geoObjects.remove(point);
+//	    		    }
+    		    	newPointDialog(coords[0], coords[1]);
+	    		    var point = new ymaps.Placemark(coords, {}, {
+	    		    	draggable: true
 		            });
+	    		    point.events.add("click", function(event) {
+	    		    	console.log(event);
+	    		    });
 	    		    myMap.geoObjects.add(point);
     		    }
-    		    pageModel.latitude(coords[0]);
-    		    pageModel.longitude(coords[1])
+//    		    pageModel.latitude(coords[0]);
+//    		    pageModel.longitude(coords[1])
     		});
 		}
+		
+		function newPointDialog(latitude, longitude) {
+			var box = bootbox.dialog({
+				title: Messages("label.event.new.map.point.adding"),
+				message: '<div class="row">  ' +
+		            '<div class="col-md-12"> ' +
+		            '<form class="form-horizontal" onsubmit="return false;"> ' +
+		            '<div class="form-group"> ' +
+		            '<label class="col-md-2 control-label" for="pointComment">' +
+		            Messages('label.comment') + '</label> ' +
+		            '<div class="col-md-10"> ' +
+		            '<input id="pointComment" name="pointComment" type="text" placeholder="' +
+		            Messages('label.comment') + '" class="form-control input-md"> ' +
+		            '<span class="help-block">' + Messages("label.event.map.point.comment.tip") +
+		            '</span> </div> </div> </form> </div>  </div>',
+				buttons: {
+					cancel: {
+						label: Messages("label.do.cancel")
+					},
+					success: {
+						className: "btn-success",
+						label: Messages("label.do.add"),
+						callback: function() {
+							var comment = $('#pointComment').val();
+							if (comment === "") return false;
+							var pointData = {
+									comment: comment,
+									latitude: latitude,
+									longitude: longitude
+							};
+							pageModel.points.push(pointData);
+						}
+					}
+				}
+			});
+			box.bind('shown.bs.modal', function(){
+			    box.find("input").focus();
+			});
+		}
+		
+		function changePointDialog(title) {
+			var box = bootbox.dialog({
+				title: Messages("label.event.map.point.changing"),
+				message: '<div class="row">  ' +
+	            '<div class="col-md-12"> ' +
+	            '<form class="form-horizontal"> ' +
+	            '<div class="form-group"> ' +
+	            '<label class="col-md-2 control-label" for="pointComment">' +
+	            Messages('label.comment') + '</label> ' +
+	            '<div class="col-md-10"> ' +
+	            '<input id="pointComment" name="pointComment" type="text" value="' + title +
+	            '" placeholder="' +
+	            Messages('label.comment') + '" class="form-control input-md"> ' +
+	            '<span class="help-block">' + Messages("label.event.map.point.comment.tip") +
+	            '</span> </div> ' +
+	            '</div> </form> </div>  </div>',
+				buttons: {
+					cancel: {
+						label: Messages("label.do.cancel")
+					},
+					remove: {
+						className: "btn-danger",
+						label: Messages("label.do.remove"),
+						callback: function() {
+							console.err('here must go remove action!');
+						}
+					},
+					success: {
+						className: "btn-success",
+						label: Messages("label.do.apply"),
+						callback: function() {
+							var comment = $('#pointComment').val();
+							if (comment === "") return false;
+							console.err('here must go change comment action');
+						}
+					}
+				}
+			});
+			box.bind('shown.bs.modal', function(){
+			    box.find("input").focus();
+			});
+		}
 	}
+
 });

@@ -1,6 +1,6 @@
 name := baseDirectory.value.getName
 
-scalaVersion := "2.10.4"
+scalaVersion := "2.11.1"
 
 version := "1.0-SNAPSHOT"
 
@@ -13,9 +13,9 @@ TwirlKeys.templateImports ++= Seq(
 
 LessKeys.compress in Assets := true
 
-pipelineStages := Seq(uglify, digest, gzip)
+pipelineStages := Seq(rjs, uglify, digest, gzip)
 
-testOptions += Tests.Argument(TestFrameworks.JUnit, "-v")
+testOptions += Tests.Argument(TestFrameworks.JUnit, "-v", "-a")
 
 offline := true
 
@@ -37,22 +37,16 @@ libraryDependencies ++= Seq(
   javaWs,
   cache,
   "be.objectify" %% "deadbolt-java" % "2.3.0-RC1",
-  "com.feth" %% "play-authenticate" % "0.6.5-SNAPSHOT",
+  "com.feth" %% "play-authenticate" % "0.6.8",
   "org.webjars" % "bootstrap" % "3.2.0",
+  "org.webjars" % "bootstrap-timepicker" % "0.2.3-1",
   "org.webjars" % "tablesorter" % "2.15.5",
-  "org.webjars" % "d3js" % "3.4.4-1",
-  "org.webjars" % "nvd3" % "1.1.15-beta-1",
   "org.webjars" % "momentjs" % "2.8.1-1",
   "org.webjars" % "bootstrap-datepicker" % "1.3.0-1",
   "org.webjars" % "knockout" % "3.1.0",
   "org.webjars" % "select2" % "3.4.6",
   "org.webjars" % "underscorejs" % "1.6.0-3",
-  "org.webjars" % "font-awesome" % "4.1.0",
   "com.github.javafaker" % "javafaker" % "0.3" exclude("org.slf4j", "slf4j-simple"),
-  "org.apache.poi" % "poi" % "3.10-FINAL",
-  "avalon-framework" % "avalon-framework-api" % "4.2.0",
-  "avalon-framework" % "avalon-framework-impl" % "4.2.0",
-  "org.apache.xmlgraphics" % "fop" % "1.1" exclude("org.apache.avalon.framework", "avalon-framework-api") exclude("org.apache.avalon.framework", "avalon-framework-impl"),
   "commons-io" % "commons-io" % "2.4",
   "org.apache.commons" % "commons-exec" % "1.2",
   "org.julienrf" %% "play-jsmessages" % "1.6.2"

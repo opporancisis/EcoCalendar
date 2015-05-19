@@ -20,33 +20,25 @@ public class CityController extends Controller {
 		return ok(views.html.geo.listCities.render(City.find.all()));
 	}
 
-	public static Result edit(long id) {
-		City city = City.find.byId(id);
-		if (city == null) {
-			return Application.notFoundObject(City.class, id);
-		}
+	public static Result edit(City city) {
 		return ok(views.html.geo.editCity.render(EDIT_FORM.fill(city), city, Country.find.all()));
 	}
 
-	public static Result doEdit(long id) {
-		City city = City.find.byId(id);
-		if (city == null) {
-			return Application.notFoundObject(City.class, id);
-		}
+	public static Result doEdit(City oldCity) {
 		Form<City> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
-			return badRequest(views.html.geo.editCity.render(filledForm, city, Country.find.all()));
+			return badRequest(views.html.geo.editCity.render(filledForm, oldCity, Country.find.all()));
 		}
-		City updatedCity = filledForm.get();
-		updatedCity.update(id);
+		City city = filledForm.get();
+		city.update(oldCity.id);
 		return redirect(routes.CityController.list());
 	}
 
-	public static Result create() {
+	public static Result add() {
 		return ok(views.html.geo.editCity.render(EDIT_FORM, null, Country.find.all()));
 	}
 
-	public static Result doCreate() {
+	public static Result doAdd() {
 		Form<City> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			return badRequest(views.html.geo.editCity.render(filledForm, null, Country.find.all()));
@@ -56,11 +48,7 @@ public class CityController extends Controller {
 		return redirect(routes.CityController.list());
 	}
 
-	public static Result remove(long id) {
-		City city = City.find.byId(id);
-		if (city == null) {
-			return Application.notFoundObject(City.class, id);
-		}
+	public static Result remove(City city) {
 		city.delete();
 		return ok();
 	}

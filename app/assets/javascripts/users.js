@@ -9,22 +9,12 @@
 			}
 			return false;
 		};
-		
-		self.house = ko.observable(!!$("#house").val());
 	}
 	
 	$(document).ready(function() {
 		// Dynamically set bindings
 		var select = $("select#roles").attr("data-bind", "selectedOptions: assignedRoles");
 		var chosenRoles = select.find("option:selected").map(function(i, el) { return $(el).val(); });
-		
-		$.each(["note"], function(i, elemId) {
-			var bindings = [];
-			bindings.push("visible: hasRoles('user')");
-			$("#" + elemId).closest(".form-group").attr("data-bind", bindings.join(", "));
-		});
-		
-		$("#house").attr("data-bind", "value: house");
 		
 		// Kick off
 		ko.applyBindings(new UserModel(chosenRoles));

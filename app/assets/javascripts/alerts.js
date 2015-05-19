@@ -15,7 +15,8 @@ $(document).ready(function() {
 	ws_uri += "//" + loc.host;
 	ws_uri += $("#ws-url").val();
 	
-	var socket = new ReconnectingWebSocket(ws_uri);
+	var pinger, socket = new ReconnectingWebSocket(ws_uri);
+	var reconnects = 0;
 	
 	socket.reconnectInterval = 5000;
 	socket.timeoutInterval = 8000;
@@ -28,7 +29,7 @@ $(document).ready(function() {
 			return;
 		}
 		var $message, $alert;
-		console.log(data.message);
+		console.log(moment().format("L LT:ss") + ": [Event] " + data.message);
 		if (_updatePageElements) {
 			_updatePageElements(data);
 		}
@@ -47,8 +48,8 @@ $(document).ready(function() {
 			$alert.one("click", ".message", function(e) {
 				var payload = $(this).parent().data("payload");
 				if (payload.body) {
+					$alert.trigger("bg.close");
 					bootbox.alert(payload.body);
-					$alert.alert("close");
 				} else if (payload.link) {
 					window.location.href = payload.link;
 				}
@@ -67,7 +68,7 @@ $(document).ready(function() {
 				$counters.hide();
 			}
 		}
-		if (data.message == "ReloadPage" && $('div.needReloadPageAlert').length == 0) {
+		if (data.message == "ReloadPage" && $('div.needReloadPageAlert').length === 0) {
 			for (var i in payload.links) {
 				if (payload.links[i] == location.pathname) {
 					$("<div class='alert alert-warning needReloadPageAlert'/>")
@@ -81,10 +82,27 @@ $(document).ready(function() {
 	};
 	
 	socket.onopen = function() {
-		console.log("Connection is open");
+		console.log(moment().format("L LT:ss") + ": Connection is open");
+		if (reconnects > 0) {
+			$.bootstrapGrowl(moment().format("L LT:ss") + ": Соединение установлено", {type: "info"});
+		}
+		reconnects++;
+		if (pinger) {
+			clearInterval(pinger);
+			pinger = null;
+		}
+		pinger = setInterval(function() {
+			if (socket.readyState !== WebSocket.OPEN) return;
+			socket.send(JSON.stringify("Ping"));
+		}, 5000);
 	};
-	socket.onerror = function(error) {
-		console.error(error);
+	socket.onerror = function() {
+		console.log(moment().format("L LT:ss") + ": Connection error");
+		$.bootstrapGrowl(moment().format("L LT:ss") + ": Ошибка подключения", {type: "danger"});
+	};
+	socket.onclose = function() {
+		console.log(moment().format("L LT:ss") + ": Connection is closed");
+		$.bootstrapGrowl(moment().format("L LT:ss") + ": Соединение потеряно", {type: "warning"});
 	};
 	
 	// Close the connection when a user leaves the page

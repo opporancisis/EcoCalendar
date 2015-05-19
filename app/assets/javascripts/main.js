@@ -26,11 +26,11 @@
 	// Bootstrap Multiselect (http://davidstutz.github.io/bootstrap-multiselect/)
 	if ($.fn.multiselect) {
 		$.extend($.fn.multiselect.Constructor.prototype.defaults, {
+			numberDisplayed: 1,
 			selectAllText: 'Выбрать всё',
 			filterPlaceholder: 'Поиск',
 			nonSelectedText: 'Ничего не выбрано',
-			nSelectedText: 'пункт(ов) выбрано',
-			numberDisplayed: 2
+			nSelectedText: 'пункт(ов) выбрано'
 		});
 	}
 
@@ -40,18 +40,9 @@
 	
 	$(document).ready(function() {
 		
-		/* ***** Indentation looks quite ugly. Not sure if we need this at all...
-		// Indent menu actions related to current page
-		var section = location.pathname.split("/")
-				.filter(function(val) { return val !== ""; }).shift();
-		if (section) {
-			$(".sidebar .nav li>a[href^='/" + section + "']").css("padding-left", "2em");
-		}
-		*/
-		
 		// Custom select
 		$("select.form-control").multiselect();
-
+		
 		// Bootstrap tooltips
 		$("[title]").tooltip();
 	});

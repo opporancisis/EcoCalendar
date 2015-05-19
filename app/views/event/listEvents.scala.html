@@ -6,6 +6,7 @@
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
 @import be.objectify.deadbolt.java.DeadboltViewSupport._
 @import be.objectify.deadbolt.java.views.html._
+@import views.menu.EventMenu._
 
 @user = @{
 	ctx.args.get("user").asInstanceOf[models.user.User]
@@ -44,9 +45,6 @@
 
 @main(
 	"nav.event.list",
-	leftNav = LinkedHashMap(
-		"nav.event.list" -> routes.EventController.list
-	),
 	breadcrumbs = LinkedHashMap(
 		"nav.event.list" -> routes.EventController.list
 	)
@@ -68,7 +66,7 @@
 			<span class="input-group-addon">@Messages("label.till")</span>
 			<input type="text" class="input-sm form-control" name="till" value="@intervalForm("till").value" />
 			<span class="input-group-btn">
-				<button class="btn btn-default btn-sm" type="submit">@Messages("label.apply")</button>
+				<button class="btn btn-default btn-sm" type="submit">@Messages("label.do.apply")</button>
 			</span>
 		</span>
 	}
@@ -82,8 +80,8 @@
 	<thead>
 		<th class="sorter-false filter-false columnSelector-disable"></th>
 		<th>@Messages("label.name")</th>
-		<th>@Messages("label.start")</th>
-		<th>@Messages("label.end")</th>
+		<th>@Messages("label.start.date")</th>
+		<th>@Messages("label.end.date")</th>
 		<th>@Messages("label.author")</th>
 		<th>@Messages("label.grand.event")</th>
 		<th>@Messages("label.city")</th>
@@ -96,25 +94,25 @@
 			<tr data-id="@e.id">
 				<td><input type="checkbox" name="events[]" value="@e.id" data-bind="checked: selectedEvents"></td>
 				<td>@e.name</td>
-				<td>@{val fd = e.firstDay; Formatters.print(fd.date) + " " + Formatters.print(fd.firstItem.start)}</td>
-				<td>@{val ld = e.lastDay;Formatters.print(ld.date) + " " + Formatters.print(ld.lastItem.end)}</td>
+				<td>@Formatters.print(e.startDate) @Formatters.print(e.startTime)</td>
+				<td>@Formatters.print(e.endDate) @Formatters.print(e.endTime)</td>
 				<td>
-					<a href="@routes.UserController.details(e.author.id)">@e.author.nick</a>
+					<a href="@routes.UserController.details(e.author)">@e.author.nick</a>
 				</td>
 				<td>
 					@if(e.parent != null) {
-						<a href="@routes.GrandEventController.details(e.parent.id)">@e.parent.name</a>
+						<a href="@routes.GrandEventController.details(e.parent)">@e.parent.name</a>
 					}
 				</td>
-				<td>@e.coords.city.name</td>
+				<td>@e.city.name</td>
 				<td>
-					@Html(e.organizations.map(o => "<a href=\"" + routes.OrganizationController.details(o.id) + "\">" + o.name + "</a>").mkString(", "))
+					@Html(e.organizations.map(o => "<a href=\"" + routes.OrganizationController.details(o) + "\">" + o.name + "</a>").mkString(", "))
 				</td>
 				<td>
 					@Html(e.tags.map("<a href=\"javascript:void(0);\" onclick=\"alert(\'What should be shown after click on tag?\')\">" + _.name + "</a>").mkString(", "))
 				</td>
 				<td>
-					<a class="btn btn-default btn-xs" href='@{routes.EventController.edit(e.id)}' title="@Messages("label.do.edit")">
+					<a class="btn btn-default btn-xs" href='@{routes.EventController.edit(e)}' title="@Messages("label.do.edit")">
 						<span class="glyphicon glyphicon-pencil"></span>
 					</a>
 				</td>
@@ -128,7 +126,7 @@
 }
 
 @subjectPresent() {
-	@_btn(routes.EventController.create, "label.do.create")
+	@_btn(routes.EventController.add, "label.do.add")
 }
 	
 }

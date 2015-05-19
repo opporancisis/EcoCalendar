@@ -11,11 +11,11 @@
 }
 
 @implicitScripts = {
-	<link href="@routes.Assets.at("stylesheets/tablesorter/theme.bootstrap.css")" rel="stylesheet">
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.pager.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.widgets.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/tables.js")"></script>
+	@_css("stylesheets/tablesorter/theme.bootstrap.css")
+	@_js("javascripts/jquery.tablesorter.min.js")
+	@_js("javascripts/jquery.tablesorter.pager.min.js")
+	@_js("javascripts/jquery.tablesorter.widgets.min.js")
+	@_js("javascripts/tables.js")
 }
 
 @main(
@@ -39,13 +39,13 @@
 				<td>@country.cities.size</td>
 				<td>
 					@restrict(la(as("admin"))) {
-						<a class="btn btn-default btn-xs" href='@{routes.CountryController.edit(country.id)}' title="@Messages("label.do.edit")">
+						<a class="btn btn-default btn-xs" href='@{routes.CountryController.edit(country)}' title="@Messages("label.do.edit")">
 							<span class="glyphicon glyphicon-pencil"></span>
 						</a>
 						<a class="btn btn-default btn-xs js-ajax" title="@Messages("label.do.remove")"
 								data-action="remove"
 								data-method="POST"
-								data-url="@routes.CountryController.remove(country.id)"
+								data-url="@routes.CountryController.remove(country)"
 								data-confirm="@Messages("label.are.you.sure.you.want.to.delete", country.name)">
 							<span class="glyphicon glyphicon-remove"></span>
 						</a>
@@ -63,7 +63,7 @@
 }
 
 @restrict(la(as("admin"))) {
-	@_btn(routes.CountryController.create, "label.do.create")
+	@_btn(routes.CountryController.add, "label.do.add")
 }
 	
 }

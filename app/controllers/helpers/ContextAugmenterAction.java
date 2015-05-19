@@ -5,6 +5,7 @@ import java.util.UUID;
 import models.message.Message;
 import models.standardPage.StandardPage;
 import models.user.User;
+import play.Play;
 import play.libs.F.Promise;
 import play.mvc.Action;
 import play.mvc.Http.Context;
@@ -32,6 +33,7 @@ public class ContextAugmenterAction extends Action<ContextAugmenter> {
 		ctx.args.put("stdPages", StandardPage.find.query().order("orderInd")
 				.findList());
 		ctx.args.put("uuid", UUID.randomUUID().toString());
+		ctx.args.put("conf", Play.application().configuration());
 	}
 
 	public static User getLoggedUser() {

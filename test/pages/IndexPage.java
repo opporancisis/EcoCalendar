@@ -11,7 +11,7 @@ public class IndexPage extends AbstractPage {
 	
 	@Override
 	public String getUrl() {
-		return routes.Application.index().url();
+		return routes.HomePageController.index().url();
 	}
 	
 	@Override

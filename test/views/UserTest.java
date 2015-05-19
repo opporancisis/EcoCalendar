@@ -32,7 +32,11 @@ public class UserTest extends AbstractTest {
 		addUserPage.isAt();
 		addUserPage.addUser(email);
 		listUsersPage.go();
+		listUsersPage.isAt();
 		listUsersPage.hasUser(email);
+		
+		// Delete user
+		listUsersPage.deleteUser(email);
 	}
 
 }

@@ -6,15 +6,17 @@
 @import views.menu.SystemMenu._
 
 @implicitScripts = {
-	<link rel="stylesheet" href="@routes.Assets.at("stylesheets/summernote.css")" />
-	<link rel="stylesheet" href="@routes.Assets.at("stylesheets/summernote-bs3.css")" />
-	<link rel="stylesheet" href="@routes.Assets.at("lib/font-awesome/css/font-awesome.min.css")" />
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/addFile.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/summernote.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/summernote-ru-RU.js")"></script>
+	@_css("stylesheets/summernote.css")
+	@_css("stylesheets/summernote-bs3.css")
+	@_css("lib/font-awesome/css/font-awesome.min.css")
+	@_js("javascripts/addFile.js")
+	@_js("javascripts/summernote.min.js")
+	@_js("javascripts/summernote-ru-RU.js")
+	@_js("javascript/jquery.range-slider.min.js")
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('#body').summernote({lang: "ru-RU"});
+			$(".range-slider").rangeSlider();
 		});
 	</script>
 }
@@ -49,6 +51,13 @@
 		'options -> files.map(a => a.id.toString -> a.name).toSeq,
 		'_label -> "label.file.files",
 		'multiple -> true
+	)
+
+	@views.html.helper.rangeSlider(
+		field = editForm("latestNewsMax"),
+		'_label -> "label.home.latestNewsMax",
+		'min -> 0,
+		'max -> 20
 	)
 
 	@_submit("label.save")

@@ -60,93 +60,109 @@ standardPages:
 countries:
 
     - &russia !!models.geo.Country
+        disabled:        false
         name:            Россия
         centerLatitude:  60.0
         centerLongitude: 100.0
         defaultZoom:     2
+        code:            ru
 
     - &ukraine !!models.geo.Country
+        disabled:        true
         name:            Украина
         centerLatitude:  49.0
         centerLongitude: 32.0
         defaultZoom:     5
+        code:            uk
 
     - &belarus !!models.geo.Country
+        disabled:        true
         name:            Беларусь
         centerLatitude:  53.0
         centerLongitude: 28.0
         defaultZoom:     6
+        code:            be
 
     - &uzbekistan !!models.geo.Country
-        id:              4
+        disabled:        true
         name:            Узбекистан
         centerLatitude:  41.0
         centerLongitude: 64.0
         defaultZoom:     5
+        code:            uz
 
 cities:
 
     - !!models.geo.City
-        name:       Москва
-        country:    *russia
+        disabled:        true
+        name:            Москва
+        country:         *russia
         centerLatitude:  55.75
         centerLongitude: 37.62
         defaultZoom:     10
         weight:          10
 
     - !!models.geo.City
-        name:       Санкт-Петербург
-        country:    *russia
+        disabled:        false
+        name:            Санкт-Петербург
+        country:         *russia
         centerLatitude:  59.93
         centerLongitude: 30.32
         defaultZoom:     10
         weight:          5
 
     - !!models.geo.City
-        name:       Великий Новгород
-        country:    *russia
+        disabled:        true
+        name:            Великий Новгород
+        country:         *russia
         centerLatitude:  58.52
         centerLongitude: 31.28
         defaultZoom:     12
 
     - !!models.geo.City
-        name:       Кириши
-        country:    *russia
+        disabled:        true
+        name:            Кириши
+        country:         *russia
         centerLatitude:  59.46
         centerLongitude: 32.02
         defaultZoom:     12
 
     - !!models.geo.City
-        name:       Гатчина
-        country:    *russia
+        disabled:        true
+        name:            Гатчина
+        country:         *russia
         centerLatitude:  59.57
         centerLongitude: 30.13
         defaultZoom:     12
 
     - !!models.geo.City
-        name:       Ярославль
-        country:    *russia
+        disabled:        true
+        name:            Ярославль
+        country:         *russia
         centerLatitude:  57.62
         centerLongitude: 39.87
         defaultZoom:     11
 
     - !!models.geo.City
-        name:       Киев
-        country:    *ukraine
+        disabled:        true
+        name:            Киев
+        country:         *ukraine
         centerLatitude:  50.43
         centerLongitude: 30.52
         defaultZoom:     11
 
     - !!models.geo.City
-        name:       Одесса
-        country:    *ukraine
+        disabled:        true
+        name:            Одесса
+        country:         *ukraine
         centerLatitude:  46.47
         centerLongitude: 30.73
         defaultZoom:     10
 
     - !!models.geo.City
-        name:       Минск
-        country:    *belarus
+        disabled:        true
+        name:            Минск
+        country:         *belarus
         centerLatitude:  53.91
         centerLongitude: 27.55
         defaultZoom:     11

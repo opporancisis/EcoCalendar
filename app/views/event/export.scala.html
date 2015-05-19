@@ -12,11 +12,6 @@
 	ctx.args.get("user").asInstanceOf[models.user.User]
 }
 
-@implicitScripts = {
-	<script>
-	</script>
-}
-
 @isBlank(str: String) = @{
 	var rp = "\\s+".r;
 	str match {
@@ -57,9 +52,6 @@
 
 @main(
 	"nav.event.export.vk",
-	leftNav = LinkedHashMap(
-		"nav.event.list" -> routes.EventController.list
-	),
 	breadcrumbs = LinkedHashMap(
 		"nav.event.list" -> routes.EventController.list,
 		"nav.event.export.vk" -> routes.EventController.exportEvents
@@ -83,14 +75,17 @@
 	@for(e <- list) {
 		*
 		@if(interval.from.equals(interval.till)) {
-			@ddMMMM.format(interval.from), @Messages("label.week.day." + interval.from.getDayOfWeek), @Formatters.print(e.days.get(0).firstItem.start) - @Formatters.print(e.days.get(0).lastItem.end)
+			@ddMMMM.format(interval.from),
+			@Messages("label.week.day." + interval.from.getDayOfWeek),
+			@Formatters.print(e.startTime) - @Formatters.print(e.endTime)
 		} else {
 			@if(interval.from.getMonthValue() == interval.till.getMonthValue()) {
 				@dd.format(interval.from) - @ddMMMM.format(interval.till)
 			} else {
 				@ddMMMM.format(interval.from) - @ddMMMM.format(interval.till)
 			}
-			, @Messages("label.week.day." + interval.from.getDayOfWeek) -  @Messages("label.week.day." + interval.till.getDayOfWeek)
+			, @Messages("label.week.day." + interval.from.getDayOfWeek) -
+			@Messages("label.week.day." + interval.till.getDayOfWeek)
 		}
 		<br />
 		@e.name
@@ -109,7 +104,7 @@
 				contact = constructContactInfo(e.contactName, e.contactPhone, e.contactProfile);
 			}
 			if(contact != null) {
-				Html(Messages("label.event.contact.info", contact) + "<br />")
+				play.twirl.api.Html(Messages("label.event.contact.info", contact) + "<br />")
 			}
 		}
 		<br />

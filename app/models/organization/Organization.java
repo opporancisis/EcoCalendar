@@ -12,10 +12,11 @@ import models.event.GrandEvent;
 import play.data.format.Formatters;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
+import utils.IdPathBindable;
 import utils.formatter.OrganizationFormatter;
 
 @Entity
-public class Organization extends Model {
+public class Organization extends Model implements IdPathBindable<Organization> {
 
 	private static final long serialVersionUID = 1L;
 

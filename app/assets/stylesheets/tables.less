@@ -11,6 +11,12 @@
 	}
 }
 
+.tablesorter-bootstrap .tablesorter-filter-row td {
+	.multiselect-container {
+		text-align: start;
+	}
+}
+
 .floatThead-container {
 	background: #fff;
 }
@@ -22,5 +28,31 @@
 	}
 	input {
 	  margin-right: 5px;
+	}
+}
+
+.table {
+	&.sorted-table .glyphicon-move {
+		cursor: move;
+		margin-top: 2px;
+	}
+	&.sorted-table tr.placeholder {
+		display: block;
+		background: red;
+		position: relative;
+		margin: 0;
+		padding: 0;
+		border: none;
+	}
+	&.sorted-table tr.placeholder:before {
+		content: "";
+		position: absolute;
+		width: 0;
+		height: 0;
+		border: 5px solid transparent;
+		border-left-color: red;
+		margin-top: -5px;
+		left: -5px;
+		border-right: none;
 	}
 }

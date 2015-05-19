@@ -16,7 +16,6 @@
 package models.user;
 
 import java.text.ParseException;
-import java.util.List;
 import java.util.Locale;
 
 import javax.persistence.Entity;

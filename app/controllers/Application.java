@@ -1,6 +1,7 @@
 package controllers;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import jsmessages.JsMessages;
@@ -14,9 +15,6 @@ import play.mvc.Result;
 import providers.MyUsernamePasswordAuthProvider;
 import providers.MyUsernamePasswordAuthProvider.MyLogin;
 import providers.MyUsernamePasswordAuthProvider.MySignup;
-
-import com.feth.play.module.pa.providers.password.UsernamePasswordAuthProvider;
-
 import controllers.helpers.ContextAugmenter;
 
 @ContextAugmenter
@@ -28,11 +26,6 @@ public class Application extends Controller {
 	public static final Lang DEF_LANG = Lang.forCode("ru");
 
 	private static final JsMessages MESSAGES = JsMessages.create(Play.application());
-
-	public static Result justOk() {
-		// is used for keep alive requests from Rasberry
-		return ok();
-	}
 
 	public static Result login() {
 		return ok(views.html.login.render(MyUsernamePasswordAuthProvider.LOGIN_FORM));
@@ -47,7 +40,7 @@ public class Application extends Controller {
 			return badRequest(views.html.login.render(filledForm));
 		} else {
 			// Everything was filled
-			return UsernamePasswordAuthProvider.handleLogin(ctx());
+			return MyUsernamePasswordAuthProvider.handleLogin(ctx());
 		}
 	}
 
@@ -63,7 +56,7 @@ public class Application extends Controller {
 						routes.javascript.UserController.details(),
 						routes.javascript.GrandEventController.details(),
 						routes.javascript.OrganizationController.details(),
-						routes.javascript.FileController.doCreate(),
+						routes.javascript.FileController.doAdd(),
 						routes.javascript.MessageController.removeMany(),
 						routes.javascript.MessageController.markAsReadMany()))
 				.as("text/javascript");
@@ -80,7 +73,7 @@ public class Application extends Controller {
 			// Everything was filled
 			// do something with your part of the form before handling the user
 			// signup
-			return UsernamePasswordAuthProvider.handleSignup(ctx());
+			return MyUsernamePasswordAuthProvider.handleSignup(ctx());
 		}
 	}
 
@@ -89,6 +82,10 @@ public class Application extends Controller {
 	}
 
 	public static Result notFoundObject(Class<?> clazz, Object id) {
+		return notFoundObject(clazz.getSimpleName(), id);
+	}
+
+	public static Result notFoundObject(String clazz, Object id) {
 		return notFound(views.html.notFoundObject.render(clazz, id));
 	}
 
@@ -98,6 +95,10 @@ public class Application extends Controller {
 
 	public static Result jsMessages() {
 		return ok(MESSAGES.generate("window.Messages"));
+	}
+
+	public static LocalDateTime now() {
+		return LocalDateTime.now();
 	}
 
 	public static void noCache(Response response) {

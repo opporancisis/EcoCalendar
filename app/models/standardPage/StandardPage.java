@@ -13,10 +13,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
+import utils.IdPathBindable;
 import controllers.routes;
 
 @Entity
-public class StandardPage extends Model {
+public class StandardPage extends Model implements IdPathBindable<StandardPage> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -43,14 +44,7 @@ public class StandardPage extends Model {
 
 	public String reallink() {
 		return StringUtils.isBlank(link) ? routes.StandardPageController
-				.getStdPageById(id).toString() : link;
+				.getStdPageById(this).toString() : link;
 	}
 
-	public static void newPage(long orderInd, String title) {
-		StandardPage page = new StandardPage();
-		page.orderInd = orderInd;
-		page.disabled = false;
-		page.title = title;
-		page.save();
-	}
 }

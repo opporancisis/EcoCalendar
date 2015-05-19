@@ -10,11 +10,11 @@
 }
 
 @implicitScripts = {
-	<link href="@routes.Assets.at("stylesheets/tablesorter/theme.bootstrap.css")" rel="stylesheet">
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.pager.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.widgets.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/tables.js")"></script>
+	@_css("stylesheets/tablesorter/theme.bootstrap.css")
+	@_js("javascripts/jquery.tablesorter.min.js")
+	@_js("javascripts/jquery.tablesorter.pager.min.js")
+	@_js("javascripts/jquery.tablesorter.widgets.min.js")
+	@_js("javascripts/tables.js")
 }
 
 @main(
@@ -39,13 +39,13 @@
 					<td>@if(tag.events != null) {@tag.events.size} else {0}</td>
 					<td>@if(tag.grandEvents != null) {@tag.grandEvents.size} else {0}</td>
 					<td>
-						<a class="btn btn-default btn-xs" href='@{routes.EventTagController.edit(tag.id)}' title="@Messages("label.do.edit")">
+						<a class="btn btn-default btn-xs" href='@{routes.EventTagController.edit(tag)}' title="@Messages("label.do.edit")">
 							<span class="glyphicon glyphicon-pencil"></span>
 						</a>
 						<a class="btn btn-default btn-xs js-ajax" title="@Messages("label.do.remove")"
 								data-action="remove"
 								data-method="POST"
-								data-url="@routes.EventTagController.remove(tag.id)"
+								data-url="@routes.EventTagController.remove(tag)"
 								data-confirm="@Messages("label.are.you.sure.you.want.to.delete", tag.name)">
 							<span class="glyphicon glyphicon-remove"></span>
 						</a>
@@ -61,6 +61,6 @@
 	@_foundNoneOf(classOf[models.event.tag.EventTag])
 }
 	
-	@_btn(routes.EventTagController.create, "label.do.create")
+	@_btn(routes.EventTagController.add, "label.do.add")
 	
 }

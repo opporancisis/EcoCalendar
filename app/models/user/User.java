@@ -1,5 +1,7 @@
 package models.user;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -24,13 +26,14 @@ import models.sys.SettingName;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.URL;
-import org.joda.time.DateTime;
 
 import play.data.validation.Constraints.Email;
 import play.data.validation.Constraints.Pattern;
+import play.data.validation.ValidationError;
 import play.db.ebean.Model;
 import play.db.ebean.Transactional;
 import play.i18n.Messages;
+import utils.IdPathBindable;
 import be.objectify.deadbolt.core.models.Permission;
 import be.objectify.deadbolt.core.models.Role;
 import be.objectify.deadbolt.core.models.Subject;
@@ -44,9 +47,11 @@ import com.feth.play.module.pa.user.EmailIdentity;
 import com.feth.play.module.pa.user.FirstLastNameIdentity;
 import com.feth.play.module.pa.user.NameIdentity;
 
+import controllers.Application;
+
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "NICK" }))
-public class User extends Model implements Subject {
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "NICK", "EMAIL" }))
+public class User extends Model implements Subject, IdPathBindable<User> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -66,7 +71,7 @@ public class User extends Model implements Subject {
 	// TODO: what's the workflow?
 	public Boolean emailPublic;
 
-	@Pattern(NICK_PAT)
+	@Pattern(value = NICK_PAT, message = "error.nick")
 	public String nick;
 
 	public String name;
@@ -113,37 +118,45 @@ public class User extends Model implements Subject {
 
 	public String note;
 
-	public DateTime lastLogin;
+	public LocalDateTime lastLogin;
 
 	public Boolean blocked;
 
 	public boolean emailValidated;
 
-	@ManyToMany
+	@ManyToMany(cascade = CascadeType.ALL)
 	public List<SecurityRole> roles;
 
 	@OneToMany(cascade = CascadeType.ALL)
 	public List<LinkedAccount> linkedAccounts;
 
-	@ManyToMany
-	public List<UserPermission> permissions;
-
 	public static final Finder<Long, User> find = new Finder<>(Long.class, User.class);
 
-	public String validate() {
+	public List<ValidationError> validate() {
+		List<ValidationError> errors = new ArrayList<>();
 		if (StringUtils.isBlank(nick)) {
 			updateNick();
-			return null;
-		}
-		ExpressionList<User> expr = User.find.query().where().eq("nick", nick);
-		if (id == null) {
-			if (expr.findRowCount() > 0) {
-				return Messages.get("error.name.must.be.unique");
+		} else {
+			ExpressionList<User> expr = User.find.query().where()
+					.eq("nick", nick);
+			if ((id == null && expr.findRowCount() > 0)
+					|| (id != null && expr.ne("id", id).findRowCount() > 0)) {
+				errors.add(new ValidationError("nick", Messages
+						.get("error.name.must.be.unique")));
 			}
-		} else if (expr.ne("id", id).findRowCount() > 0) {
-			return Messages.get("error.name.must.be.unique");
 		}
-		return null;
+		if (StringUtils.isNotBlank(email)) {
+			ExpressionList<User> exprEmail = User.find.query().where()
+					.eq("email", email);
+			if ((id == null && exprEmail.findRowCount() > 0)
+					|| (id != null && exprEmail.ne("id", id).findRowCount() > 0)) {
+				errors.add(new ValidationError("email", Messages
+						.get("error.email.must.be.unique")));
+			}
+		} else {
+			email = null;
+		}
+		return errors.isEmpty() ? null : errors;
 	}
 
 	@Override
@@ -189,7 +202,7 @@ public class User extends Model implements Subject {
 
 	@Override
 	public List<? extends Permission> getPermissions() {
-		return permissions;
+		return null;
 	}
 
 	public static boolean existsByAuthUserIdentity(final AuthUserIdentity identity) {
@@ -261,8 +274,9 @@ public class User extends Model implements Subject {
 		// user.permissions = new ArrayList<>();
 		// user.permissions.add(UserPermission.findByValue("printers.edit"));
 		user.blocked = false;
-		user.lastLogin = new DateTime();
-		user.linkedAccounts = Collections.singletonList(LinkedAccount.create(authUser));
+		user.lastLogin = Application.now();
+		user.linkedAccounts = Collections.singletonList(LinkedAccount
+				.create(authUser));
 
 		if (authUser instanceof EmailIdentity) {
 			EmailIdentity identity = (EmailIdentity) authUser;
@@ -322,7 +336,7 @@ public class User extends Model implements Subject {
 
 	public static void setLastLoginDate(final AuthUser knownUser) {
 		final User u = User.findByAuthUserIdentity(knownUser);
-		u.lastLogin = new DateTime();
+		u.lastLogin = Application.now();
 		u.save();
 	}
 

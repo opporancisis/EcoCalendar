@@ -11,16 +11,16 @@
 }
 
 @implicitScripts = {
-	<link href="@routes.Assets.at("stylesheets/tablesorter/theme.bootstrap.css")" rel="stylesheet">
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.pager.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.widgets.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/tables.js")"></script>
-	<link href="@routes.Assets.at("lib/select2/select2.css")" rel="stylesheet">
-	<link href="@routes.Assets.at("lib/select2/select2-bootstrap.css")" rel="stylesheet">
-	<script type="text/javascript" src="@routes.Assets.at("lib/select2/select2.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("lib/select2/select2_locale_ru.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/tablesorter/widget-columnSelector.js")"></script>
+	@_css("stylesheets/tablesorter/theme.bootstrap.css")
+	@_js("javascripts/jquery.tablesorter.min.js")
+	@_js("javascripts/jquery.tablesorter.pager.min.js")
+	@_js("javascripts/jquery.tablesorter.widgets.min.js")
+	@_js("javascripts/tables.js")
+	@_css("lib/select2/select2.css")
+	@_css("lib/select2/select2-bootstrap.css")
+	@_js("lib/select2/select2.min.js")
+	@_js("lib/select2/select2_locale_ru.js")
+	@_js("javascripts/tablesorter/widget-columnSelector.js")
 }
 
 @main(
@@ -49,16 +49,16 @@
 					<td>@org.grandEvents.size</td>
 					<td>@org.description</td>
 					<td>
-						<a class="btn btn-default btn-xs" href='@{routes.OrganizationController.details(org.id)}' title="@Messages("label.do.edit")">
+						<a class="btn btn-default btn-xs" href='@{routes.OrganizationController.details(org)}' title="@Messages("label.do.view")">
 							<span class="glyphicon glyphicon-eye-open"></span>
 						</a>
-						<a class="btn btn-default btn-xs" href='@{routes.OrganizationController.edit(org.id)}' title="@Messages("label.do.edit")">
+						<a class="btn btn-default btn-xs" href='@{routes.OrganizationController.edit(org)}' title="@Messages("label.do.edit")">
 							<span class="glyphicon glyphicon-pencil"></span>
 						</a>
 						<a class="btn btn-default btn-xs js-ajax" title="@Messages("label.do.remove")"
 								data-action="remove"
 								data-method="POST"
-								data-url="@routes.OrganizationController.remove(org.id)"
+								data-url="@routes.OrganizationController.remove(org)"
 								data-confirm="@Messages("label.are.you.sure.you.want.to.delete", org.name)">
 							<span class="glyphicon glyphicon-remove"></span>
 						</a>
@@ -74,6 +74,6 @@
 	@_foundNoneOf(classOf[models.organization.Organization])
 }
 	
-	@_btn(routes.OrganizationController.create, "label.do.create")
+	@_btn(routes.OrganizationController.add, "label.do.add")
 	
 }

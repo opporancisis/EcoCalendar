@@ -5,11 +5,12 @@
 
 @import scala.collection.mutable.LinkedHashMap
 @import helpers.BootstrapHelper._
+@import views.menu.EventMenu._
 
 @implicitScripts = {
-	<link href="@routes.Assets.at("lib/bootstrap-datepicker/css/datepicker3.css")" rel="stylesheet">
-	<script type="text/javascript" src="@routes.Assets.at("lib/bootstrap-datepicker/js/bootstrap-datepicker.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("lib/bootstrap-datepicker/js/locales/bootstrap-datepicker.ru.js")"></script>
+	@_css("lib/bootstrap-datepicker/css/datepicker3.css")
+	@_js("lib/bootstrap-datepicker/js/bootstrap-datepicker.js")
+	@_js("lib/bootstrap-datepicker/js/locales/bootstrap-datepicker.ru.js")
 	<script>
 		$(document).ready(function() {
 			$("#startDate").datepicker(app.settings.bootstrapDatepicker);
@@ -22,18 +23,15 @@
 	if(event != null)
 		"nav.event.grand.edit"
 	else
-		"nav.event.grand.create",
-	leftNav = LinkedHashMap(
-		"nav.event.grand.list" -> routes.GrandEventController.list
-	),
+		"nav.event.grand.add",
 	breadcrumbs = LinkedHashMap(
 		"nav.event.grand.list" -> routes.GrandEventController.list,
-		if (event != null) editForm("name").value -> routes.GrandEventController.edit(event.id)
-		else "nav.event.grand.create" -> routes.GrandEventController.create
+		if (event != null) editForm("name").value -> routes.GrandEventController.edit(event)
+		else "nav.event.grand.add" -> routes.GrandEventController.add
 	)
 ) {
 
-@form(if(event != null) routes.GrandEventController.doEdit(event.id) else routes.GrandEventController.doCreate) {
+@form(if(event != null) routes.GrandEventController.doEdit(event) else routes.GrandEventController.doAdd) {
 
 	@if(editForm.hasGlobalErrors) { 
 		<div class="alert alert-danger">@editForm.globalError.message</div>
@@ -61,13 +59,13 @@
 	@inputText(
 		field = editForm("startDate"),
 		args = 'required -> true,
-		'_label -> "label.start"
+		'_label -> "label.start.date"
 	)
 
 	@inputText(
 		field = editForm("endDate"),
 		args = 'required -> true,
-		'_label -> "label.end"
+		'_label -> "label.end.date"
 	)
 
 	@select(
@@ -84,7 +82,7 @@
 		'multiple -> true
 	)
 
-	@_submit(if(event != null) "label.save" else "label.create")
+	@_submit(if(event != null) "label.save" else "label.add")
 
 }
 

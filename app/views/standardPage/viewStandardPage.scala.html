@@ -30,9 +30,9 @@
 	<div>
 		@for(attachment <- page.attachments) {
 			@if(attachment.isImage) {
-				<img src="@routes.FileController.get(attachment.id)" />
+				<img src="@routes.FileController.get(attachment)" />
 			} else {
-				<a href="@routes.FileController.get(attachment.id)">@attachment.name</a>
+				<a href="@routes.FileController.get(attachment)">@attachment.name</a>
 			}
 			<br />
 		}

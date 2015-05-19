@@ -27,10 +27,6 @@ public class MyDeadboltHandler extends AbstractDeadboltHandler {
 		} else {
 			// user is not logged in
 
-			if (context.request().path().startsWith("/1c")) {
-				return F.Promise.promise(() -> unauthorized());
-			}
-			
 			// call this if you want to redirect your visitor to the page that
 			// was requested before sending him to the login page
 			// if you don't call this, the user will get redirected to the page

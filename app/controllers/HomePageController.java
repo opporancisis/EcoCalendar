@@ -1,5 +1,8 @@
 package controllers;
 
+import java.util.List;
+
+import models.blog.BlogPost;
 import models.file.UploadedFile;
 import models.standardPage.HomePage;
 import models.standardPage.StandardPage;
@@ -22,7 +25,9 @@ public class HomePageController extends Controller {
 
 	public static Result index() {
 		HomePage home = HomePage.get();
-		return ok(views.html.standardPage.homePage.render(home));
+		List<BlogPost> news = BlogPost.find.query().orderBy("created desc")
+				.setMaxRows(home.latestNewsMax).findList();
+		return ok(views.html.standardPage.homePage.render(home, news));
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))

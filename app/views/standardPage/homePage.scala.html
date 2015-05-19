@@ -1,4 +1,5 @@
-@(homePage: models.standardPage.HomePage)
+@(homePage: models.standardPage.HomePage,
+	news: List[models.blog.BlogPost])
 
 @import scala.collection.mutable.LinkedHashMap
 
@@ -23,12 +24,23 @@
 	<div>
 		@for(attachment <- homePage.attachments) {
 			@if(attachment.isImage) {
-				<img src="@routes.FileController.get(attachment.id)" />
+				<img src="@routes.FileController.get(attachment)" />
 			} else {
-				<a href="@routes.FileController.get(attachment.id)">@attachment.name</a>
+				<a href="@routes.FileController.get(attachment)">@attachment.name</a>
 			}
 			<br />
 		}
+	</div>
+}
+
+@if(news != null && !news.isEmpty) {
+	<div class="row">
+	@for(post <- news) {
+		<div class="col-6 col-sm-6 col-lg-4">
+			<h4><a href="@routes.BlogController.list#post_@post.id">@post.title</a></h4>
+			<p>@post.content.split(" ").take(15).mkString(" ")&hellip;</p>
+		</div>
+	}
 	</div>
 }
 

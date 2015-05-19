@@ -6,7 +6,8 @@
 @import views.menu.SystemMenu._
 
 @implicitScripts = {
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery-sortable-min.js")"></script>
+	@_js("javascripts/jquery-sortable-min.js")
+	@_js("javascripts/legend.js")
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('.sorted-table').sortable({
@@ -56,13 +57,13 @@
 					<td>@page.link</td>
 					<td>@page.attachments.size</td>
 					<td>
-						<a class="btn btn-default btn-xs" href='@{routes.StandardPageController.edit(page.id)}' title="@Messages("label.do.edit")">
+						<a class="btn btn-default btn-xs" href='@{routes.StandardPageController.edit(page)}' title="@Messages("label.do.edit")">
 							<span class="glyphicon glyphicon-pencil"></span>
 						</a>
 						<a class="btn btn-default btn-xs js-ajax" title="@Messages("label.do.remove")"
 								data-action="remove"
 								data-method="POST"
-								data-url="@routes.StandardPageController.remove(page.id)"
+								data-url="@routes.StandardPageController.remove(page)"
 								data-confirm="@Messages("label.are.you.sure.you.want.to.delete", page.title)">
 							<span class="glyphicon glyphicon-remove"></span>
 						</a>
@@ -76,7 +77,7 @@
 }
 
 @if(viewRestrict(la(as("admin")), null)) {
-	<a href="@routes.StandardPageController.create" class="btn btn-primary">@Messages("label.do.create")</a>
+	@_btn(routes.StandardPageController.add, "label.do.add")
 }
 
 @_legend(Seq(

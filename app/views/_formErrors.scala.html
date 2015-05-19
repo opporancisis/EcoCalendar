@@ -1,0 +1,5 @@
+@* _btn Template File *@
+@(form: play.data.Form[_])
+@if(form.hasGlobalErrors) { 
+	<div class="alert alert-danger">@play.twirl.api.Html(form.globalErrors.map(_.message).mkString("<br />"))</div>
+}

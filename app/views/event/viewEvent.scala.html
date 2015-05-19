@@ -1,0 +1,138 @@
+@(event: models.event.Event)
+
+@import scala.collection.mutable.LinkedHashMap
+@import helpers.BootstrapHelper._
+@import views.menu.EventMenu._
+@import play.twirl.api.Html
+
+@user = @{
+	ctx.args.get("user").asInstanceOf[models.user.User]
+}
+
+@implicitScripts = {
+	<script type="text/javascript" src="http://api-maps.yandex.ru/2.1/?lang=ru_RU"></script>
+	<script>
+	</script>
+}
+
+@main(
+	"nav.event.view",
+	breadcrumbs = LinkedHashMap(
+		"nav.event.list" -> routes.EventController.list,
+		"nav.event.view" -> routes.EventController.view(event)
+	)
+) {
+
+@form(routes.EventController.view(event)) {
+
+	@_staticFormField("label.created", Formatters.print(event.created))
+	@_staticFormField("label.updated", Formatters.print(event.updated))
+	@_staticFormField("label.author", event.author.nick)
+
+	<div class="panel panel-default">
+		<div class="panel-heading">@Messages("label.event.general.info.settings")</div>
+  		<div class="panel-body">
+
+			@_staticFormField("label.label", event.name)
+			@_staticFormField("label.description", event.description)
+			@if(event.tags.size > 0) {
+				@_staticFormField("label.tags", event.tags.map(_.name).mkString(", "))
+			}
+			@if(event.additionalInfoLink.length > 0) {
+				@_staticFormField("label.link", event.additionalInfoLink)
+			}
+			
+			@if(event.moreGeneralSettings) {
+				@if(event.parent != null) {
+					@_staticFormField("label.grand.event", event.parent.name)
+				}
+				@if(event.organizations.size > 0) {
+					@_staticFormField("label.organizations", event.organizations.map(_.name).mkString(", "))
+				}
+			}
+			
+		</div>
+	</div>
+
+	<div class="panel panel-default">
+		<div class="panel-heading">@Messages("label.event.time.info.settings")</div>
+  		<div class="panel-body">
+
+			@_staticFormField("label.start.date", Formatters.print(event.startDate))
+			@_staticFormField("label.start.time", Formatters.print(event.startTime))
+			@_staticFormField("label.end.date", Formatters.print(event.endDate))
+			@_staticFormField("label.end.time", Formatters.print(event.endTime))
+
+		</div>
+	</div>
+
+	@if(event.useContactInfo) {
+		<div class="panel panel-default">
+			<div class="panel-heading">@Messages("label.event.contact.info.settings")</div>
+	  		<div class="panel-body">
+	
+				@if(event.useAuthorContactInfo) {
+					@if(event.author.name != null && !event.author.name.isEmpty &&
+						event.author.profileLink != null && !event.author.profileLink.isEmpty) {
+						@_staticFormField("label.name", "<a href=\"" + event.author.profileLink +
+							"\">" + event.author.name + "</a>")
+					} else {
+						@if(event.author.name != null && !event.author.name.isEmpty &&
+							(event.author.profileLink == null || event.author.profileLink.isEmpty)) {
+							@_staticFormField("label.name", event.author.name)
+						} else {
+							@if((event.author.name == null || event.author.name.isEmpty) &&
+								event.author.profileLink != null && !event.author.profileLink.isEmpty) {
+								@_staticFormField("label.profile", "<a href=\"" + event.author.profileLink +
+									"\">" + event.author.profileLink + "</a>")
+							}
+						}
+					}
+					@if(event.author.phone != null && !event.author.phone.isEmpty) {
+						@_staticFormField("label.phone", event.author.phone)
+					}
+				} else {
+					@if(event.contactName != null && !event.contactName.isEmpty &&
+						event.contactProfile != null && !event.contactProfile.isEmpty) {
+						@_staticFormField("label.name", "<a href=\"" + event.contactProfile +
+							"\">" + event.contactName + "</a>")
+					} else {
+						@if(event.contactName != null && !event.contactName.isEmpty &&
+							(event.contactProfile == null || event.contactProfile.isEmpty)) {
+							@_staticFormField("label.name", event.contactName)
+						} else {
+							@if((event.contactName == null || event.contactName.isEmpty) &&
+								event.contactProfile != null && !event.contactProfile.isEmpty) {
+								@_staticFormField("label.profile", "<a href=\"" + event.contactProfile +
+									"\">" + event.contactProfile + "</a>")
+							}
+						}
+					}
+					@if(event.contactPhone != null && !event.contactPhone.isEmpty) {
+						@_staticFormField("label.phone", event.contactPhone)
+					}
+				}
+	
+			</div>
+		</div>
+	}
+
+	<div class="panel panel-default">
+		<div class="panel-heading">@Messages("label.event.geo.settings")</div>
+  		<div class="panel-body">
+
+			@_staticFormField("label.country", event.country.name)
+			@_staticFormField("label.city", event.city.name)
+
+			@if(event.extendedGeoSettings) {
+				<div id="map" style="width: 100%; height: 400px;"></div>
+			} else {
+				@_staticFormField("label.event.address", event.address)
+			}
+
+		</div>
+	</div>
+
+}
+
+}

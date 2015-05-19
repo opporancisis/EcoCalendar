@@ -1,0 +1,120 @@
+@(filter: play.data.Form[controllers.EventController.FilterForm],
+	countries: List[models.geo.Country],
+	grandEvents: List[models.event.GrandEvent],
+	tags: List[models.event.tag.EventTag]
+)
+
+@import scala.collection.mutable.LinkedHashMap
+@import helpers.BootstrapHelper._
+@import views.menu.EventMenu._
+@import play.twirl.api.Html
+
+@user = @{
+	ctx.args.get("user").asInstanceOf[models.user.User]
+}
+
+@implicitScripts = {
+	@_css("stylesheets/fullcalendar.css")
+	@_js("javascripts/fullcalendar/fullcalendar.js")
+	@_js("javascripts/fullcalendar/lang/ru.js")
+	@_js("javascripts/calendar.js")
+	@_js("lib/knockout/knockout.debug.js")
+	<script>
+		var countriesMap = @Html(play.libs.Json.toJson(countries).toString());
+		var countries = @Html(countries.map(a => a.id + ":" + a.cities.map(b => b.id + ":\"" + b.name + "\"").mkString("{", ",", "}") ).mkString("{", ",", "}"));
+		var countryNames = @Html(countries.map(a => a.id + ":\"" + a.name + "\"").mkString("{", ",", "}"));
+		var grandEvents = @Html(grandEvents.map(a => "{\"id\":" + a.id + ",\"name\":\"" + a.name + "\"}").mkString("[", ",", "]"));
+		var grandEventNames = @Html(grandEvents.map(a => a.id + ":\"" + a.name + "\"").mkString("{", ",", "}"));
+		var eventTags = @Html(tags.map(a => "{\"id\":" + a.id + ",\"name\":\"" + a.name + "\"}").mkString("[", ",", "]"));
+		var eventTagsNames = @Html(tags.map(a => a.id + ":{\"id\":" + a.id + ",\"name\":\"" + a.name + "\"}").mkString("{", ",", "}"));
+		$(function() {
+			$('#collapseOne').collapse();
+		});
+	</script>
+}
+
+@main(
+	"nav.event.calendar",
+	breadcrumbs = LinkedHashMap(
+		"nav.event.calendar" -> routes.EventController.calendar
+	)
+) {
+
+@*It's a pseudo-form. Data will be processed at client, stored in localStorage and events fetched
+via ajax *@
+@form(routes.EventController.calendar(), 'id -> "filterForm", Symbol("data-bind") -> "submit: submitFilter") {
+
+	<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+		<div class="panel panel-default">
+			<div class="panel-heading" role="tab" id="headingOne">
+				<h4 class="panel-title">
+					<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+						@Messages("label.event.calendar.filter"):
+							<span data-bind="visible: selectedCountry, text: '[' + countryNames[selectedCountry()] + ']' "></span>
+							<span data-bind="visible: selectedCountry && selectedCity, text: selectedCountry() ? '[' + countries[selectedCountry()][selectedCity()] + ']' : '' "></span>
+							<span data-bind="visible: selectedGrandEvent, text: '[' + grandEventNames[selectedGrandEvent()] + ']' "></span>
+							<span data-bind="visible: selectedTags, text: '[' + $.map(selectedTags(),function(n,i){return eventTagsNames[n].name }) + ']' "></span>
+					</a>
+				</h4>
+			</div>
+			<div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+				<div class="panel-body">
+
+					@select(
+						field = filter("country"),
+						'_label -> "label.country",
+						Symbol("data-bind") -> ("options: availableCountries, " +
+							"optionsText: function(item) {return item.name + ' (" + Messages("label.country.with.cities.count") + ": ' + item.cities.length + ')'}, " + 
+							"optionsValue: 'id', " + 
+							"value: selectedCountry, " +
+							"optionsCaption: '" + Messages("label.none.selected") + "', " +
+							"multiselect: true")
+					)
+
+					@select(
+						field = filter("city"),
+						'_label -> "label.city",
+						'dataBind -> "visible: selectedCountry",
+						Symbol("data-bind") -> ("options: availableCities, "+
+							"optionsText: 'name', " +
+							"optionsValue: 'id', " +
+							"value: selectedCity, " +
+							"optionsCaption: '" + Messages("label.none.selected") + "', " +
+							"multiselect: true")
+					)
+
+					@select(
+						field = filter("parent"),
+						'_label -> "label.grand.event",
+						'help -> "label.event.parent.tip",
+						Symbol("data-bind") -> ("options: availableGrandEvents, "+
+							"value: selectedGrandEvent, " +
+							"optionsText: 'name', " +
+							"optionsValue: 'id', " +
+							"optionsCaption: '" + Messages("label.none.selected") + "', " +
+							"multiselect: true")
+					)
+
+					@select(
+						field = filter("tags"),
+						'_label -> "label.tags",
+						'multiple -> true,
+						Symbol("data-bind") -> ("options: availableTags, "+
+							"selectedOptions: selectedTags, " +
+							"optionsText: 'name', " +
+							"optionsValue: 'id', " +
+							"multiselect: true")
+					)
+
+					@_submit("label.do.apply")
+				</div>
+			</div>
+		</div>
+	</div>
+
+}
+
+<div id="calendar"></div>
+
+
+}

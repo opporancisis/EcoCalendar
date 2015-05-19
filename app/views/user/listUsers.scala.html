@@ -4,17 +4,17 @@
 @import views.menu.SystemMenu._
 
 @implicitScripts = {
-	<link href="@routes.Assets.at("lib/select2/select2.css")" rel="stylesheet">
-	<link href="@routes.Assets.at("lib/select2/select2-bootstrap.css")" rel="stylesheet">
-	<link href="@routes.Assets.at("stylesheets/tablesorter/theme.bootstrap.css")" rel="stylesheet">
-	<script type="text/javascript" src="@routes.Assets.at("lib/select2/select2.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("lib/select2/select2_locale_ru.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.pager.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.widgets.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.widgets-filter-formatter-select2.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/tablesorter/widget-columnSelector.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/tables.js")"></script>
+	@_css("lib/select2/select2.css")
+	@_css("lib/select2/select2-bootstrap.css")
+	@_css("stylesheets/tablesorter/theme.bootstrap.css")
+	@_js("lib/select2/select2.min.js")
+	@_js("lib/select2/select2_locale_ru.js")
+	@_js("javascripts/jquery.tablesorter.min.js")
+	@_js("javascripts/jquery.tablesorter.pager.min.js")
+	@_js("javascripts/jquery.tablesorter.widgets.min.js")
+	@_js("javascripts/jquery.tablesorter.widgets-filter-formatter-select2.js")
+	@_js("javascripts/tablesorter/widget-columnSelector.js")
+	@_js("javascripts/tables.js")
 }
 
 @main(
@@ -22,15 +22,15 @@
 ) {
 
 @if(!users.isEmpty) {
-	<button class="column-selector btn btn-default">Выбор колонок</button>
+	<button class="column-selector btn btn-default">@Messages("label.choose.columns")</button>
 	<br /><br />
 	<table class="table table-striped js-tablesorter">
 		<thead>
 			<th class="unselectable">@Messages("label.nick")</th>
 			<th>@Messages("label.email")</th>
 			<th>@Messages("label.name")</th>
-			<th>@Messages("label.status.blocked")</th>
-			<th class="js-select-filter" data-init-selection="@Messages("label.roles.user")">@Messages("label.roles")</th>
+			<th class="filter-select filter-exact" data-placeholder="@Messages("label.user.status.blocked.no.matter")">@Messages("label.status.blocked")</th>
+			<th class="filter-select filter-exact" data-placeholder="@Messages("label.user.all.roles")">@Messages("label.roles")</th>
 			<th>@Messages("label.note")</th>
 			<th class="sorter-false filter-false unselectable">@Messages("label.action")</th>
 		</thead>
@@ -44,16 +44,16 @@
 					<td>@user.roles.map{ role => @Messages("label.roles." + role)}.mkString(",")</td>
 					<td>@user.note</td>
 					<td>
-						<a class="btn btn-default btn-xs" href='@{routes.UserController.edit(user.id)}' title="@Messages("label.do.edit")">
+						<a class="btn btn-default btn-xs" href='@{routes.UserController.edit(user)}' title="@Messages("label.do.edit")">
 							<span class="glyphicon glyphicon-pencil"></span>
 						</a>
-						<a class="btn btn-default btn-xs" href='@{routes.UserController.changePassword(user.id)}' title="@Messages("label.do.change.password")">
+						<a class="btn btn-default btn-xs" href='@{routes.UserController.changePassword(user)}' title="@Messages("label.do.change.password")">
 							<span class="glyphicon glyphicon-asterisk"></span>
 						</a>
 						<a class="btn btn-default btn-xs js-ajax" title="@Messages("label.do.remove")"
 								data-action="remove"
 								data-method="POST"
-								data-url="@routes.UserController.remove(user.id)"
+								data-url="@routes.UserController.remove(user)"
 								data-confirm="@Messages("label.are.you.sure.you.want.to.delete", user.somename)">
 							<span class="glyphicon glyphicon-remove"></span>
 						</a>
@@ -62,13 +62,13 @@
 			}
 		</tbody>
 		<tfoot>
-			@_tablePager(9)
+			@_tablePager(7)
 		</tfoot>
 	</table>
 } else {
 	@_foundNoneOf(classOf[models.user.User])
 }
 
-	<a href="@routes.UserController.create" class="btn btn-primary">@Messages("nav.user.create")</a>
+	<a href="@routes.UserController.add" class="btn btn-primary">@Messages("label.do.add")</a>
 
 }

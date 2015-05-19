@@ -3,6 +3,7 @@ package utils.formatter;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Locale;
 
 import play.data.format.Formatters.SimpleFormatter;
@@ -18,7 +19,11 @@ public final class LocalDateTimeFormatter extends
 
 	@Override
 	public LocalDateTime parse(String input, Locale l) throws ParseException {
-		throw new UnsupportedOperationException();
+		try {
+			return LocalDateTime.parse(input, FORMATTER);
+		} catch (DateTimeParseException e) {
+			throw new ParseException(input, 0);
+		}
 	}
 
 	@Override

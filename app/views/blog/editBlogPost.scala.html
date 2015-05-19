@@ -1,0 +1,59 @@
+@(editForm: play.data.Form[models.blog.BlogPost],
+	post: models.blog.BlogPost,
+	files: List[models.file.UploadedFile])
+
+@import helpers.BootstrapHelper._
+@import scala.collection.mutable.LinkedHashMap
+
+@implicitScripts = {
+	@_js("javascripts/addFile.js")
+}
+
+@main(
+	if(post != null) {
+		"nav.blog.edit"
+	} else {
+		"nav.blog.add"
+	},
+	leftNav = LinkedHashMap(
+		"nav.blog" -> routes.BlogController.list
+	),
+	breadcrumbs = LinkedHashMap(
+		"nav.blog" -> routes.BlogController.list,
+		if(post != null) {
+			"nav.blog.edit" -> routes.BlogController.edit(post)
+		} else {
+			"nav.blog.add" -> routes.BlogController.add
+		}
+	)
+) {
+
+@form(if(post != null) routes.BlogController.doEdit(post) else routes.BlogController.doAdd) {
+
+	@if(editForm.hasGlobalErrors) { 
+		<div class="alert alert-danger">@editForm.globalError.message</div>
+	}
+
+	@inputText(
+		field = editForm("title"),
+		'_label -> "label.title"
+	)
+
+	@textarea(
+		field = editForm("content"),
+		args = 'rows -> 3, 'cols -> 50,
+		'_label -> "label.note"
+	)
+
+	@select(
+		field = editForm("attachments"),
+		'options -> files.map(a => a.id.toString -> a.name).toSeq,
+		'multiple -> true,
+		'_label -> "label.file.files"
+	)
+
+	@_submit(if(post != null) "label.save" else "label.create")
+
+}
+
+}

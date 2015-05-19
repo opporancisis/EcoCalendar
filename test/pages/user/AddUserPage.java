@@ -17,7 +17,7 @@ public class AddUserPage extends AbstractPage {
 
 	@Override
 	public String getUrl() {
-		return routes.UserController.create().url();
+		return routes.UserController.add().url();
 	}
 	
 	@Override
@@ -28,17 +28,10 @@ public class AddUserPage extends AbstractPage {
 	public void addUser(String email) {
 		fill("#email").with(email);
 		select("#roles", "пользователь");
-		await().until("#flatNumber").areDisplayed();
-		fill("#surname").with(faker.lastName());
+		await().until("#note").areDisplayed();
 		fill("#name").with(faker.firstName());
-		fill("#patronymic").with(faker.firstName());
-		fill("#flatNumber").with(faker.numerify("##"));
-		fill("#accountNumber").with(faker.numerify("########"));
-		fill("#certificate").with(faker.numerify("########"));
-		executeScript("$('#membershipStartDate').datepicker('remove');");	// disable datepicker to make the test more reliable
-		fill("#membershipStartDate").with(faker.numerify("1#-0#-201#"));
-		fill("#tenants").with(faker.numerify("#"));
-		fill("#flatArea").with(faker.numerify("##"));
+
+
 		fill("#note").with(faker.sentence());
 		findFirst("input[type='submit']").click();
 		assertNoErrorsInForm();

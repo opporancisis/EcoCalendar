@@ -5,19 +5,24 @@
 @import views.menu.SystemMenu._
 @import helpers.BootstrapHelper._
 
+@implicitScripts = {
+	@_js("javascripts/geoObjectSetupForm.js")
+	@_maps()
+}
+
 @main(
 	if(country != null)
 		"nav.geo.country.edit"
 	else
-		"nav.geo.country.create",
+		"nav.geo.country.add",
 	breadcrumbs = LinkedHashMap(
 		"nav.geo.country.list" -> routes.CountryController.list,
-		if (country != null) editForm("name").value -> routes.CountryController.edit(country.id)
-		else "nav.geo.country.create" -> routes.CountryController.create
+		if (country != null) editForm("name").value -> routes.CountryController.edit(country)
+		else "nav.geo.country.add" -> routes.CountryController.add
 	)
 ) {
 
-@form(if(country != null) routes.CountryController.doEdit(country.id) else routes.CountryController.doCreate) {
+@form(if(country != null) routes.CountryController.doEdit(country) else routes.CountryController.doAdd) {
 
 	@if(editForm.hasGlobalErrors) { 
 		<div class="alert alert-danger">@editForm.globalError.message</div>
@@ -31,6 +36,12 @@
 		field = editForm("name"),
 		'_label -> "label.name",
 		'required -> true
+	)
+
+	@inputText(
+		field = editForm("code"),
+		'_label -> "label.code",
+		'help -> "label.city.country.code.tip"
 	)
 
 	@inputText(
@@ -51,7 +62,7 @@
 		'required -> true
 	)
 
-	@_submit(if(country != null) "label.save" else "label.create")
+	@_submit(if(country != null) "label.save" else "label.add")
 }
 
 }

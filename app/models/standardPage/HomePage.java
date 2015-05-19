@@ -10,6 +10,7 @@ import javax.persistence.ManyToMany;
 import models.file.UploadedFile;
 import models.sys.Setting;
 import models.sys.SettingName;
+import play.data.validation.Constraints.Min;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
 import play.i18n.Messages;
@@ -31,6 +32,9 @@ public class HomePage extends Model {
 	@ManyToMany
 	public List<UploadedFile> attachments;
 
+	@Min(0)
+	public Integer latestNewsMax;
+
 	public static final Finder<Long, HomePage> find = new Finder<>(Long.class,
 			HomePage.class);
 
@@ -45,6 +49,7 @@ public class HomePage extends Model {
 				home.title = Messages.get("label.welcome");
 			}
 			home.body = Messages.get("label.home.not.configured");
+			home.latestNewsMax = 3;
 			home.save();
 		}
 		return home;

@@ -12,12 +12,13 @@ import java.util.function.Function;
 import models.event.Event;
 import models.event.GrandEvent;
 import models.event.tag.EventTag;
+import models.geo.City;
 import models.geo.Country;
 import models.geo.GeoCoords;
-import models.message.Message;
 import models.organization.Organization;
 import models.user.User;
 import play.data.Form;
+import play.data.validation.Constraints.Required;
 import play.db.ebean.Transactional;
 import play.i18n.Messages;
 import play.mvc.Controller;
@@ -28,6 +29,7 @@ import be.objectify.deadbolt.java.actions.SubjectPresent;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import controllers.EventController.ExportForm;
+import controllers.EventController.FilterForm;
 import controllers.helpers.ContextAugmenter;
 import controllers.helpers.ContextAugmenterAction;
 
@@ -35,13 +37,13 @@ import controllers.helpers.ContextAugmenterAction;
 public class EventController extends Controller {
 
 	private static final Form<Event> EDIT_FORM = Form.form(Event.class);
-	private static final Form<GeoCoords> COORDS_FORM = Form.form(GeoCoords.class);
 	private static final Form<ExportForm> EXPORT_FORM = Form.form(ExportForm.class);
+	private static final Form<FilterForm> FILTER = Form.form(FilterForm.class);
 
 	private static Result list(Form<DatesInterval> intervalForm) {
 		DatesInterval f = intervalForm.get();
-		List<Event> events = Event.find.query().where().ge("days.date", f.from)
-				.le("days.date", f.till).findList();
+		List<Event> events = Event.find.query().where().ge("startDate", f.from)
+				.le("endDate", f.till).findList();
 		return ok(views.html.event.listEvents.render(events, intervalForm));
 
 	}
@@ -61,46 +63,37 @@ public class EventController extends Controller {
 	}
 
 	@SubjectPresent
-	public static Result edit(long id) {
-		Event event = Event.find.byId(id);
-		if (event == null) {
-			return Application.notFoundObject(Event.class, id);
-		}
-		event.initTimetableJson();
+	public static Result edit(Event event) {
 		List<GrandEvent> grandEvents = getActualGrandEvents();
 		if (event.parent != null && !grandEvents.contains(event.parent)) {
 			// grandEvents.
 		}
-		event.coords.country = event.coords.city.country;
-		return ok(views.html.event.editEvent.render(EDIT_FORM.fill(event),
-				COORDS_FORM.fill(event.coords), event, getActualGrandEvents(),
-				EventTag.findAllOrdered(), Organization.find.all(), Country.all()));
+		event.country = event.city.country;
+		return ok(views.html.event.editEvent.render(EDIT_FORM.fill(event), event,
+				getActualGrandEvents(), EventTag.findAllOrdered(), Organization.find.all(),
+				Country.all()));
 	}
 
 	@SubjectPresent
-	public static Result doEdit(long id) {
+	public static Result doEdit(Event oldEvent) {
 		Form<Event> filledForm = EDIT_FORM.bindFromRequest();
-		Form<GeoCoords> filledCoords = COORDS_FORM.bindFromRequest();
-		if (filledForm.hasErrors() || filledCoords.hasErrors()) {
-			Event event = Event.find.byId(id);
-			if (event == null) {
-				return Application.notFoundObject(Event.class, id);
-			}
-			return badRequest(views.html.event.editEvent.render(filledForm, filledCoords, event,
+		if (filledForm.hasErrors()) {
+			return badRequest(views.html.event.editEvent.render(filledForm, oldEvent,
 					getActualGrandEvents(), EventTag.findAllOrdered(), Organization.find.all(),
 					Country.all()));
 		}
+		// TODO: how will coords be populated?
 		Event event = filledForm.get();
-		GeoCoords coords = filledCoords.get();
-		event.updateWithTimetableAndCoords(id, coords);
+		event.update(oldEvent.id);
+		// TODO: check that old coords will be deleted from DB after event
+		// update
 		return redirect(routes.EventController.list());
 	}
 
 	@SubjectPresent
-	public static Result create() {
-		return ok(views.html.event.editEvent.render(EDIT_FORM, COORDS_FORM, null,
-				getActualGrandEvents(), EventTag.findAllOrdered(), Organization.find.all(),
-				Country.all()));
+	public static Result add() {
+		return ok(views.html.event.editEvent.render(EDIT_FORM, null, getActualGrandEvents(),
+				EventTag.findAllOrdered(), Organization.find.all(), Country.all()));
 	}
 
 	private static List<GrandEvent> getActualGrandEvents() {
@@ -109,11 +102,10 @@ public class EventController extends Controller {
 	}
 
 	@SubjectPresent
-	public static Result doCreate() {
+	public static Result doAdd() {
 		Form<Event> filledForm = EDIT_FORM.bindFromRequest();
-		Form<GeoCoords> filledCoords = COORDS_FORM.bindFromRequest();
-		if (filledForm.hasErrors() || filledCoords.hasErrors()) {
-			return badRequest(views.html.event.editEvent.render(filledForm, filledCoords, null,
+		if (filledForm.hasErrors()) {
+			return badRequest(views.html.event.editEvent.render(filledForm, null,
 					getActualGrandEvents(), EventTag.findAllOrdered(), Organization.find.all(),
 					Country.all()));
 		}
@@ -121,7 +113,8 @@ public class EventController extends Controller {
 		Event event = filledForm.get();
 		event.author = user;
 		event.published = user.hasEnoughPowerToPublishEvents();
-		event.coords = filledCoords.get();
+		// TODO: how we will populate coords?
+		event.coords = null;
 		if (event.parent != null) {
 			// TODO: notify creator of grand event about new event
 			// TODO: take action upon GE settings: include sub-event
@@ -141,6 +134,7 @@ public class EventController extends Controller {
 		return TODO;
 	}
 
+	// TODO: form hash tags in exported text based on event tags
 	public static Result exportEvents() {
 		Form<ExportForm> filledForm = EXPORT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
@@ -173,9 +167,7 @@ public class EventController extends Controller {
 		LocalDate startDate = null;
 		LocalDate endDate = null;
 		for (Event event : events) {
-			LocalDate efd = event.firstDay().date;
-			LocalDate eld = event.lastDay().date;
-			DatesInterval interval = new DatesInterval(efd, eld);
+			DatesInterval interval = new DatesInterval(event.startDate, event.endDate);
 			List<Event> evs = map.get(interval);
 			if (evs == null) {
 				evs = new ArrayList<>();
@@ -183,15 +175,15 @@ public class EventController extends Controller {
 			}
 			evs.add(event);
 			if (startDate == null) {
-				startDate = efd;
-				endDate = eld;
+				startDate = event.startDate;
+				endDate = event.endDate;
 				continue;
 			}
-			if (startDate.isAfter(efd)) {
-				startDate = efd;
+			if (startDate.isAfter(event.startDate)) {
+				startDate = event.startDate;
 			}
-			if (endDate.isBefore(eld)) {
-				endDate = eld;
+			if (endDate.isBefore(event.endDate)) {
+				endDate = event.endDate;
 			}
 		}
 		return ok(views.html.event.export.render(map, startDate, endDate, lang()));
@@ -226,8 +218,50 @@ public class EventController extends Controller {
 		}
 		return ok();
 	}
+	
+	public static Result getEventsJson() {
+		// ArrayNode arr = Json.newObject().arrayNode();
+		// for (EventDayProgram day : days) {
+		// LocalDate date = day.date;
+		// for (EventProgamItem item : day.items) {
+		// arr.add(Json.newObject()
+		// .put("start", LocalDateTime.of(date, item.start).toString())
+		// .put("end", LocalDateTime.of(date, item.end).toString())
+		// .put("title", item.description));
+		// }
+		// }
+		// timetableJson = arr.toString();
+		
+		return TODO;
+	}
+
+	public static Result calendar() {
+		// just return UI. actual events will be fetched via ajax
+		return ok(views.html.event.calendar.render(FILTER, Country.all(), getActualGrandEvents(),
+				EventTag.findAllOrdered()));
+	}
+
+	public static Result map() {
+		return TODO;
+	}
+	
+	public static Result view(Event event) {
+		return ok(views.html.event.viewEvent.render(event));
+	}
 
 	public static class ExportForm {
 		public List<Event> events;
+	}
+
+	public static class FilterForm {
+
+		public Country country;
+
+		public City city;
+
+		public GrandEvent parent;
+
+		public List<EventTag> tags;
+
 	}
 }

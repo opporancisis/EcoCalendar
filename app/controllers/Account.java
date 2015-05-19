@@ -75,7 +75,7 @@ public class Account extends Controller {
 		@Required
 		public String email;
 
-		@Pattern(User.NICK_PAT)
+		@Pattern(value = User.NICK_PAT, message = "error.nick")
 		@Required
 		public String nick;
 	}

@@ -2,18 +2,12 @@
 
 @import helpers.BootstrapHelper._
 @import scala.collection.mutable.LinkedHashMap
+@import views.menu.SystemMenu._
 
 @main(
 	"nav.sys.settings",
 	breadcrumbs = LinkedHashMap(
 		"nav.sys.settings" -> routes.SettingController.edit
-	),
-	leftNav = LinkedHashMap(
-		"nav.sys.settings" -> routes.SettingController.edit,
-		"nav.homePage.edit" -> routes.HomePageController.edit,
-		"nav.user.list" -> routes.UserController.list,
-		"nav.file.list" -> routes.FileController.list,
-		"nav.stdPage.list" -> routes.StandardPageController.list
 	)
 ) {
 
@@ -28,7 +22,7 @@
 		</div>
 	}
 
-	@_submit("label.save")           
+	@_submit("label.save")
 }
 
 }

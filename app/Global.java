@@ -1,10 +1,9 @@
 import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.Date;
-
-import org.joda.time.DateTime;
 
 import play.Application;
 import play.Configuration;
@@ -14,12 +13,14 @@ import play.Logger.ALogger;
 import play.api.mvc.EssentialFilter;
 import play.data.format.Formats;
 import play.data.format.Formatters;
+import play.libs.Akka;
 import play.mvc.Call;
-import utils.formatter.DateTimeFormatter;
 import utils.formatter.LocalDateFormatter;
 import utils.formatter.LocalDateTimeFormatter;
+import utils.formatter.LocalTimeFormatter;
 import utils.formatter.LongFormatter;
 import utils.formatter.YearMonthFormatter;
+import akka.actor.Props;
 
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.PlayAuthenticate.Resolver;
@@ -29,6 +30,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
 import controllers.routes;
+import events.AlertPublisher;
 import filters.AccessLog;
 
 public class Global extends GlobalSettings {
@@ -56,6 +58,7 @@ public class Global extends GlobalSettings {
 
 	@Override
 	public void onStart(Application app) {
+		events.AlertPublisher.ref = Akka.system().actorOf(Props.create(AlertPublisher.class));
 		PlayAuthenticate.setResolver(new Resolver() {
 
 			@Override
@@ -108,9 +111,9 @@ public class Global extends GlobalSettings {
 		Formatters.register(Date.class, new Formats.DateFormatter(
 				LocalDateTimeFormatter.FULL_DATE_FORMAT));
 		Formatters.register(Long.class, new LongFormatter());
-		Formatters.register(DateTime.class, new DateTimeFormatter());
 		Formatters.register(LocalDateTime.class, new LocalDateTimeFormatter());
 		Formatters.register(LocalDate.class, new LocalDateFormatter());
+		Formatters.register(LocalTime.class, new LocalTimeFormatter());
 		Formatters.register(YearMonth.class, new YearMonthFormatter());
 
 		InitialData.initData();

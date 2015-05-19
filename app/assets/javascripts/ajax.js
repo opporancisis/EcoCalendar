@@ -28,10 +28,14 @@ $(document).ready(function() {
 			console.debug("[" + event.type + "] " + settings.type + " " + settings.url);
 		},
 		ajaxError: function(event, jqxhr, settings, error) {
+			var message = "Ошибка при выполнении запроса";
+			if (~jqxhr.getResponseHeader("Content-Type").indexOf("text/plain")) {
+				message = jqxhr.responseText;
+			}
 			console.error("[" + event.type + "] " + error);
 			console.error(jqxhr);
 			console.error(settings);
-			$.bootstrapGrowl("Сбой при выполнении запроса: " + error, {type: "danger"});
+			$.bootstrapGrowl(message, {type: "danger"});
 		},
 		ajaxStop: function() {
 			spinner.stop();
@@ -59,6 +63,7 @@ $(document).ready(function() {
 		
 		function doRequest() {
 			$.ajax(options).done(function() {
+				$this.triggerHandler("ajaxSuccess.app", arguments);
 				if (action === "remove" && $item.length > 0) {
 					var $table = $item.closest("table");
 					if ($item.is("[data-id]")) {

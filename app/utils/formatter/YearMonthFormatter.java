@@ -3,9 +3,11 @@ package utils.formatter;
 import java.text.ParseException;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Locale;
 
 import play.data.format.Formatters.SimpleFormatter;
+import play.i18n.Messages;
 
 public final class YearMonthFormatter extends SimpleFormatter<YearMonth> {
 
@@ -14,7 +16,11 @@ public final class YearMonthFormatter extends SimpleFormatter<YearMonth> {
 
 	@Override
 	public YearMonth parse(String input, Locale l) throws ParseException {
-		throw new UnsupportedOperationException();
+		try {
+			return YearMonth.parse(input, YYYY_MM);
+		} catch (DateTimeParseException e) {
+			throw new ParseException(Messages.get("error.format.must.be.MM-yyyy"), 0);
+		}
 	}
 
 	@Override

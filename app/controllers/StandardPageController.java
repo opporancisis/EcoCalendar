@@ -10,6 +10,7 @@ import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.annotation.Transactional;
 
@@ -28,51 +29,42 @@ public class StandardPageController extends Controller {
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result edit(long id) {
-		StandardPage standardPage = StandardPage.find.byId(id);
-		if (standardPage == null) {
-			return Application.notFoundObject(StandardPage.class, id);
-		}
-		Form<StandardPage> filledForm = EDIT_FORM.fill(standardPage);
+	public static Result edit(StandardPage page) {
+		Form<StandardPage> filledForm = EDIT_FORM.fill(page);
 		return ok(views.html.standardPage.editStandardPage.render(filledForm,
-				UploadedFile.find.all()));
+				page, UploadedFile.find.all()));
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
 	@Transactional
-	public static Result doEdit(long id) {
+	public static Result doEdit(StandardPage oldPage) {
 		Form<StandardPage> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
-			StandardPage standardPage = StandardPage.find.byId(id);
-			if (standardPage == null) {
-				return Application.notFoundObject(StandardPage.class, id);
-			}
-			filledForm.data().put("id", Long.toString(id));
 			return badRequest(views.html.standardPage.editStandardPage.render(
-					filledForm, UploadedFile.find.all()));
+					filledForm, oldPage, UploadedFile.find.all()));
 		}
 		StandardPage standardPage = filledForm.get();
 		if (standardPage.attachments == null) {
 			Ebean.createUpdate(StandardPage.class,
 					"update standardPage set attachments=null where id=:id")
-					.setParameter("id", id).execute();
+					.setParameter("id", oldPage.id).execute();
 		}
-		standardPage.update(id);
+		standardPage.update(oldPage.id);
 		return redirect(routes.StandardPageController.list());
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result create() {
+	public static Result add() {
 		return ok(views.html.standardPage.editStandardPage.render(EDIT_FORM,
-				UploadedFile.find.all()));
+				null, UploadedFile.find.all()));
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result doCreate() {
+	public static Result doAdd() {
 		Form<StandardPage> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			return badRequest(views.html.standardPage.editStandardPage.render(
-					filledForm, UploadedFile.find.all()));
+					filledForm, null, UploadedFile.find.all()));
 		}
 		StandardPage standardPage = filledForm.get();
 		standardPage.disabled = false;
@@ -86,20 +78,20 @@ public class StandardPageController extends Controller {
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result remove(long id) {
-		StandardPage standardPage = StandardPage.find.byId(id);
-		if (standardPage == null) {
-			return Application.notFoundObject(StandardPage.class, id);
+	@Transactional
+	public static Result remove(StandardPage page) {
+		page.delete();
+		QueryIterator<StandardPage> it = StandardPage.find.query()
+				.orderBy("orderInd").findIterate();
+		for (long i = 1; it.hasNext(); i++) {
+			StandardPage next = it.next();
+			next.orderInd = i;
+			next.update();
 		}
-		standardPage.delete();
 		return ok();
 	}
 
-	public static Result getStdPageById(long id) {
-		StandardPage page = StandardPage.find.byId(id);
-		if (page == null) {
-			return Application.notFoundObject(StandardPage.class, id);
-		}
+	public static Result getStdPageById(StandardPage page) {
 		return ok(views.html.standardPage.viewStandardPage.render(page));
 	}
 
@@ -114,19 +106,16 @@ public class StandardPageController extends Controller {
 
 	@Transactional
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result moveBy(long id, long by) {
-		StandardPage page = StandardPage.find.byId(id);
-		if (page == null) {
-			return Application.notFoundObject(StandardPage.class, id);
-		}
+	public static Result moveBy(StandardPage page, long by) {
 		StandardPage moved = StandardPage.find.query().where()
 				.eq("orderInd", page.orderInd + by).findUnique();
 		if (moved != null) {
 			moved.orderInd = page.orderInd;
 			page.orderInd += by;
 			moved.update();
-			page.update(id);
+			page.update(page.id);
 		}
 		return redirect(routes.StandardPageController.list());
 	}
+
 }

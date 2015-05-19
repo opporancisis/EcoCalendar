@@ -9,3 +9,5 @@ workspace
 .classpath
 .project
 /bin
+
+*.bak

@@ -1,4 +1,0 @@
-<accounts>
-	<account id="id123456" surname="Иванов" name="Иван" patronymic="Иванович0" certificate="cert123456" discount="Льгота для ветерана войны" tenants="3" flat="123" area="44" />
-	<account id="id234567" surname="Иванов" name="Иван" patronymic="Иванович1" certificate="cert234567" discount="Нет льгот" tenants="5"  flat="234" area="55" />
-</accounts>

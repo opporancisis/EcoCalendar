@@ -1,0 +1,69 @@
+@(posts: List[models.blog.BlogPost])
+
+@import scala.collection.mutable.LinkedHashMap
+@import be.objectify.deadbolt.java.views.html._
+@import be.objectify.deadbolt.core.utils.TemplateUtils._
+@import be.objectify.deadbolt.java.DeadboltViewSupport._
+
+@main(
+	"nav.blog",
+	leftNav = LinkedHashMap(
+		"nav.blog" -> routes.BlogController.list
+	),
+	breadcrumbs = LinkedHashMap(
+		"nav.blog" -> routes.BlogController.list
+	)
+) {
+
+@(if(posts.isEmpty()) _foundNoneOf(classOf[models.blog.BlogPost]))
+
+@if(viewRestrict(la(as("admin")), null)) {
+	<a href="@routes.BlogController.add" class="btn btn-primary">@Messages("label.do.add")</a>
+}
+
+@for(post <- posts) {
+	<div class="blogPost">
+		<a name="post_@post.id" />
+		<div class="blogPostDate">@Formatters.print(post.created)
+			@if(post.created != post.updated) {
+				<div class="blogPostDateModified">(@Messages("label.changed") : @Formatters.print(post.updated))</div>
+			}
+		</div>
+		<div class="blogPostAuthor">
+			@post.owner.nick
+		</div>
+		<div class="blogPostTitle">
+			@post.title
+			@if(viewRestrict(la(as("admin")), null)) {
+				<a class="btn btn-default btn-xs" href='@{routes.BlogController.edit(post)}' title="@Messages("label.do.edit")">
+					<span class="glyphicon glyphicon-pencil"></span>
+				</a>
+				<a class="btn btn-default btn-xs js-ajax" title="@Messages("label.do.remove")"
+						data-action="remove"
+						data-method="POST"
+						data-url="@routes.BlogController.remove(post)"
+						data-confirm="@Messages("label.are.you.sure.you.want.to.delete", post.title)">
+					<span class="glyphicon glyphicon-remove"></span>
+				</a>
+			}
+		</div>
+		<div class="blogPostContent">
+			@post.content
+		</div>
+		@if(!post.attachments.isEmpty) {
+			<div class="blogPostAttachments">
+				@for(attachment <- post.attachments) {
+					@if(attachment.isImage) {
+						<img src="@routes.FileController.get(attachment)" />
+					} else {
+						<a href="@routes.FileController.get(attachment)">@attachment.name</a>
+					}
+					<br />
+				}
+			</div>
+		}
+		
+	</div>
+}
+	
+}

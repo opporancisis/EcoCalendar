@@ -18,13 +18,15 @@ import models.user.User;
 import play.data.format.Formatters;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
+import utils.IdPathBindable;
 import utils.formatter.GrandEventFormatter;
 
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-public class GrandEvent extends Model {
+public class GrandEvent extends Model implements IdPathBindable<GrandEvent> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -36,14 +38,18 @@ public class GrandEvent extends Model {
 	public Long id;
 
 	@CreatedTimestamp
+	@JsonIgnore
 	public Date created;
 
 	@UpdatedTimestamp
+	@JsonIgnore
 	public Date updated;
 
 	@ManyToOne
+	@JsonIgnore
 	public User author;
 
+	@JsonIgnore
 	public Boolean published;
 
 	// TODO: make this logic work
@@ -51,6 +57,7 @@ public class GrandEvent extends Model {
 	 * If it's true, then notify GE-creator about each new sub event and don't
 	 * enable sub-event until premoderation
 	 */
+	@JsonIgnore
 	public Boolean preModeration;
 
 	@Required
@@ -58,26 +65,32 @@ public class GrandEvent extends Model {
 
 	@Required
 	@Lob
+	@JsonIgnore
 	public String description;
 
 	/**
 	 * Strict time border for all sub-events. No sub-event can start before
 	 * startDate.
 	 */
+	@JsonIgnore
 	public LocalDate startDate;
 
 	/**
 	 * Strict time border for all sub-events. No sub-event can finish after
 	 * endDate.
 	 */
+	@JsonIgnore
 	public LocalDate endDate;
 
+	@JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "parent")
 	public List<Event> events;
 
+	@JsonIgnore
 	@ManyToMany(mappedBy = "grandEvents")
 	public List<EventTag> tags;
 
+	@JsonIgnore
 	@ManyToMany(mappedBy = "grandEvents")
 	public List<Organization> organizations;
 

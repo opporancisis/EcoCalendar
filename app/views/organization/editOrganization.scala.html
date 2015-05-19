@@ -9,15 +9,15 @@
 	if(org != null)
 		"nav.organization.edit"
 	else
-		"nav.organization.create",
+		"nav.organization.add",
 	breadcrumbs = LinkedHashMap(
 		"nav.organization.list" -> routes.OrganizationController.list,
-		if (org != null) editForm("name").value -> routes.OrganizationController.edit(org.id)
-		else "nav.organization.create" -> routes.OrganizationController.create
+		if (org != null) editForm("name").value -> routes.OrganizationController.edit(org)
+		else "nav.organization.add" -> routes.OrganizationController.add
 	)
 ) {
 
-@form(if(org != null) routes.OrganizationController.doEdit(org.id) else routes.OrganizationController.doCreate) {
+@form(if(org != null) routes.OrganizationController.doEdit(org) else routes.OrganizationController.doAdd) {
 
 	@if(editForm.hasGlobalErrors) { 
 		<div class="alert alert-danger">@editForm.globalError.message</div>
@@ -41,7 +41,7 @@
 		'required -> true
 	)
 
-	@_submit(if(org != null) "label.save" else "label.create")
+	@_submit(if(org != null) "label.save" else "label.add")
 }
 
 }

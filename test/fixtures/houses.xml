@@ -1,4 +1,0 @@
-<Building>
-	<Rec GUID="guid-1-111-222" Street="ул. Сезам" N_House="15" N_Case="1" Area="1234" Area_MOL="2345" />
-	<Rec GUID="guid-2-222-333" Street="ул. Сезам" N_House="12" N_Case="5" Area="2345" Area_MOL="3456" />
-</Building>

@@ -14,12 +14,12 @@
 	}
 }
 @scripts = {
-	<link href="@routes.Assets.at("stylesheets/tablesorter/theme.bootstrap.css")" rel="stylesheet">
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.pager.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.widgets.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/tables.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/messages.js")"></script>
+	@_css("stylesheets/tablesorter/theme.bootstrap.css")
+	@_js("javascripts/jquery.tablesorter.min.js")
+	@_js("javascripts/jquery.tablesorter.pager.min.js")
+	@_js("javascripts/jquery.tablesorter.widgets.min.js")
+	@_js("javascripts/tables.js")
+	@_js("javascripts/messages.js")
 }
 
 @main(
@@ -62,7 +62,7 @@
 							</span>
 						</span>
 					</td>
-					<td>@Formatters.print(message.time)</td>
+					<td>@Formatters.print(message.created)</td>
 				</tr>
 			}
 		</tbody>

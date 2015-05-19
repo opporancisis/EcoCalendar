@@ -53,6 +53,8 @@ $(document).ready(function() {
 			// option added in v2.16.0
 			filter_selectSource : {},
 			
+			filter_saveFilters: true,
+			
 			// column status, true = display, false = hide
 			// disable = do not display on list
 			columnSelector_columns : {},
@@ -80,9 +82,6 @@ $(document).ready(function() {
 				input.siblings("input.select2").val(optionsString);
 				var options = optionsString.split(/,\s*/);
 				input.siblings("input.select2").select2("val", options, true);
-				// setTimeout(function() {
-                //	input.siblings("input.select2").trigger("change");
-				// }, 0);
 			}
 			
 			return input;
@@ -92,13 +91,10 @@ $(document).ready(function() {
 		options.widgetOptions.filter_selectSource[index] = function(table, column) {
 			var options = [];
 			$("tbody>tr", table).each(function(i, el) {
-				var items = $(el).children().eq(column).text()
-						.split(/,\s*/).map(function(word) { return word.trim(); });
-				options = options.concat(items);
+				var item = $(el).children().eq(column).text().trim();
+				if (item) options.push(item);
 			});
-			return options.filter(function(word, indx, array) {
-				return !~array.slice(0, indx).indexOf(word);
-			}, options);
+			return options;
 		};
 	});
 	
@@ -128,14 +124,43 @@ $(document).ready(function() {
 	});
 	
 	$(".column-selector")
-		.popover({
-			placement: "bottom",
-			html: true, // required if content has HTML
-			content: "<div class=\"column-selector-popover\"></div>"
-		})
 		// bootstrap popover event triggered when the popover opens
 		.on("shown.bs.popover", function () {
 			// call this function to copy the column selection code into the popover
 			$.tablesorter.columnSelector.attachTo( table, ".column-selector-popover");
+
+			// popover reposition
+			var offset = $(this).offset();
+			offset.top += $(this).outerHeight() + $(".popover>.arrow").outerHeight();
+			offset.left -= 40;
+			$(".popover").offset(offset);
+			
+			// auto-cancel
+			$(".column-selector").on("click.app.cs", function() {
+				$(document).off(".app.cs");
+			});
+			$(".popover").on("click.app.cs", function(e) {
+				e.stopImmediatePropagation();
+			});
+			$(document).on("click.app.cs", function(e) {
+				if ($(e.target).is(".column-selector") ||
+						$(e.target).is(".popover") ||
+						$(e.target).closest(".column-selector").length > 0 ||
+						$(e.target).closest(".popover").length > 0) return;
+				e.stopPropagation();
+				$(document).off(".app.cs");
+				$(".column-selector").click();
+			});
+			$(document).on("keydown.app.cs", function(e) {
+				if (e.keyCode !== 27) return;
+				$(document).off(".app.cs");
+				$(".column-selector").click();
+			});
+		})
+		.popover({
+			placement: "bottom",
+			html: true, // required if content has HTML
+			content: "<div class=\"column-selector-popover\"></div>",
+			trigger: "click"
 		});
 });

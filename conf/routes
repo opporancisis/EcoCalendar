@@ -7,11 +7,8 @@ GET    /                                 controllers.HomePageController.index
 GET    /homePage/edit                    controllers.HomePageController.edit
 POST   /homePage/edit                    controllers.HomePageController.doEdit
 
-
-GET    /keepAlive                        controllers.Application.justOk
-
-GET    /assets/javascript/routes.js      controllers.Application.jsRoutes
-GET    /messages.js                      controllers.Application.jsMessages
+GET    /assets/javascripts/routes.js     controllers.Application.jsRoutes
+GET    /assets/javascripts/messages.js   controllers.Application.jsMessages
 
 GET    /sys/settings                     controllers.SettingController.edit
 POST   /sys/settings                     controllers.SettingController.doEdit
@@ -22,11 +19,10 @@ GET    /account/password                 controllers.Account.changePersonalPassw
 POST   /account/password                 controllers.Account.doChangePersonalPassword
 GET    /account/link                     controllers.Account.askLink
 POST   /account/link                     controllers.Account.doLink
-GET    /account/create                   controllers.Account.link
+GET    /account/add                      controllers.Account.link
 GET    /account/unverified               controllers.Signup.unverified
 GET    /account/message                  controllers.MessageController.list
 GET    /account/message/:id              controllers.MessageController.read(id: Long)
-POST   /account/message/remove/:id       controllers.MessageController.remove(id:Long)
 POST   /account/message/removeMany       controllers.MessageController.removeMany
 POST   /account/message/markAsReadMany   controllers.MessageController.markAsReadMany
 
@@ -57,82 +53,93 @@ GET    /login/password/forgot            controllers.Signup.forgotPassword(email
 POST   /login/password/forgot            controllers.Signup.doForgotPassword
 
 # Map static resources from the /public folder to the /assets URL path
-GET    /assets/*file                     controllers.Assets.at(path="/public", file)
+GET    /assets/*file                     controllers.Assets.versioned(path="/public", file)
 
-GET    /user/create                      controllers.UserController.create
-POST   /user/create                      controllers.UserController.doCreate
-GET    /user/edit/:id                    controllers.UserController.edit(id:Long)
-POST   /user/edit/:id                    controllers.UserController.doEdit(id:Long)
-POST   /user/remove/:id                  controllers.UserController.remove(id:Long)
-GET    /user/passwd/:id                  controllers.UserController.changePassword(id:Long)
-POST   /user/passwd/:id                  controllers.UserController.doChangePassword(id:Long)
-GET    /user/:id                         controllers.UserController.details(id: Long)
+GET    /user/add                         controllers.UserController.add
+POST   /user/add                         controllers.UserController.doAdd
+GET    /user/edit/:user                  controllers.UserController.edit(user: models.user.User)
+POST   /user/edit/:user                  controllers.UserController.doEdit(user: models.user.User)
+POST   /user/remove/:user                controllers.UserController.remove(user: models.user.User)
+GET    /user/passwd/:user                controllers.UserController.changePassword(user: models.user.User)
+POST   /user/passwd/:user                controllers.UserController.doChangePassword(user: models.user.User)
+GET    /user/:user                       controllers.UserController.details(user: models.user.User)
 GET    /user                             controllers.UserController.list
 
 GET    /alert/ws/:uuid                   controllers.CommunicationController.alerts(uuid: String)
 
-GET    /file/edit/:id                    controllers.FileController.edit(id: Long)
-POST   /file/edit/:id                    controllers.FileController.doEdit(id: Long)
-GET    /file/create                      controllers.FileController.create
-POST   /file/create                      controllers.FileController.doCreate
-POST   /file/remove/:id                  controllers.FileController.remove(id: Long)
-GET    /file/:id                         controllers.FileController.get(id: Long)
-GET    /file/preview/:id                 controllers.FileController.preview(id: Long)
+GET    /file/edit/:file                  controllers.FileController.edit(file: models.file.UploadedFile)
+POST   /file/edit/:file                  controllers.FileController.doEdit(file: models.file.UploadedFile)
+GET    /file/add                         controllers.FileController.add
+POST   /file/add                         controllers.FileController.doAdd
+POST   /file/remove/:file                controllers.FileController.remove(file: models.file.UploadedFile)
+GET    /file/:file                       controllers.FileController.get(file: models.file.UploadedFile)
+GET    /file/preview/:file               controllers.FileController.preview(file: models.file.UploadedFile)
 GET    /file                             controllers.FileController.list
 
-POST   /stdPage/move/:id/by/:by          controllers.StandardPageController.moveBy(id: Long, by: Long)
-GET    /stdPage/edit/:id                 controllers.StandardPageController.edit(id: Long)
-POST   /stdPage/edit/:id                 controllers.StandardPageController.doEdit(id: Long)
-GET    /stdPage/create                   controllers.StandardPageController.create
-POST   /stdPage/create                   controllers.StandardPageController.doCreate
-POST   /stdPage/remove/:id               controllers.StandardPageController.remove(id: Long)
-GET    /stdPage/:id                      controllers.StandardPageController.getStdPageById(id: Long)
+GET    /blog/edit/:post                    controllers.BlogController.edit(post: models.blog.BlogPost)
+POST   /blog/edit/:post                    controllers.BlogController.doEdit(post: models.blog.BlogPost)
+GET    /blog/add                           controllers.BlogController.add
+POST   /blog/add                           controllers.BlogController.doAdd
+POST   /blog/remove/:post                  controllers.BlogController.remove(post: models.blog.BlogPost)
+GET    /blog                               controllers.BlogController.list
+
+POST   /stdPage/move/:page/by/:by        controllers.StandardPageController.moveBy(page: models.standardPage.StandardPage, by: Long)
+GET    /stdPage/edit/:page               controllers.StandardPageController.edit(page: models.standardPage.StandardPage)
+POST   /stdPage/edit/:page               controllers.StandardPageController.doEdit(page: models.standardPage.StandardPage)
+GET    /stdPage/add                      controllers.StandardPageController.add
+POST   /stdPage/add                      controllers.StandardPageController.doAdd
+POST   /stdPage/remove/:page             controllers.StandardPageController.remove(page: models.standardPage.StandardPage)
+GET    /stdPage/:page                    controllers.StandardPageController.getStdPageById(page: models.standardPage.StandardPage)
 GET    /stdPage                          controllers.StandardPageController.list
 
-GET    /grandevent/create                controllers.GrandEventController.create
-POST   /grandevent/create                controllers.GrandEventController.doCreate
-GET    /grandevent/edit/:id              controllers.GrandEventController.edit(id: Long)
-POST   /grandevent/edit/:id              controllers.GrandEventController.doEdit(id: Long)
-POST   /grandevent/remove/:id            controllers.GrandEventController.remove(id: Long)
-GET    /grandevent/:id                   controllers.GrandEventController.details(id: Long)
+GET    /grandevent/add                   controllers.GrandEventController.add
+POST   /grandevent/add                   controllers.GrandEventController.doAdd
+GET    /grandevent/edit/:event           controllers.GrandEventController.edit(event: models.event.GrandEvent)
+POST   /grandevent/edit/:event           controllers.GrandEventController.doEdit(event: models.event.GrandEvent)
+POST   /grandevent/remove/:event         controllers.GrandEventController.remove(event: models.event.GrandEvent)
+GET    /grandevent/:event                controllers.GrandEventController.details(event: models.event.GrandEvent)
 GET    /grandevent                       controllers.GrandEventController.list
 
-GET    /event/create                     controllers.EventController.create
-POST   /event/create                     controllers.EventController.doCreate
-GET    /event/edit/:id                   controllers.EventController.edit(id: Long)
-POST   /event/edit/:id                   controllers.EventController.doEdit(id: Long)
-POST   /event/removeMany                 controllers.EventController.removeMany
-POST   /event/export                     controllers.EventController.exportEvents()
-GET    /event                            controllers.EventController.list
-POST   /event                            controllers.EventController.doChangeInterval
-
-GET    /event/tag/create                 controllers.EventTagController.create
-POST   /event/tag/create                 controllers.EventTagController.doCreate()
-GET    /event/tag/edit/:id               controllers.EventTagController.edit(id: Long)
-POST   /event/tag/edit/:id               controllers.EventTagController.doEdit(id: Long)
-POST   /event/tag/remove/:id             controllers.EventTagController.remove(id: Long)
+GET    /event/tag/add                    controllers.EventTagController.add
+POST   /event/tag/add                    controllers.EventTagController.doAdd
+GET    /event/tag/edit/:tag              controllers.EventTagController.edit(tag: models.event.tag.EventTag)
+POST   /event/tag/edit/:tag              controllers.EventTagController.doEdit(tag: models.event.tag.EventTag)
+POST   /event/tag/remove/:tag            controllers.EventTagController.remove(tag: models.event.tag.EventTag)
 GET    /event/tag                        controllers.EventTagController.list
 
-GET    /organization/create              controllers.OrganizationController.create
-POST   /organization/create              controllers.OrganizationController.doCreate()
-GET    /organization/edit/:id            controllers.OrganizationController.edit(id: Long)
-POST   /organization/edit/:id            controllers.OrganizationController.doEdit(id: Long)
-POST   /organization/remove/:id          controllers.OrganizationController.remove(id: Long)
-GET    /organization/:id                 controllers.OrganizationController.details(id: Long)
+GET    /event/add                        controllers.EventController.add
+POST   /event/add                        controllers.EventController.doAdd
+GET    /event/edit/:event                controllers.EventController.edit(event: models.event.Event)
+POST   /event/edit/:event                controllers.EventController.doEdit(event: models.event.Event)
+POST   /event/removeMany                 controllers.EventController.removeMany
+POST   /event/export                     controllers.EventController.exportEvents()
+GET    /event/list                       controllers.EventController.list
+POST   /event/list                       controllers.EventController.doChangeInterval
+GET    /event/calendar                   controllers.EventController.calendar
+POST   /event/getEventsJson              controllers.EventController.getEventsJson
+GET    /event/map                        controllers.EventController.map
+GET    /event/:event                     controllers.EventController.view(event: models.event.Event)
+
+GET    /organization/add                 controllers.OrganizationController.add
+POST   /organization/add                 controllers.OrganizationController.doAdd
+GET    /organization/edit/:org           controllers.OrganizationController.edit(org: models.organization.Organization)
+POST   /organization/edit/:org           controllers.OrganizationController.doEdit(org: models.organization.Organization)
+POST   /organization/remove/:org         controllers.OrganizationController.remove(org: models.organization.Organization)
+GET    /organization/:org                controllers.OrganizationController.details(org: models.organization.Organization)
 GET    /organization                     controllers.OrganizationController.list
 
-GET    /geo/country/create               controllers.CountryController.create
-POST   /geo/country/create               controllers.CountryController.doCreate()
-GET    /geo/country/edit/:id             controllers.CountryController.edit(id: Long)
-POST   /geo/country/edit/:id             controllers.CountryController.doEdit(id: Long)
-POST   /geo/country/remove/:id           controllers.CountryController.remove(id: Long)
+GET    /geo/country/add                  controllers.CountryController.add
+POST   /geo/country/add                  controllers.CountryController.doAdd
+GET    /geo/country/edit/:country        controllers.CountryController.edit(country: models.geo.Country)
+POST   /geo/country/edit/:country        controllers.CountryController.doEdit(country: models.geo.Country)
+POST   /geo/country/remove/:country      controllers.CountryController.remove(country: models.geo.Country)
 GET    /geo/country                      controllers.CountryController.list
 
-GET    /geo/city/create                  controllers.CityController.create
-POST   /geo/city/create                  controllers.CityController.doCreate()
-GET    /geo/city/edit/:id                controllers.CityController.edit(id: Long)
-POST   /geo/city/edit/:id                controllers.CityController.doEdit(id: Long)
-POST   /geo/city/remove/:id              controllers.CityController.remove(id: Long)
+GET    /geo/city/add                     controllers.CityController.add
+POST   /geo/city/add                     controllers.CityController.doAdd
+GET    /geo/city/edit/:city              controllers.CityController.edit(city: models.geo.City)
+POST   /geo/city/edit/:city              controllers.CityController.doEdit(city: models.geo.City)
+POST   /geo/city/remove/:city            controllers.CityController.remove(city: models.geo.City)
 GET    /geo/city                         controllers.CityController.list
 
 # ALLWAYS LAST LINE!!!!

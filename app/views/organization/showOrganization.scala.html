@@ -7,13 +7,13 @@
 	Messages("nav.organization.show", org.name),
 	breadcrumbs = LinkedHashMap(
 		"nav.organization.list" -> routes.OrganizationController.list,
-		org.name -> routes.OrganizationController.details(org.id)
+		org.name -> routes.OrganizationController.details(org)
 	)
 ) {
 
 @org.description
 
-@form(routes.OrganizationController.details(org.id)) {
+@form(routes.OrganizationController.details(org)) {
 
 	@_staticFormField("label.event.count", org.events.size)
 	@_staticFormField("label.grand.event.count", org.grandEvents.size)

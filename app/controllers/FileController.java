@@ -2,6 +2,8 @@ package controllers;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import models.file.UploadedFile;
 import models.user.RoleName;
@@ -13,7 +15,6 @@ import org.apache.commons.exec.Executor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 
 import play.Logger;
 import play.Logger.ALogger;
@@ -46,24 +47,15 @@ public class FileController extends Controller {
 	}
 
 	@Restrict({ @Group(RoleName.ADMIN) })
-	public static Result edit(long id) {
-		UploadedFile file = UploadedFile.find.byId(id);
-		if (file == null) {
-			return Application.notFoundObject(UploadedFile.class, id);
-		}
+	public static Result edit(UploadedFile file) {
 		Form<UploadedFile> filledForm = EDIT_FORM.fill(file);
 		return ok(views.html.file.editFile.render(filledForm, file));
 	}
 
 	@Restrict({ @Group(RoleName.ADMIN) })
-	public static Result doEdit(long id) {
-		UploadedFile origFile = UploadedFile.find.byId(id);
-		if (origFile == null) {
-			return Application.notFoundObject(UploadedFile.class, id);
-		}
+	public static Result doEdit(UploadedFile origFile) {
 		Form<UploadedFile> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
-			filledForm.data().put("id", Long.toString(id));
 			filledForm.data().put("originalName", origFile.name);
 			return badRequest(views.html.file.editFile.render(filledForm,
 					origFile));
@@ -74,8 +66,7 @@ public class FileController extends Controller {
 		if (origFile.name.equals(file.name) && uploadedFile == null) {
 			return redirect(routes.FileController.list());
 		}
-		file.modified = new DateTime();
-		file.id = id;
+		file.id = origFile.id;
 		if (uploadedFile != null) {
 			file.mime = uploadedFile.getContentType();
 			File backup = new File(file.file().getAbsolutePath() + "_backup");
@@ -96,17 +87,17 @@ public class FileController extends Controller {
 				return internalServerError();
 			}
 		}
-		file.update(id);
+		file.update(origFile.id);
 		return redirect(routes.FileController.list());
 	}
 
 	@Restrict({ @Group(RoleName.ADMIN) })
-	public static Result create() {
+	public static Result add() {
 		return ok(views.html.file.editFile.render(EDIT_FORM, null));
 	}
 
 	@Restrict({ @Group(RoleName.ADMIN) })
-	public static Result doCreate() {
+	public static Result doAdd() {
 		Form<UploadedFile> filledForm = EDIT_FORM.bindFromRequest();
 		ObjectNode result = Json.newObject();
 		if (filledForm.hasErrors()) {
@@ -129,8 +120,10 @@ public class FileController extends Controller {
 				return badRequest(views.html.file.editFile.render(filledForm,
 						null));
 			} else {
+				Map<String,String[]> errors = new HashMap<>();
+				errors.put("uploadedFile", new String[] { err });
 				result.put("status", "error");
-				result.put("errors", err);
+				result.put("errors", Json.toJson(errors));
 				return badRequest(result);
 			}
 		}
@@ -139,8 +132,6 @@ public class FileController extends Controller {
 		if (StringUtils.isBlank(file.name)) {
 			file.name = fileName;
 		}
-		file.created = new DateTime();
-		file.modified = file.created;
 		file.mime = uploadedFile.getContentType();
 		file.save();
 		try {
@@ -195,34 +186,26 @@ public class FileController extends Controller {
 	}
 
 	@Restrict({ @Group(RoleName.ADMIN) })
-	public static Result remove(long id) {
-		UploadedFile file = UploadedFile.find.byId(id);
-		if (file == null) {
-			return Application.notFoundObject(UploadedFile.class, id);
-		}
+	public static Result remove(UploadedFile file) {
 		file.delete();
 		return ok();
 	}
 
 	// TODO: no restriction - view anybody?
-	public static Result get(long id) {
-		UploadedFile file = UploadedFile.find.byId(id);
-		if (file == null) {
-			return Application.notFoundObject(UploadedFile.class, id);
+	public static Result get(UploadedFile file) {
+		File f = file.file();
+		if (!f.exists()) {
+			return Application.notFoundObject(UploadedFile.class, file.id);
 		}
 		response().setContentType(file.mime);
 		response().setHeader(
 				"Content-Disposition",
 				"attachment; filename=\"" + FilenameUtils.getName(file.name)
 						+ "\"");
-		return ok(file.file());
+		return ok(f);
 	}
 
-	public static Result preview(long id) {
-		UploadedFile file = UploadedFile.find.byId(id);
-		if (file == null) {
-			return Application.notFoundObject(UploadedFile.class, id);
-		}
+	public static Result preview(UploadedFile file) {
 		response().setContentType(file.mime);
 		File preview = file.preview();
 		return ok(preview);

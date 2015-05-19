@@ -1,4 +1,4 @@
-@(clazz: java.lang.Class[_], id: java.lang.Object)
+@(clazz: String, id: java.lang.Object)
 
 @import scala.collection.mutable.LinkedHashMap
 
@@ -7,7 +7,7 @@
 	breadcrumbs = LinkedHashMap()
 ) {
 
-@Messages("error.not.found.object", Messages("label.entity." + clazz.getSimpleName), id)
+@Messages("error.not.found.object", Messages("label.entity." + clazz), id)
 <br /><br />
 <a href="javascript:window.history.back()">@Messages("label.do.go.back")</a>
 

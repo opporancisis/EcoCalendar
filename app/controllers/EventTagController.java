@@ -15,33 +15,25 @@ public class EventTagController extends Controller {
 		return ok(views.html.event.listEventTags.render(EventTag.find.all()));
 	}
 
-	public static Result edit(long id) {
-		EventTag tag = EventTag.find.byId(id);
-		if (tag == null) {
-			return Application.notFoundObject(EventTag.class, id);
-		}
+	public static Result edit(EventTag tag) {
 		return ok(views.html.event.editEventTag.render(EDIT_FORM.fill(tag), tag));
 	}
 
-	public static Result doEdit(long id) {
-		EventTag tag = EventTag.find.byId(id);
-		if (tag == null) {
-			return Application.notFoundObject(EventTag.class, id);
-		}
+	public static Result doEdit(EventTag oldTag) {
 		Form<EventTag> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
-			return badRequest(views.html.event.editEventTag.render(filledForm, tag));
+			return badRequest(views.html.event.editEventTag.render(filledForm, oldTag));
 		}
-		EventTag updatedTag = filledForm.get();
-		updatedTag.update(id);
+		EventTag tag = filledForm.get();
+		tag.update(oldTag.id);
 		return redirect(routes.EventTagController.list());
 	}
 
-	public static Result create() {
+	public static Result add() {
 		return ok(views.html.event.editEventTag.render(EDIT_FORM, null));
 	}
 
-	public static Result doCreate() {
+	public static Result doAdd() {
 		Form<EventTag> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			return badRequest(views.html.event.editEventTag.render(filledForm, null));
@@ -51,11 +43,7 @@ public class EventTagController extends Controller {
 		return redirect(routes.EventTagController.list());
 	}
 
-	public static Result remove(long id) {
-		EventTag tag = EventTag.find.byId(id);
-		if (tag == null) {
-			return Application.notFoundObject(EventTag.class, id);
-		}
+	public static Result remove(EventTag tag) {
 		tag.delete();
 		return ok();
 	}

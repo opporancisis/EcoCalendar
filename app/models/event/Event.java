@@ -2,15 +2,11 @@ package models.event;
 
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -19,16 +15,15 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
 import models.event.tag.EventTag;
+import models.geo.City;
+import models.geo.Country;
 import models.geo.GeoCoords;
 import models.organization.Organization;
 import models.user.User;
 
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.URL;
 
 import play.data.format.Formatters;
@@ -37,15 +32,13 @@ import play.data.validation.Constraints.Required;
 import play.data.validation.ValidationError;
 import play.db.ebean.Model;
 import play.i18n.Messages;
-import play.libs.Json;
+import utils.IdPathBindable;
 
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 @Entity
-public class Event extends Model {
+public class Event extends Model implements IdPathBindable<Event> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -62,8 +55,33 @@ public class Event extends Model {
 	@UpdatedTimestamp
 	public Date updated;
 
+	public Boolean published;
+
 	@ManyToOne
 	public User author;
+
+	@Required
+	public String name;
+
+	@Required
+	@Lob
+	public String description;
+
+	@ManyToMany(mappedBy = "events", cascade = CascadeType.ALL)
+	public List<EventTag> tags;
+
+	@URL
+	public String additionalInfoLink;
+
+	public Boolean moreGeneralSettings;
+
+	@ManyToOne
+	public GrandEvent parent;
+
+	@ManyToMany(mappedBy = "events", cascade = CascadeType.ALL)
+	public List<Organization> organizations;
+
+	public Boolean useContactInfo;
 
 	public Boolean useAuthorContactInfo;
 
@@ -73,103 +91,44 @@ public class Event extends Model {
 
 	public String contactProfile;
 
-	public Boolean published;
+	@Transient
+	@Required
+	public Country country;
 
 	@ManyToOne
-	public GrandEvent parent;
-
-	@OneToOne(cascade = CascadeType.ALL)
-	public GeoCoords coords;
-
 	@Required
-	public String name;
+	public City city;
 
-	@Required
-	@Lob
-	public String description;
+	public String address;
 
-	@URL
-	public String additionalInfoLink;
-
-	@URL
-	public String postReleaseLink;
-
-	@Transient
-	public String timetableJson;
+	public Boolean extendedGeoSettings;
 
 	@OneToMany(cascade = CascadeType.ALL)
-	public List<EventDayProgram> days;
+	public List<GeoCoords> coords;
 
-	@ManyToMany(mappedBy = "events", cascade = CascadeType.ALL)
-	public List<EventTag> tags;
+	@Required
+	public LocalDate startDate;
 
-	@ManyToMany(mappedBy = "events", cascade = CascadeType.ALL)
-	public List<Organization> organizations;
+	@Required
+	public LocalTime startTime;
+
+	@Required
+	public LocalDate endDate;
+
+	@Required
+	public LocalTime endTime;
 
 	public static Finder<Long, Event> find = new Finder<>(Long.class, Event.class);
 
-	public boolean finished() {
-		EventDayProgram lastDay = lastDay();
-		if (lastDay.date.isBefore(LocalDate.now())) {
-			return true;
-		}
-		return lastDay.items.get(lastDay.items.size() - 1).end.isBefore(LocalTime.now());
-	}
-
-	public EventDayProgram lastDay() {
-		EventDayProgram edp = null;
-		for (EventDayProgram day : days) {
-			if (edp == null) {
-				edp = day;
-				continue;
-			}
-			if (edp.date.isBefore(day.date)) {
-				edp = day;
-			}
-		}
-		return edp;
-	}
-
-	public EventDayProgram firstDay() {
-		EventDayProgram edp = null;
-		for (EventDayProgram day : days) {
-			if (edp == null) {
-				edp = day;
-				continue;
-			}
-			if (edp.date.isAfter(day.date)) {
-				edp = day;
-			}
-		}
-		return edp;
-	}
-
-	public void initTimetableJson() {
-		ArrayNode arr = Json.newObject().arrayNode();
-		for (EventDayProgram day : days) {
-			LocalDate date = day.date;
-			for (EventProgamItem item : day.items) {
-				arr.add(Json.newObject()
-						.put("start", LocalDateTime.of(date, item.start).toString())
-						.put("end", LocalDateTime.of(date, item.end).toString())
-						.put("title", item.description));
-			}
-		}
-		timetableJson = arr.toString();
-	}
-
 	public List<ValidationError> validate() {
-		List<ValidationError> errors = processTimetable();
-		if (errors != null) {
-			return errors;
-		}
+		List<ValidationError> errors = null;
 		if (parent != null) {
-			if (parent.startDate.isAfter(firstDay().date)) {
+			if (parent.startDate.isAfter(startDate)) {
 				errors = new ArrayList<>();
 				errors.add(new ValidationError("", Messages.get(
 						"label.event.error.parentStartDateIsAfter", parent.startDate)));
 			}
-			if (parent.endDate.isBefore(lastDay().date)) {
+			if (parent.endDate.isBefore(endDate)) {
 				if (errors == null) {
 					errors = new ArrayList<>();
 				}
@@ -178,59 +137,6 @@ public class Event extends Model {
 			}
 		}
 		return errors;
-	}
-
-	private List<ValidationError> processTimetable() {
-		JsonNode timetableArr = Json.parse(timetableJson);
-		if (!timetableArr.isArray() || timetableArr.size() == 0) {
-			return Arrays.<ValidationError> asList(new ValidationError("", Messages
-					.get("error.incorrect.timetable.data.format")));
-		}
-		Map<LocalDate, EventDayProgram> items = new HashMap<>();
-		for (JsonNode elem : timetableArr) {
-			LocalDateTime startLdt = LocalDateTime.parse(elem.get("start").asText());
-			LocalDateTime endLdt = LocalDateTime.parse(elem.get("end").asText());
-			String title = elem.get("title").asText();
-			LocalDate ld = startLdt.toLocalDate();
-			EventDayProgram dayProgram = items.get(ld);
-			if (dayProgram == null) {
-				dayProgram = new EventDayProgram();
-				dayProgram.date = ld;
-				items.put(ld, dayProgram);
-				dayProgram.items = new ArrayList<>();
-			}
-			dayProgram.items.add(new EventProgamItem(startLdt.toLocalTime(), endLdt.toLocalTime(),
-					title, dayProgram));
-		}
-		this.days = new ArrayList<>(items.values());
-		return null;
-	}
-
-	public void updateWithTimetableAndCoords(long id, GeoCoords newCoords) {
-		update(id);
-		newCoords.update(this.coords.id);
-	}
-
-	public String contact() {
-		if (BooleanUtils.isTrue(useAuthorContactInfo)) {
-			if (StringUtils.isBlank(author.phone)) {
-				return null;
-			}
-			if (StringUtils.isNotBlank(author.name)) {
-				return author.phone + ", " + author.name;
-			} else {
-				return author.phone;
-			}
-		} else {
-			if (StringUtils.isBlank(contactPhone)) {
-				return null;
-			}
-			if (StringUtils.isNotBlank(contactName)) {
-				return contactPhone + ", " + contactName;
-			} else {
-				return contactPhone;
-			}
-		}
 	}
 
 	public static class EventFormatter extends SimpleFormatter<Event> {

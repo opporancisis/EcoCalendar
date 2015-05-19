@@ -49,17 +49,6 @@ public class MessageController extends Controller {
 		return ok(views.html.message.viewMessage.render(message));
 	}
 
-	@Dynamic(CHECK_AUTHORSHIP_TOPIC)
-	public static Result remove(long id) {
-		Message message = MyDynamicResourceHandler
-				.getAuthoredObject(Message.class);
-		if (message == null) {
-			return Application.notFoundObject(Message.class, id);
-		}
-		message.delete();
-		return ok();
-	}
-
 	@Transactional
 	public static Result removeMany() {
 		return processMessages((message) -> {
@@ -101,4 +90,5 @@ public class MessageController extends Controller {
 		}
 		return ok();
 	}
+
 }

@@ -20,27 +20,19 @@ public class GrandEventController extends Controller {
 				.order("startDate").findList()));
 	}
 
-	public static Result edit(long id) {
-		GrandEvent event = GrandEvent.find.byId(id);
-		if (event == null) {
-			return Application.notFoundObject(GrandEvent.class, id);
-		}
+	public static Result edit(GrandEvent event) {
 		return ok(views.html.grandevent.editGrandEvent.render(EDIT_FORM.fill(event), event,
 				Organization.find.all(), EventTag.find.all()));
 	}
 
-	public static Result doEdit(long id) {
+	public static Result doEdit(GrandEvent oldEvent) {
 		Form<GrandEvent> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
-			GrandEvent event = GrandEvent.find.byId(id);
-			if (event == null) {
-				return Application.notFoundObject(GrandEvent.class, id);
-			}
-			return badRequest(views.html.grandevent.editGrandEvent.render(filledForm, event,
+			return badRequest(views.html.grandevent.editGrandEvent.render(filledForm, oldEvent,
 					Organization.find.all(), EventTag.find.all()));
 		}
 		GrandEvent event = filledForm.get();
-		event.update(id);
+		event.update(oldEvent.id);
 		// TODO: if (1) start/end date changed and (2) this GE has some events
 		// and (3) these events are out of start-end period, then:
 		// 1. exclude out-of-period events from GE
@@ -50,13 +42,13 @@ public class GrandEventController extends Controller {
 		return redirect(routes.GrandEventController.list());
 	}
 
-	public static Result create() {
+	public static Result add() {
 		return ok(views.html.grandevent.editGrandEvent.render(EDIT_FORM, null,
 				Organization.find.all(), EventTag.find.all()));
 	}
 
 	@SubjectPresent
-	public static Result doCreate() {
+	public static Result doAdd() {
 		Form<GrandEvent> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			return badRequest(views.html.grandevent.editGrandEvent.render(filledForm, null,
@@ -73,16 +65,13 @@ public class GrandEventController extends Controller {
 		return redirect(routes.GrandEventController.list());
 	}
 
-	public static Result remove(long id) {
-		GrandEvent event = GrandEvent.find.byId(id);
-		if (event == null) {
-			return Application.notFoundObject(GrandEvent.class, id);
-		}
+	// TODO: who is able to delete grand events? restrict access
+	public static Result remove(GrandEvent event) {
 		event.delete();
 		return ok();
 	}
 
-	public static Result details(long id) {
+	public static Result details(GrandEvent event) {
 		return TODO;
 	}
 }

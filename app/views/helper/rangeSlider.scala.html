@@ -1,0 +1,23 @@
+@**
+ * Generate an HTML range slider.
+ *
+ * Example:
+ * {{{
+ * @rangeSlider(field = myForm("password"), args = 'size -> 10)
+ * }}}
+ *
+ * @param field The form field.
+ * @param args Set of extra attributes.
+ * @param handler The field constructor.
+ *@
+@(field: play.api.data.Field, args: (Symbol,Any)*)(implicit handler: views.html.helper.FieldConstructor)
+
+@min = @{ args.toMap.get('min).getOrElse(0) }
+@max = @{ args.toMap.get('max).getOrElse(100) }
+
+@views.html.helper.input(field, args:_*) { (id, name, value, htmlArgs) =>
+	<div id="@id" class="range-slider js-range-slider">
+		<input type="range" min="@min" max="@max" name="@name" value="@value"/>
+		<input type="number" min="@min" max="@max" size="@max.toString.length" maxlength="@max.toString.length"/>
+	</div>
+}

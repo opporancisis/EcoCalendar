@@ -8,10 +8,19 @@
 @main(
 	if(file != null)
 		Messages("nav.file.edit", if(editForm("originalName").value != null) editForm("originalName").value else editForm("name").value)
-		else "nav.file.create"
+	else
+		"nav.file.add",
+	breadcrumbs = LinkedHashMap(
+		"nav.file.list" -> routes.FileController.list,
+		if(file != null) {
+			Messages("nav.file.edit", if(editForm("originalName").value != null) editForm("originalName").value else editForm("name").value) -> routes.FileController.edit(file)
+		} else {
+			"nav.file.add" -> routes.FileController.add
+		}
+	)
 ) {
 
-@form(if(file != null) routes.FileController.doEdit(file.id) else routes.FileController.doCreate, 'enctype -> "multipart/form-data") {
+@form(if(file != null) routes.FileController.doEdit(file) else routes.FileController.doAdd, 'enctype -> "multipart/form-data") {
 
 	@if(editForm.hasGlobalErrors) { 
 		<div class="alert alert-danger">@editForm.globalError.message</div>
@@ -24,7 +33,8 @@
 
 	@inputFile(
 		field = editForm("uploadedFile"),
-		'_label -> "label.file"
+		'_label -> "label.file",
+		'required -> true
 	)
 
 	@_submit(if(file != null) "label.save" else "label.create")
@@ -34,7 +44,7 @@
 @if(file != null && file.isImage && file.preview.exists) {
 	<div style="margin-top: 20px">
 		<b>@Messages("label.file.preview")</b><br /><br />
-		<img src="@routes.FileController.preview(file.id)" />
+		<img src="@routes.FileController.preview(file)" />
 	</div>
 }
 

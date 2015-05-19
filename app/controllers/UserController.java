@@ -38,12 +38,12 @@ public class UserController extends Controller {
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result create() {
+	public static Result add() {
 		return ok(views.html.user.editUser.render(EDIT_FORM, null));
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result doCreate() {
+	public static Result doAdd() {
 		Form<User> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			return badRequest(views.html.user.editUser.render(filledForm, null));
@@ -54,24 +54,15 @@ public class UserController extends Controller {
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result edit(long id) {
-		User user = User.find.byId(id);
-		if (user == null) {
-			return Application.notFoundObject(User.class, id);
-		}
+	public static Result edit(User user) {
 		Form<User> filledForm = EDIT_FORM.fill(user);
 		return ok(views.html.user.editUser.render(filledForm, user));
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result doEdit(long id) {
-		User oldUser = User.find.byId(id);
-		if (oldUser == null) {
-			return Application.notFoundObject(User.class, id);
-		}
+	public static Result doEdit(User oldUser) {
 		Form<User> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
-			filledForm.data().put("id", Long.toString(id));
 			try {
 				filledForm.data().put("roles",
 						Formatters.print(User.class.getField("roles"), oldUser.roles));
@@ -82,13 +73,12 @@ public class UserController extends Controller {
 			return badRequest(views.html.user.editUser.render(filledForm, oldUser));
 		}
 		User user = filledForm.get();
-		boolean emailChanged = !StringUtils.equalsIgnoreCase(oldUser.email, user.email);
-		if (emailChanged) {
-			user.emailValidated = false;
-		} else {
-			user.emailValidated = oldUser.emailValidated;
+		if (!user.hasRole(RoleName.ADMIN) && oldUser.hasRole(RoleName.ADMIN)) {
+			return badRequest("cannot revoke ADMIN role");
 		}
-		user.update(id);
+		boolean emailChanged = !StringUtils.equalsIgnoreCase(oldUser.email,
+				user.email);
+		user.update(oldUser.id);
 		User self = ContextAugmenterAction.getLoggedUser();
 		if (self.equals(user) && emailChanged) {
 			flash(Application.FLASH_MESSAGE_KEY,
@@ -100,11 +90,7 @@ public class UserController extends Controller {
 
 	@Transactional
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result remove(long id) {
-		User user = User.find.byId(id);
-		if (user == null) {
-			return Application.notFoundObject(User.class, id);
-		}
+	public static Result remove(User user) {
 		if (user.equals(ContextAugmenterAction.getLoggedUser())) {
 			return badRequest("cannot delete yourself");
 		}
@@ -113,29 +99,22 @@ public class UserController extends Controller {
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result changePassword(long id) {
+	public static Result changePassword(User user) {
 		Application.noCache(response());
-		User user = User.find.byId(id);
-		if (user == null) {
-			return Application.notFoundObject(User.class, id);
-		}
-		return ok(views.html.account.password_change.render(Account.PASSWORD_CHANGE_FORM, user));
+		return ok(views.html.account.password_change.render(
+				Account.PASSWORD_CHANGE_FORM, user));
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result doChangePassword(long id) {
+	public static Result doChangePassword(User user) {
 		Application.noCache(response());
-		User user = User.find.byId(id);
-		if (user == null) {
-			return Application.notFoundObject(User.class, id);
-		}
-		final Form<Account.PasswordChange> filledForm = Account.PASSWORD_CHANGE_FORM
+		Form<Account.PasswordChange> filledForm = Account.PASSWORD_CHANGE_FORM
 				.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			// User did not select whether to link or not link
 			return badRequest(views.html.account.password_change.render(filledForm, user));
 		}
-		final String newPassword = filledForm.get().password;
+		String newPassword = filledForm.get().password;
 		user.changePassword(new MyUsernamePasswordAuthUser(newPassword), true);
 		flash(Application.FLASH_MESSAGE_KEY,
 				Messages.get("playauthenticate.change_password.success"));
@@ -143,7 +122,7 @@ public class UserController extends Controller {
 	}
 
 	@SubjectPresent
-	public static Result details(long id) {
+	public static Result details(User user) {
 		// get general information about user
 		return TODO;
 	}

@@ -2,6 +2,7 @@ package models.geo;
 
 import java.text.ParseException;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -14,9 +15,13 @@ import play.data.format.Formatters;
 import play.data.format.Formatters.SimpleFormatter;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
+import utils.IdPathBindable;
+
+import com.avaje.ebean.annotation.CreatedTimestamp;
+import com.avaje.ebean.annotation.UpdatedTimestamp;
 
 @Entity
-public class Country extends Model {
+public class Country extends Model implements IdPathBindable<Country> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -27,8 +32,22 @@ public class Country extends Model {
 	@Id
 	public Long id;
 
+	@CreatedTimestamp
+	public Date created;
+
+	@UpdatedTimestamp
+	public Date updated;
+
+	public Boolean disabled;
+
 	@Required
 	public String name;
+
+	/**
+	 * Code is used for constructing human-readable URLs. If empty, then id is
+	 * used.
+	 */
+	public String code;
 
 	@OneToMany
 	public List<City> cities;

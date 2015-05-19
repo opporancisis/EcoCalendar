@@ -30,8 +30,7 @@ public class AlertPublisher extends UntypedActor {
 
 	private static final ALogger LOG = Logger.of(AlertPublisher.class);
 
-	public static ActorRef ref = Akka.system().actorOf(
-			Props.create(AlertPublisher.class));
+	public static ActorRef ref; // = Akka.system().actorOf(Props.create(AlertPublisher.class));
 
 	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 	// Pair instead of HashMap - cause one user can has more than one openned

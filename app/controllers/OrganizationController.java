@@ -15,33 +15,25 @@ public class OrganizationController extends Controller {
 		return ok(views.html.organization.listOrganizations.render(Organization.find.all()));
 	}
 
-	public static Result edit(long id) {
-		Organization org = Organization.find.byId(id);
-		if (org == null) {
-			return Application.notFoundObject(Organization.class, id);
-		}
+	public static Result edit(Organization org) {
 		return ok(views.html.organization.editOrganization.render(EDIT_FORM.fill(org), org));
 	}
 
-	public static Result doEdit(long id) {
+	public static Result doEdit(Organization oldOrg) {
 		Form<Organization> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
-			Organization org = Organization.find.byId(id);
-			if (org == null) {
-				return Application.notFoundObject(Organization.class, id);
-			}
-			return badRequest(views.html.organization.editOrganization.render(filledForm, org));
+			return badRequest(views.html.organization.editOrganization.render(filledForm, oldOrg));
 		}
 		Organization org = filledForm.get();
-		org.update(id);
+		org.update(oldOrg.id);
 		return redirect(routes.OrganizationController.list());
 	}
 
-	public static Result create() {
+	public static Result add() {
 		return ok(views.html.organization.editOrganization.render(EDIT_FORM, null));
 	}
 
-	public static Result doCreate() {
+	public static Result doAdd() {
 		Form<Organization> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			return badRequest(views.html.organization.editOrganization.render(filledForm, null));
@@ -51,20 +43,12 @@ public class OrganizationController extends Controller {
 		return redirect(routes.OrganizationController.list());
 	}
 
-	public static Result remove(long id) {
-		Organization org = Organization.find.byId(id);
-		if (org == null) {
-			return Application.notFoundObject(Organization.class, id);
-		}
+	public static Result remove(Organization org) {
 		org.delete();
 		return ok();
 	}
 
-	public static Result details(long id) {
-		Organization org = Organization.find.byId(id);
-		if (org == null) {
-			return Application.notFoundObject(Organization.class, id);
-		}
+	public static Result details(Organization org) {
 		return ok(views.html.organization.showOrganization.render(org));
 	}
 }

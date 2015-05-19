@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
@@ -15,7 +16,8 @@ import com.avaje.ebeaninternal.server.type.ScalarTypeBaseDateTime;
 public class ScalarTypeJava8LocalDateTime extends
 		ScalarTypeBaseDateTime<LocalDateTime> {
 
-	private static final ZoneOffset ZO = ZoneOffset.UTC;
+	private static final ZoneId ZO = ZoneOffset.systemDefault();
+//	private static final ZoneOffset ZO = Application.getZone();
 
 	public ScalarTypeJava8LocalDateTime() {
 		super(LocalDateTime.class, false, Types.TIMESTAMP);
@@ -28,12 +30,12 @@ public class ScalarTypeJava8LocalDateTime extends
 
 	@Override
 	public Timestamp convertToTimestamp(LocalDateTime t) {
-		return new Timestamp(t.atOffset(ZO).toInstant().toEpochMilli());
+		return new Timestamp(t.atZone(ZO).toInstant().toEpochMilli());
 	}
 
 	public Object toJdbcType(Object value) {
 		if (value instanceof LocalDateTime) {
-			return new Timestamp(((LocalDateTime) value).atOffset(ZO)
+			return new Timestamp(((LocalDateTime) value).atZone(ZO)
 					.toInstant().toEpochMilli());
 		}
 		return BasicTypeConverter.toTimestamp(value);

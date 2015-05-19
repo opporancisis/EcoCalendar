@@ -1,4 +1,5 @@
 @(editForm: play.data.Form[models.standardPage.StandardPage],
+	page: models.standardPage.StandardPage,
 	files: List[models.file.UploadedFile])
 
 @import helpers.BootstrapHelper._
@@ -6,12 +7,12 @@
 @import views.menu.SystemMenu._
 
 @implicitScripts = {
-	<link rel="stylesheet" href="@routes.Assets.at("stylesheets/summernote.css")" />
-	<link rel="stylesheet" href="@routes.Assets.at("stylesheets/summernote-bs3.css")" />
-	<link rel="stylesheet" href="@routes.Assets.at("lib/font-awesome/css/font-awesome.min.css")" />
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/addFile.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/summernote.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/summernote-ru-RU.js")"></script>
+	@_css("stylesheets/summernote.css")
+	@_css("stylesheets/summernote-bs3.css")
+	@_css("lib/font-awesome/css/font-awesome.min.css")
+	@_js("javascripts/addFile.js")
+	@_js("javascripts/summernote.min.js")
+	@_js("javascripts/summernote-ru-RU.js")
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('#description').summernote({lang: "ru-RU"});
@@ -20,21 +21,21 @@
 }
 
 @main(
-	if(editForm("id").value != null) "nav.stdPage.edit" else "nav.stdPage.create",
+	if(page != null) "nav.stdPage.edit" else "nav.stdPage.add",
 	breadcrumbs = LinkedHashMap(
 		"nav.stdPage.list" -> routes.StandardPageController.list,
-		if (editForm("id").value != null) editForm("title").value -> routes.StandardPageController.edit(editForm("id").value.toLong)
-		else "nav.stdPage.create" -> routes.StandardPageController.create
+		if (page != null) editForm("title").value -> routes.StandardPageController.edit(page)
+		else "nav.stdPage.add" -> routes.StandardPageController.add
 	)
 ) {
 
-@form(if(editForm("id").value != null) routes.StandardPageController.doEdit(editForm("id").value.toLong) else routes.StandardPageController.doCreate) {
+@form(if(page != null) routes.StandardPageController.doEdit(page) else routes.StandardPageController.doAdd) {
 
 	@if(editForm.hasGlobalErrors) { 
 		<div class="alert alert-danger">@editForm.globalError.message</div>
 	}
 
-	@if(editForm("id").value != null) {
+	@if(page != null) {
 		@checkbox(
 			field = editForm("disabled"),
 			'_text -> "label.stdPage.is.disabled"
@@ -65,7 +66,7 @@
 		'multiple -> true
 	)
 
-	@_submit(if(editForm("id").value != null) "label.save" else "label.create")
+	@_submit(if(page != null) "label.save" else "label.create")
 
 }
 

@@ -4,29 +4,27 @@
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
 @import be.objectify.deadbolt.java.DeadboltViewSupport._
 @import be.objectify.deadbolt.java.views.html._
+@import views.menu.EventMenu._
 
 @user = @{
 	ctx.args.get("user").asInstanceOf[models.user.User]
 }
 
 @implicitScripts = {
-	<link href="@routes.Assets.at("stylesheets/tablesorter/theme.bootstrap.css")" rel="stylesheet">
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.pager.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.tablesorter.widgets.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/tables.js")"></script>
-	<link href="@routes.Assets.at("lib/select2/select2.css")" rel="stylesheet">
-	<link href="@routes.Assets.at("lib/select2/select2-bootstrap.css")" rel="stylesheet">
-	<script type="text/javascript" src="@routes.Assets.at("lib/select2/select2.min.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("lib/select2/select2_locale_ru.js")"></script>
-	<script type="text/javascript" src="@routes.Assets.at("javascripts/tablesorter/widget-columnSelector.js")"></script>
+	@_css("stylesheets/tablesorter/theme.bootstrap.css")
+	@_js("javascripts/jquery.tablesorter.min.js")
+	@_js("javascripts/jquery.tablesorter.pager.min.js")
+	@_js("javascripts/jquery.tablesorter.widgets.min.js")
+	@_js("javascripts/tables.js")
+	@_css("lib/select2/select2.css")
+	@_css("lib/select2/select2-bootstrap.css")
+	@_js("lib/select2/select2.min.js")
+	@_js("lib/select2/select2_locale_ru.js")
+	@_js("javascripts/tablesorter/widget-columnSelector.js")
 }
 
 @main(
 	"nav.event.grand.list",
-	leftNav = LinkedHashMap(
-		"nav.event.grand.list" -> routes.GrandEventController.list
-	),
 	breadcrumbs = LinkedHashMap(
 		"nav.event.grand.list" -> routes.GrandEventController.list
 	)
@@ -38,8 +36,8 @@
 	<table class="events table table-striped js-tablesorter">
 		<thead>
 			<th>@Messages("label.name")</th>
-			<th>@Messages("label.start")</th>
-			<th>@Messages("label.end")</th>
+			<th>@Messages("label.start.date")</th>
+			<th>@Messages("label.end.date")</th>
 			<th>@Messages("label.entity.plural.Event")</th>
 			<th>@Messages("label.author")</th>
 			<th>@Messages("label.organizations")</th>
@@ -54,17 +52,17 @@
 				<td>@Formatters.print(event.endDate)</td>
 				<td>@event.events.size</td>
 				<td>@event.author.nick</td>
-				<td>@play.twirl.api.Html(event.organizations.map(o => "<a href=\"" + routes.OrganizationController.details(o.id) + "\">" + o.name + "</a>").mkString(", "))</td>
+				<td>@play.twirl.api.Html(event.organizations.map(o => "<a href=\"" + routes.OrganizationController.details(o) + "\">" + o.name + "</a>").mkString(", "))</td>
 				<td>@event.tags.map(_.name).mkString(", ")</td>
 				<td>
 					@restrict(la(as("admin"))) {
-						<a class="btn btn-default btn-xs" href='@routes.GrandEventController.edit(event.id)' title="@Messages("label.do.edit")">
+						<a class="btn btn-default btn-xs" href='@routes.GrandEventController.edit(event)' title="@Messages("label.do.edit")">
 							<span class="glyphicon glyphicon-pencil"></span>
 						</a>
 						<a class="btn btn-default btn-xs js-ajax" title="@Messages("label.do.remove")"
 								data-action="remove"
 								data-method="POST"
-								data-url="@routes.GrandEventController.remove(event.id)"
+								data-url="@routes.GrandEventController.remove(event)"
 								data-confirm="@Messages("label.are.you.sure.you.want.to.delete", event.name)">
 							<span class="glyphicon glyphicon-remove"></span>
 						</a>
@@ -82,7 +80,7 @@
 }
 
 @restrict(la(as("admin"))) {
-	@_btn(routes.GrandEventController.create, "label.do.create")
+	@_btn(routes.GrandEventController.add, "label.do.add")
 }
 	
 }

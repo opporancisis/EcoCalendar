@@ -24,38 +24,39 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-		<link href="@routes.Assets.at("images/favicon.png")" type="image/png" rel="shortcut icon">
+		<link href="@routes.Assets.versioned("images/favicon.jpg")" type="image/png" rel="shortcut icon">
 
 		<script type="text/javascript" src="@routes.Application.jsMessages()"></script>
+		<script type="text/javascript" src="@routes.Application.jsRoutes"></script>
 
-		<link href="@routes.Assets.at("lib/bootstrap/css/bootstrap.min.css")" rel="stylesheet">
-		<link href="@routes.Assets.at("stylesheets/bootstrap-multiselect.css")" rel="stylesheet">
-		<link href="@routes.Assets.at("stylesheets/main.min.css")" rel="stylesheet">
-		<script src="@routes.Assets.at("lib/jquery/jquery.min.js")"></script>
-		<script src="@routes.Assets.at("lib/underscorejs/underscore-min.js")" defer="defer"></script>
-		<script src="@routes.Assets.at("lib/bootstrap/js/bootstrap.min.js")" defer="defer"></script>
-		<script src="@routes.Assets.at("lib/momentjs/moment.js")" defer="defer"></script>
-		@*<script src="@routes.Assets.at("lib/momentjs/lang/ru.js")" defer="defer"></script>*@
-		<script src="@routes.Application.jsRoutes" defer="defer"></script>
-		<script src="@routes.Assets.at("javascripts/jquery.bootstrap-growl.min.js")" defer="defer"></script>
-		<script src="@routes.Assets.at("javascripts/bootbox.min.js")" defer="defer"></script>
-		<script src="@routes.Assets.at("javascripts/spin.min.js")" defer="defer"></script>
-		<script src="@routes.Assets.at("javascripts/bootstrap-multiselect.js")" defer="defer"></script>
-		<script src="@routes.Assets.at("javascripts/jquery.form.min.js")" defer="defer"></script>
-		<script src="@routes.Assets.at("javascripts/reconnecting-websocket.min.js")" defer="defer"></script>
-		<script src="@routes.Assets.at("javascripts/bootstrap-hover-dropdown.min.js")" defer="defer"></script>
-		<script src="@routes.Assets.at("javascripts/application.js")"></script>
-		<script src="@routes.Assets.at("javascripts/ajax.js")" defer="defer"></script>
+		@_css("lib/bootstrap/css/bootstrap.min.css")
+		@_css("stylesheets/main.min.css")
+		@_js("lib/jquery/jquery.min.js")
+		@_js("lib/underscorejs/underscore-min.js")
+		@_js("lib/bootstrap/js/bootstrap.min.js")
+		@_js("lib/momentjs/moment.js")
+		@*@_js("lib/momentjs/lang/ru.js")*@
+		@_js("javascripts/jquery.bootstrap-growl.min.js")
+		@_js("javascripts/bootbox.min.js")
+		@_js("javascripts/spin.min.js")
+		@_js("javascripts/jquery.form.min.js")
+		@_js("javascripts/reconnecting-websocket.min.js")
+		@_js("javascripts/bootstrap-hover-dropdown.min.js")
+		@_js("javascripts/application.js")
+		@_js("javascripts/ajax.js")
+		@_js("lib/knockout/knockout.js")
+		@_css("stylesheets/bootstrap-multiselect.css")
+		@_js("javascripts/bootstrap-multiselect.js")
 
 		@subjectPresent() {
-			<script src="@routes.Assets.at("javascripts/alerts.js")" defer="defer"></script>
+			@_js("javascripts/alerts.js")
 		}
 
 		@scripts
 		
 		@implicitScripts
 
-		<script src="@routes.Assets.at("javascripts/main.js")" defer="defer"></script>
+		@_js("javascripts/main.js")
 	</head>
 
 	<body class="@request.path.replaceAll("[\\d\\s/]+", " ").trim.toLowerCase">
@@ -71,8 +72,10 @@
 			</div>
 		}
 
-		@*<input type="hidden" id="ws-url" value="@routes.CommunicationController.alerts().webSocketURL(request)" />*@
-		<input type="hidden" id="ws-url" value="@routes.CommunicationController.alerts(ctx.args.get("uuid").asInstanceOf[String]).url" />
+		@subjectPresent() {
+			@*<input type="hidden" id="ws-url" value="@routes.CommunicationController.alerts().webSocketURL(request)" />*@
+			<input type="hidden" id="ws-url" value="@routes.CommunicationController.alerts(ctx.args.get("uuid").asInstanceOf[String]).url" />
+		}
 
 		<div role="navigation" class="navbar navbar-default navbar-fixed-top">
 			<div class="container">
@@ -83,7 +86,7 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</button>
-					<a href="@routes.HomePageController.index" class="navbar-brand"><img src="@routes.Assets.at("images/Logo.png")" style="margin-top: -10px;" width=64 height="64" /></a>
+					<a href="@routes.HomePageController.index" class="navbar-brand"><img src="@routes.Assets.versioned("images/Logo.png")" style="margin-top: -10px;" width=64 height="64" /></a>
 				</div>
 				<div class="navbar-collapse collapse">
 					<ul class="nav navbar-nav">
@@ -91,27 +94,20 @@
 							<li class="dropdown">
 								<a data-toggle="dropdown" data-hover="dropdown" class="dropdown-toggle" href="#">@Messages("nav.top.sys.admin") <b class="caret"></b></a>
 								<ul class="dropdown-menu">
-									<li>@_link(routes.SettingController.edit, "nav.sys.settings")</li>
-									<li>@_link(routes.HomePageController.edit, "nav.homePage.edit")</li>
-									<li>@_link(routes.UserController.list, "nav.user.list")</li>
-									<li>@_link(routes.FileController.list, "nav.file.list")</li>
-									<li>@_link(routes.StandardPageController.list, "nav.stdPage.list")</li>
-									<li class="divider"></li>
-									<li>@_link(routes.EventTagController.list, "nav.event.tag.list")</li>
-									<li class="divider"></li>
-									<li>@_link(routes.OrganizationController.list, "nav.organization.list")</li>
-									<li class="divider"></li>
-									<li>@_link(routes.CountryController.list, "nav.geo.country.list")</li>
-									<li>@_link(routes.CityController.list, "nav.geo.city.list")</li>
+									@play.twirl.api.Html(views.menu.SystemMenu.implicitLeftNav.foldLeft("")((acc,kv) => acc + (if(kv._2 == null) "\n<li class=\"divider\"></li>" else "\n<li>" + _link(kv._2, kv._1) + "</li>")))
 								</ul>
 							</li>
 						}
 						<li class="dropdown">
 							<a data-toggle="dropdown" data-hover="dropdown" class="dropdown-toggle" href="#">@Messages("nav.top.events") <b class="caret"></b></a>
 							<ul class="dropdown-menu">
-								<li>@_link(routes.EventController.list, "nav.event.list")</li>
-								<li>@_link(routes.GrandEventController.list, "nav.event.grand.list")</li>
+								@for((label, action) <- views.menu.EventMenu.menu) {
+									<li>@_link(action, label)</li>
+								}
 							</ul>
+						</li>
+						<li class="dropdown">
+							<a href="@routes.BlogController.list">@Messages("nav.blog").capitalize</a>
 						</li>
 						<li class="dropdown">
 							<a data-toggle="dropdown" data-hover="dropdown" class="dropdown-toggle" href="#">@Messages("nav.top.information").capitalize <b class="caret"></b></a>
@@ -152,16 +148,20 @@
 						</li>
 						@if(leftNav != null) {
 							@for((label, path) <- leftNav) {
-								<li class="@("active".when(path.toString == request.path))">
-									<a href="@path">@Messages(label).capitalize</a>
-								</li>
+								@if(path != null) {
+									<li class="@("active".when(path.toString == request.path))">
+										<a href="@path">@Messages(label).capitalize</a>
+									</li>
+								}
 							}
 						}
 						@if(implicitLeftNav != null) {
 							@for((label, path) <- implicitLeftNav) {
-								<li class="@("active".when(path.toString == request.path))">
-									<a href="@path">@Messages(label).capitalize</a>
-								</li>
+								@if(path != null) {
+									<li class="@("active".when(path.toString == request.path))">
+										<a href="@path">@Messages(label).capitalize</a>
+									</li>
+								}
 							}
 						}
 					</ul>
