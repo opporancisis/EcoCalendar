@@ -9,7 +9,7 @@ public class Config {
 	}
 
 	public static File getMainLocalConfig() {
-		return getConfig("local-application.conf");
+		return getConfig("ecocalendar.conf");
 	}
 
 }

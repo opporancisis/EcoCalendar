@@ -44,14 +44,14 @@ public class Signup extends Controller {
 
 	private static final Form<PasswordReset> PASSWORD_RESET_FORM = form(PasswordReset.class);
 
-	public static Result unverified() {
+	public Result unverified() {
 		Application.noCache(response());
 		return ok(unverified.render());
 	}
 
 	private static final Form<MyIdentity> FORGOT_PASSWORD_FORM = form(MyIdentity.class);
 
-	public static Result forgotPassword(final String email) {
+	public Result forgotPassword(final String email) {
 		Application.noCache(response());
 		Form<MyIdentity> form = FORGOT_PASSWORD_FORM;
 		if (email != null && !email.trim().isEmpty()) {
@@ -60,7 +60,7 @@ public class Signup extends Controller {
 		return ok(password_forgot.render(form));
 	}
 
-	public static Result doForgotPassword() {
+	public Result doForgotPassword() {
 		Application.noCache(response());
 		final Form<MyIdentity> filledForm = FORGOT_PASSWORD_FORM
 				.bindFromRequest();
@@ -132,7 +132,7 @@ public class Signup extends Controller {
 		return ret;
 	}
 
-	public static Result resetPassword(final String token) {
+	public Result resetPassword(final String token) {
 		Application.noCache(response());
 		final TokenAction ta = tokenIsValid(token, Type.PASSWORD_RESET);
 		if (ta == null) {
@@ -143,7 +143,7 @@ public class Signup extends Controller {
 				.fill(new PasswordReset(token))));
 	}
 
-	public static Result doResetPassword() {
+	public Result doResetPassword() {
 		Application.noCache(response());
 		final Form<PasswordReset> filledForm = PASSWORD_RESET_FORM
 				.bindFromRequest();
@@ -186,17 +186,17 @@ public class Signup extends Controller {
 		}
 	}
 
-	public static Result oAuthDenied(final String getProviderKey) {
+	public Result oAuthDenied(final String getProviderKey) {
 		Application.noCache(response());
 		return ok(oAuthDenied.render(getProviderKey));
 	}
 
-	public static Result exists() {
+	public Result exists() {
 		Application.noCache(response());
 		return ok(exists.render());
 	}
 
-	public static Result verify(final String token) {
+	public Result verify(final String token) {
 		Application.noCache(response());
 		final TokenAction ta = tokenIsValid(token, Type.EMAIL_VERIFICATION);
 		if (ta == null) {

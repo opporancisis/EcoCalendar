@@ -9,13 +9,12 @@ import javax.persistence.Id;
 import org.apache.commons.lang3.StringUtils;
 
 import play.data.format.Formatters;
-import play.db.ebean.Model;
 import play.i18n.Messages;
+
+import com.avaje.ebean.Model;
 
 @Entity
 public class Setting extends Model {
-
-	private static final long serialVersionUID = 1L;
 
 	@Id
 	public Long id;
@@ -33,8 +32,8 @@ public class Setting extends Model {
 	 */
 	public Boolean editable;
 
-	public static final Finder<Long, Setting> find = new Finder<>(Long.class,
-			Setting.class);
+	public static final Find<Long, Setting> find = new Find<Long, Setting>() {
+	};
 
 	public String validate() {
 		try {

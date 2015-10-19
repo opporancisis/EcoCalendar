@@ -3,7 +3,7 @@
 @import scala.collection.mutable.LinkedHashMap
 @import be.objectify.deadbolt.java.views.html._
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
-@import be.objectify.deadbolt.java.DeadboltViewSupport._
+@import be.objectify.deadbolt.java.ViewSupport._
 
 @main(
 	"nav.blog",
@@ -17,7 +17,7 @@
 
 @(if(posts.isEmpty()) _foundNoneOf(classOf[models.blog.BlogPost]))
 
-@if(viewRestrict(la(as("admin")), null)) {
+@restrict(la(as("admin"))) {
 	<a href="@routes.BlogController.add" class="btn btn-primary">@Messages("label.do.add")</a>
 }
 
@@ -34,7 +34,7 @@
 		</div>
 		<div class="blogPostTitle">
 			@post.title
-			@if(viewRestrict(la(as("admin")), null)) {
+			@restrict(la(as("admin"))) {
 				<a class="btn btn-default btn-xs" href='@{routes.BlogController.edit(post)}' title="@Messages("label.do.edit")">
 					<span class="glyphicon glyphicon-pencil"></span>
 				</a>

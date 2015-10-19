@@ -11,16 +11,13 @@ import models.user.User;
 
 import org.apache.commons.lang3.StringUtils;
 
-import play.db.ebean.Model;
-
+import com.avaje.ebean.Model;
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.feth.play.module.mail.Mailer;
 import com.feth.play.module.mail.Mailer.Mail.Body;
 
 @Entity
 public class Message extends Model {
-
-	private static final long serialVersionUID = 1L;
 
 	// for annotation Dynamic
 	public static final String CLAZZ = "models.message.Message";
@@ -43,8 +40,8 @@ public class Message extends Model {
 
 	public Boolean unread;
 
-	public static final Finder<Long, Message> find = new Finder<>(Long.class,
-			Message.class);
+	public static final Find<Long, Message> find = new Find<Long, Message>() {
+	};
 
 	public Message() {
 		// do nothing
@@ -57,8 +54,7 @@ public class Message extends Model {
 	}
 
 	public static int countUnread(User user) {
-		return Message.find.query().where().eq("owner", user)
-				.eq("unread", true).findRowCount();
+		return Message.find.query().where().eq("owner", user).eq("unread", true).findRowCount();
 	}
 
 	public void send(User user) {
@@ -66,8 +62,7 @@ public class Message extends Model {
 		unread = true;
 		save();
 		if (user.emailValidated && StringUtils.isNotBlank(user.email)) {
-			Mailer.getDefaultMailer().sendMail(subject, new Body(null, body),
-					user.email);
+			Mailer.getDefaultMailer().sendMail(subject, new Body(null, body), user.email);
 		}
 
 	}

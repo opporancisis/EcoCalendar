@@ -2,7 +2,7 @@
 
 @import scala.collection.mutable.LinkedHashMap; var disabledExist=false
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
-@import be.objectify.deadbolt.java.DeadboltViewSupport._
+@import be.objectify.deadbolt.java.ViewSupport._
 @import views.menu.SystemMenu._
 
 @implicitScripts = {
@@ -76,7 +76,7 @@
 	@_foundNoneOf(classOf[models.standardPage.StandardPage])
 }
 
-@if(viewRestrict(la(as("admin")), null)) {
+@restrict(la(as("admin"))) {
 	@_btn(routes.StandardPageController.add, "label.do.add")
 }
 

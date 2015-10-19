@@ -121,7 +121,7 @@
 		<div class="panel-heading">@Messages("label.event.geo.settings")</div>
   		<div class="panel-body">
 
-			@_staticFormField("label.country", event.country.name)
+			@_staticFormField("label.country", event.city.country.name)
 			@_staticFormField("label.city", event.city.name)
 
 			@if(event.extendedGeoSettings) {

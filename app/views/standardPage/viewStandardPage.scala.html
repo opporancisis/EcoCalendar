@@ -2,7 +2,7 @@
 
 @import scala.collection.mutable.LinkedHashMap
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
-@import be.objectify.deadbolt.java.DeadboltViewSupport._
+@import be.objectify.deadbolt.java.ViewSupport._
 
 @main(
 	page.title,
@@ -19,10 +19,10 @@
 ) {
 
 <div>
-	@if(page.description == null || page.description.isEmpty) {
+	@if(page.content == null || page.content.isEmpty) {
 		@Messages("label.no.content")
 	} else {
-		@play.twirl.api.Html(page.description)
+		@play.twirl.api.Html(page.content)
 	}
 </div>
 

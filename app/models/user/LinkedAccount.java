@@ -4,14 +4,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import play.db.ebean.Model;
-
+import com.avaje.ebean.Model;
 import com.feth.play.module.pa.user.AuthUser;
 
 @Entity
 public class LinkedAccount extends Model {
-
-	private static final long serialVersionUID = 1L;
 
 	@Id
 	public Long id;
@@ -22,8 +19,8 @@ public class LinkedAccount extends Model {
 	public String providerUserId;
 	public String providerKey;
 
-	public static final Finder<Long, LinkedAccount> find = new Finder<>(
-			Long.class, LinkedAccount.class);
+	public static final Find<Long, LinkedAccount> find = new Find<Long, LinkedAccount>() {
+	};
 
 	public static LinkedAccount findByProviderKey(final User user, String key) {
 		return find.where().eq("user", user).eq("providerKey", key)

@@ -9,7 +9,7 @@
 @import com.feth.play.module.pa.views.html._
 @import be.objectify.deadbolt.java.views.html._
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
-@import be.objectify.deadbolt.java.DeadboltViewSupport._
+@import be.objectify.deadbolt.java.ViewSupport._
 
 @portalTitle = @{models.sys.Setting.get(models.sys.SettingName.PORTAL_TITLE).value}
 
@@ -40,17 +40,12 @@
 		@_js("javascripts/bootbox.min.js")
 		@_js("javascripts/spin.min.js")
 		@_js("javascripts/jquery.form.min.js")
-		@_js("javascripts/reconnecting-websocket.min.js")
 		@_js("javascripts/bootstrap-hover-dropdown.min.js")
 		@_js("javascripts/application.js")
 		@_js("javascripts/ajax.js")
 		@_js("lib/knockout/knockout.js")
 		@_css("stylesheets/bootstrap-multiselect.css")
 		@_js("javascripts/bootstrap-multiselect.js")
-
-		@subjectPresent() {
-			@_js("javascripts/alerts.js")
-		}
 
 		@scripts
 		
@@ -70,11 +65,6 @@
 			<div class="alert alert-success" style="color: blue;">
 				@flash().get(Application.FLASH_MESSAGE_KEY)
 			</div>
-		}
-
-		@subjectPresent() {
-			@*<input type="hidden" id="ws-url" value="@routes.CommunicationController.alerts().webSocketURL(request)" />*@
-			<input type="hidden" id="ws-url" value="@routes.CommunicationController.alerts(ctx.args.get("uuid").asInstanceOf[String]).url" />
 		}
 
 		<div role="navigation" class="navbar navbar-default navbar-fixed-top">

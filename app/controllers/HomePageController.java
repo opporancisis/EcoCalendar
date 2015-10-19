@@ -8,6 +8,8 @@ import models.standardPage.HomePage;
 import models.standardPage.StandardPage;
 import models.user.RoleName;
 import play.data.Form;
+import play.data.validation.Constraints.Min;
+import play.data.validation.Constraints.Required;
 import play.mvc.Controller;
 import play.mvc.Result;
 import be.objectify.deadbolt.java.actions.Group;
@@ -21,9 +23,9 @@ import controllers.helpers.ContextAugmenter;
 @ContextAugmenter
 public class HomePageController extends Controller {
 
-	private static final Form<HomePage> EDIT_FORM = Form.form(HomePage.class);
+	private static final Form<HomePageProps> EDIT_FORM = Form.form(HomePageProps.class);
 
-	public static Result index() {
+	public Result index() {
 		HomePage home = HomePage.get();
 		List<BlogPost> news = BlogPost.find.query().orderBy("created desc")
 				.setMaxRows(home.latestNewsMax).findList();
@@ -31,26 +33,54 @@ public class HomePageController extends Controller {
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result edit() {
+	public Result edit() {
 		HomePage home = HomePage.get();
-		Form<HomePage> filledForm = EDIT_FORM.fill(home);
+		Form<HomePageProps> filledForm = EDIT_FORM.fill(new HomePageProps(home));
 		return ok(views.html.standardPage.editHomePage.render(filledForm, UploadedFile.find.all()));
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
 	@Transactional
-	public static Result doEdit() {
-		Form<HomePage> filledForm = EDIT_FORM.bindFromRequest();
+	public Result doEdit() {
+		Form<HomePageProps> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			return badRequest(views.html.standardPage.editHomePage.render(filledForm,
 					UploadedFile.find.all()));
 		}
-		HomePage homePage = filledForm.get();
-		if (homePage.attachments == null) {
-			Ebean.createUpdate(StandardPage.class, "update homePage set attachments=null")
-					.execute();
-		}
-		homePage.update(HomePage.find.findUnique().id);
+		HomePageProps hpProps = filledForm.get();
+		hpProps.updateHomePage(HomePage.get());
 		return redirect(routes.HomePageController.index());
+	}
+
+	public static class HomePageProps {
+		@Required
+		public String title;
+
+		public String content;
+
+		public List<UploadedFile> attachments;
+
+		@Min(0)
+		public Integer latestNewsMax;
+
+		public HomePageProps() {
+			// no-op
+		}
+
+		public HomePageProps(HomePage hp) {
+			this.title = hp.title;
+			this.content = hp.content;
+			this.attachments = hp.attachments;
+			this.latestNewsMax = hp.latestNewsMax;
+		}
+
+		public void updateHomePage(HomePage hp) {
+			hp.title = this.title;
+			hp.content = this.content;
+			hp.attachments = this.attachments;
+			hp.latestNewsMax = this.latestNewsMax;
+			hp.update();
+		}
+
 	}
 }

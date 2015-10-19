@@ -11,8 +11,7 @@ import javax.persistence.ManyToOne;
 
 import play.data.format.Formatters;
 import play.data.format.Formatters.SimpleFormatter;
-import play.data.validation.Constraints.Required;
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 import utils.IdPathBindable;
 
 import com.avaje.ebean.annotation.CreatedTimestamp;
@@ -21,8 +20,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class City extends Model implements IdPathBindable<City> {
-
-	private static final long serialVersionUID = 1L;
 
 	static {
 		Formatters.register(City.class, new CityFormatter());
@@ -39,7 +36,6 @@ public class City extends Model implements IdPathBindable<City> {
 
 	public Boolean disabled;
 
-	@Required
 	public String name;
 
 	/**
@@ -50,19 +46,15 @@ public class City extends Model implements IdPathBindable<City> {
 
 	@ManyToOne
 	@JsonIgnore
-	@Required
 	public Country country;
 
 	@JsonIgnore
 	public ZoneId zone;
 
-	@Required
 	public Double centerLatitude;
 
-	@Required
 	public Double centerLongitude;
 
-	@Required
 	public Integer defaultZoom;
 
 	/**

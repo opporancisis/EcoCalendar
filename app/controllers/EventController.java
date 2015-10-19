@@ -1,6 +1,7 @@
 package controllers;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,8 +18,12 @@ import models.geo.Country;
 import models.geo.GeoCoords;
 import models.organization.Organization;
 import models.user.User;
+
+import org.hibernate.validator.constraints.URL;
+
 import play.data.Form;
 import play.data.validation.Constraints.Required;
+import play.data.validation.ValidationError;
 import play.db.ebean.Transactional;
 import play.i18n.Messages;
 import play.mvc.Controller;
@@ -28,19 +33,17 @@ import be.objectify.deadbolt.java.actions.SubjectPresent;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import controllers.EventController.ExportForm;
-import controllers.EventController.FilterForm;
 import controllers.helpers.ContextAugmenter;
 import controllers.helpers.ContextAugmenterAction;
 
 @ContextAugmenter
 public class EventController extends Controller {
 
-	private static final Form<Event> EDIT_FORM = Form.form(Event.class);
+	private static final Form<EventProps> EDIT_FORM = Form.form(EventProps.class);
 	private static final Form<ExportForm> EXPORT_FORM = Form.form(ExportForm.class);
 	private static final Form<FilterForm> FILTER = Form.form(FilterForm.class);
 
-	private static Result list(Form<DatesInterval> intervalForm) {
+	private Result list(Form<DatesInterval> intervalForm) {
 		DatesInterval f = intervalForm.get();
 		List<Event> events = Event.find.query().where().ge("startDate", f.from)
 				.le("endDate", f.till).findList();
@@ -48,12 +51,12 @@ public class EventController extends Controller {
 
 	}
 
-	public static Result list() {
+	public Result list() {
 		Application.noCache(response());
 		return list(DatesInterval.fill(new DatesInterval()));
 	}
 
-	public static Result doChangeInterval() {
+	public Result doChangeInterval() {
 		Form<DatesInterval> filledForm = DatesInterval.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			return badRequest(views.html.event.listEvents.render(Collections.<Event> emptyList(),
@@ -63,35 +66,36 @@ public class EventController extends Controller {
 	}
 
 	@SubjectPresent
-	public static Result edit(Event event) {
+	public Result edit(Event event) {
 		List<GrandEvent> grandEvents = getActualGrandEvents();
 		if (event.parent != null && !grandEvents.contains(event.parent)) {
 			// grandEvents.
 		}
-		event.country = event.city.country;
-		return ok(views.html.event.editEvent.render(EDIT_FORM.fill(event), event,
+		EventProps eventProps = new EventProps(event);
+		return ok(views.html.event.editEvent.render(EDIT_FORM.fill(eventProps), event,
 				getActualGrandEvents(), EventTag.findAllOrdered(), Organization.find.all(),
 				Country.all()));
 	}
 
 	@SubjectPresent
-	public static Result doEdit(Event oldEvent) {
-		Form<Event> filledForm = EDIT_FORM.bindFromRequest();
+	public Result doEdit(Event event) {
+		Form<EventProps> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
-			return badRequest(views.html.event.editEvent.render(filledForm, oldEvent,
+			return badRequest(views.html.event.editEvent.render(filledForm, event,
 					getActualGrandEvents(), EventTag.findAllOrdered(), Organization.find.all(),
 					Country.all()));
 		}
 		// TODO: how will coords be populated?
-		Event event = filledForm.get();
-		event.update(oldEvent.id);
+		EventProps eventProps = filledForm.get();
+		eventProps.updateEvent(event);
+		event.update();
 		// TODO: check that old coords will be deleted from DB after event
 		// update
 		return redirect(routes.EventController.list());
 	}
 
 	@SubjectPresent
-	public static Result add() {
+	public Result add() {
 		return ok(views.html.event.editEvent.render(EDIT_FORM, null, getActualGrandEvents(),
 				EventTag.findAllOrdered(), Organization.find.all(), Country.all()));
 	}
@@ -102,15 +106,16 @@ public class EventController extends Controller {
 	}
 
 	@SubjectPresent
-	public static Result doAdd() {
-		Form<Event> filledForm = EDIT_FORM.bindFromRequest();
+	public Result doAdd() {
+		Form<EventProps> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			return badRequest(views.html.event.editEvent.render(filledForm, null,
 					getActualGrandEvents(), EventTag.findAllOrdered(), Organization.find.all(),
 					Country.all()));
 		}
 		User user = ContextAugmenterAction.getLoggedUser();
-		Event event = filledForm.get();
+		EventProps eventProps = filledForm.get();
+		Event event = eventProps.createEvent();
 		event.author = user;
 		event.published = user.hasEnoughPowerToPublishEvents();
 		// TODO: how we will populate coords?
@@ -130,12 +135,12 @@ public class EventController extends Controller {
 	// TODO: let users to complain about events. each complain will temporarily
 	// reduce karma, but karma reduction will be compensated after complaint
 	// success check.
-	public static Result complain() {
+	public Result complain() {
 		return TODO;
 	}
 
 	// TODO: form hash tags in exported text based on event tags
-	public static Result exportEvents() {
+	public Result exportEvents() {
 		Form<ExportForm> filledForm = EXPORT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			flash(Application.FLASH_ERROR_KEY, Messages.get("error.event.export.unknown.error"));
@@ -190,14 +195,14 @@ public class EventController extends Controller {
 	}
 
 	@Transactional
-	public static Result removeMany() {
+	public Result removeMany() {
 		return processMessages((event) -> {
 			event.delete();
 			return null;
 		});
 	}
 
-	private static Result processMessages(Function<Event, Void> handler) {
+	private Result processMessages(Function<Event, Void> handler) {
 		JsonNode json = request().body().asJson();
 		if (json == null) {
 			return badRequest("Expecting Json data");
@@ -218,8 +223,8 @@ public class EventController extends Controller {
 		}
 		return ok();
 	}
-	
-	public static Result getEventsJson() {
+
+	public Result getEventsJson() {
 		// ArrayNode arr = Json.newObject().arrayNode();
 		// for (EventDayProgram day : days) {
 		// LocalDate date = day.date;
@@ -231,21 +236,21 @@ public class EventController extends Controller {
 		// }
 		// }
 		// timetableJson = arr.toString();
-		
+
 		return TODO;
 	}
 
-	public static Result calendar() {
+	public Result calendar() {
 		// just return UI. actual events will be fetched via ajax
 		return ok(views.html.event.calendar.render(FILTER, Country.all(), getActualGrandEvents(),
 				EventTag.findAllOrdered()));
 	}
 
-	public static Result map() {
+	public Result map() {
 		return TODO;
 	}
-	
-	public static Result view(Event event) {
+
+	public Result view(Event event) {
 		return ok(views.html.event.viewEvent.render(event));
 	}
 
@@ -262,6 +267,140 @@ public class EventController extends Controller {
 		public GrandEvent parent;
 
 		public List<EventTag> tags;
+
+	}
+
+	public static class EventProps {
+		@Required
+		public String name;
+
+		@Required
+		public String description;
+
+		public List<EventTag> tags;
+
+		@URL
+		public String additionalInfoLink;
+
+		public Boolean moreGeneralSettings;
+
+		public GrandEvent parent;
+
+		public List<Organization> organizations;
+
+		public Boolean useContactInfo;
+
+		public Boolean useAuthorContactInfo;
+
+		public String contactName;
+
+		public String contactPhone;
+
+		public String contactProfile;
+
+		@Required
+		public Country country;
+
+		@Required
+		public City city;
+
+		public String address;
+
+		public Boolean extendedGeoSettings;
+
+		public List<GeoCoords> coords;
+
+		@Required
+		public LocalDate startDate;
+
+		@Required
+		public LocalTime startTime;
+
+		@Required
+		public LocalDate endDate;
+
+		@Required
+		public LocalTime endTime;
+
+		public EventProps() {
+			// no-op
+		}
+
+		public EventProps(Event event) {
+			this.name = event.name;
+			this.description = event.description;
+			this.tags = event.tags;
+			this.additionalInfoLink = event.additionalInfoLink;
+			this.moreGeneralSettings = event.moreGeneralSettings;
+			this.parent = event.parent;
+			this.organizations = event.organizations;
+			this.useContactInfo = event.useContactInfo;
+			this.useAuthorContactInfo = event.useAuthorContactInfo;
+			this.contactName = event.contactName;
+			this.contactPhone = event.contactPhone;
+			this.contactProfile = event.contactProfile;
+			this.country = event.city.country;
+			this.city = event.city;
+			this.address = event.address;
+			this.extendedGeoSettings = event.extendedGeoSettings;
+			this.coords = event.coords;
+			this.startDate = event.startDate;
+			this.startTime = event.startTime;
+			this.endDate = event.endDate;
+			this.endTime = event.endTime;
+		}
+
+		private void setFields(Event event) {
+			event.name = this.name;
+			event.description = this.description;
+			event.tags = this.tags;
+			event.additionalInfoLink = this.additionalInfoLink;
+			event.moreGeneralSettings = this.moreGeneralSettings;
+			event.parent = this.parent;
+			event.organizations = this.organizations;
+			event.useContactInfo = this.useContactInfo;
+			event.useAuthorContactInfo = this.useAuthorContactInfo;
+			event.contactName = this.contactName;
+			event.contactPhone = this.contactPhone;
+			event.contactProfile = this.contactProfile;
+			event.city = this.city;
+			event.address = this.address;
+			event.extendedGeoSettings = this.extendedGeoSettings;
+			event.coords = this.coords;
+			event.startDate = this.startDate;
+			event.startTime = this.startTime;
+			event.endDate = this.endDate;
+			event.endTime = this.endTime;
+		}
+
+		public void updateEvent(Event event) {
+			setFields(event);
+		}
+
+		public Event createEvent() {
+			Event event = new Event();
+			setFields(event);
+			return event;
+		}
+
+		public List<ValidationError> validate() {
+			List<ValidationError> errors = null;
+			if (parent != null) {
+				if (parent.startDate.isAfter(startDate)) {
+					errors = new ArrayList<>();
+					errors.add(new ValidationError("", Messages.get(
+							"label.event.error.parentStartDateIsAfter", parent.startDate)));
+				}
+				if (parent.endDate.isBefore(endDate)) {
+					if (errors == null) {
+						errors = new ArrayList<>();
+					}
+					errors.add(new ValidationError("", Messages.get(
+							"label.event.error.parentEndDateIsBefore", parent.endDate)));
+				}
+			}
+			return errors;
+		}
 
 	}
 }

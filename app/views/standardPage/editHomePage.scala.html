@@ -1,4 +1,4 @@
-@(editForm: play.data.Form[models.standardPage.HomePage],
+@(editForm: play.data.Form[controllers.HomePageController.HomePageProps],
 	files: List[models.file.UploadedFile])
 
 @import helpers.BootstrapHelper._
@@ -40,7 +40,7 @@
 	)
 
 	@textarea(
-		field = editForm("body"),
+		field = editForm("content"),
 		args = 'rows -> 3, 'cols -> 50,
 		'_label -> "label.description",
 		'required -> true

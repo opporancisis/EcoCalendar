@@ -28,7 +28,7 @@ public class MessageController extends Controller {
 	private static final String CHECK_AUTHORSHIP_TOPIC = CHECK_AUTHORSHIP
 			+ Message.CLAZZ;
 
-	public static Result list() {
+	public Result list() {
 		Application.noCache(response());
 		List<Message> messages = Message.find.query().where()
 				.eq("owner", ContextAugmenterAction.getLoggedUser()).findList();
@@ -36,7 +36,7 @@ public class MessageController extends Controller {
 	}
 
 	@Dynamic(CHECK_AUTHORSHIP_TOPIC)
-	public static Result read(long id) {
+	public Result read(long id) {
 		Message message = MyDynamicResourceHandler
 				.getAuthoredObject(Message.class);
 		if (message == null) {
@@ -50,7 +50,7 @@ public class MessageController extends Controller {
 	}
 
 	@Transactional
-	public static Result removeMany() {
+	public Result removeMany() {
 		return processMessages((message) -> {
 			message.delete();
 			return null;
@@ -58,7 +58,7 @@ public class MessageController extends Controller {
 	}
 
 	@Transactional
-	public static Result markAsReadMany() {
+	public Result markAsReadMany() {
 		return processMessages((message) -> {
 			message.unread = false;
 			message.update();
@@ -66,7 +66,7 @@ public class MessageController extends Controller {
 		});
 	}
 	
-	private static Result processMessages(Function<Message, Void> handler) {
+	private Result processMessages(Function<Message, Void> handler) {
 		JsonNode json = request().body().asJson();
 		if (json == null) {
 			return badRequest("Expecting Json data");

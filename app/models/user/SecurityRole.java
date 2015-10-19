@@ -23,7 +23,9 @@ import javax.persistence.Id;
 
 import play.data.format.Formatters;
 import play.data.format.Formatters.SimpleFormatter;
-import play.db.ebean.Model;
+
+import com.avaje.ebean.Model;
+
 import be.objectify.deadbolt.core.models.Role;
 
 /**
@@ -31,8 +33,6 @@ import be.objectify.deadbolt.core.models.Role;
  */
 @Entity
 public class SecurityRole extends Model implements Role {
-
-	private static final long serialVersionUID = 1L;
 
 	static {
 		Formatters.register(SecurityRole.class, new SecurityRoleFormatter());
@@ -43,8 +43,8 @@ public class SecurityRole extends Model implements Role {
 
 	public String roleName;
 
-	public static final Finder<Long, SecurityRole> find = new Finder<>(Long.class,
-			SecurityRole.class);
+	public static final Find<Long, SecurityRole> find = new Find<Long, SecurityRole>() {
+	};
 
 	@Override
 	public String getName() {

@@ -13,7 +13,7 @@ import javax.persistence.ManyToOne;
 import models.file.UploadedFile;
 import models.user.User;
 import play.data.validation.Constraints.Required;
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 import utils.IdPathBindable;
 
 import com.avaje.ebean.annotation.CreatedTimestamp;
@@ -21,8 +21,6 @@ import com.avaje.ebean.annotation.UpdatedTimestamp;
 
 @Entity
 public class BlogPost extends Model implements IdPathBindable<BlogPost> {
-
-	private static final long serialVersionUID = 1L;
 
 	@Id
 	public Long id;
@@ -46,7 +44,7 @@ public class BlogPost extends Model implements IdPathBindable<BlogPost> {
 	@ManyToOne
 	public User owner;
 
-	public static final Finder<Long, BlogPost> find = new Finder<>(Long.class,
-			BlogPost.class);
+	public static final Find<Long, BlogPost> find = new Find<Long, BlogPost>() {
+	};
 
 }

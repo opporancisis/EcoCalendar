@@ -17,7 +17,7 @@ import models.organization.Organization;
 import models.user.User;
 import play.data.format.Formatters;
 import play.data.validation.Constraints.Required;
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 import utils.IdPathBindable;
 import utils.formatter.GrandEventFormatter;
 
@@ -27,8 +27,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class GrandEvent extends Model implements IdPathBindable<GrandEvent> {
-
-	private static final long serialVersionUID = 1L;
 
 	static {
 		Formatters.register(GrandEvent.class, new GrandEventFormatter());
@@ -60,10 +58,8 @@ public class GrandEvent extends Model implements IdPathBindable<GrandEvent> {
 	@JsonIgnore
 	public Boolean preModeration;
 
-	@Required
 	public String name;
 
-	@Required
 	@Lob
 	@JsonIgnore
 	public String description;

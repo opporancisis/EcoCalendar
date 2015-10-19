@@ -1,4 +1,4 @@
-@(editForm: play.data.Form[models.user.User],
+@(editForm: play.data.Form[controllers.UserController.UserProperties],
 	editUser: models.user.User)
 
 @import helpers.BootstrapHelper._
@@ -54,7 +54,6 @@
 	@if(editUser != null) {
 		@* id is needed for User.validate() *@
 		<input type="hidden" name="id" value="@editUser.id" />
-		@_staticFormField("label.last.login.time", editUser.lastLogin)
 	}
 
 	@checkbox(

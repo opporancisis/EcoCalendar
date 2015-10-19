@@ -8,19 +8,23 @@ import java.util.Locale;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import org.apache.commons.io.FilenameUtils;
+
+import models.blog.BlogPost;
 import play.data.format.Formatters;
 import play.data.format.Formatters.SimpleFormatter;
-import play.db.ebean.Model;
+
+import com.avaje.ebean.Model;
+
 import utils.Config;
 import utils.IdPathBindable;
 
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
+import com.google.common.base.Strings;
 
 @Entity
 public class UploadedFile extends Model implements IdPathBindable<UploadedFile> {
-
-	private static final long serialVersionUID = 1L;
 
 	private static final File FILES_DIR = Config.getConfig("files");
 	static {
@@ -43,8 +47,8 @@ public class UploadedFile extends Model implements IdPathBindable<UploadedFile> 
 
 	public String mime;
 
-	public static final Finder<Long, UploadedFile> find = new Finder<>(
-			Long.class, UploadedFile.class);
+	public static final Find<Long, UploadedFile> find = new Find<Long, UploadedFile>() {
+	};
 
 	private String getFileName() {
 		return String.format("%019d", id);
@@ -60,6 +64,11 @@ public class UploadedFile extends Model implements IdPathBindable<UploadedFile> 
 
 	public boolean isImage() {
 		return mime.startsWith("image/");
+	}
+
+	public String typeIcon() {
+		String extension = FilenameUtils.getExtension(name);
+		return "images/mime/" + (Strings.isNullOrEmpty(extension) ? "unknown" : extension) + ".png";
 	}
 
 	private static class UploadedFileFormatter extends

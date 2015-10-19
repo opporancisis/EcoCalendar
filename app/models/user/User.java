@@ -1,7 +1,6 @@
 package models.user;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -25,14 +24,10 @@ import models.sys.Setting;
 import models.sys.SettingName;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.URL;
 
-import play.data.validation.Constraints.Email;
-import play.data.validation.Constraints.Pattern;
-import play.data.validation.ValidationError;
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
+
 import play.db.ebean.Transactional;
-import play.i18n.Messages;
 import utils.IdPathBindable;
 import be.objectify.deadbolt.core.models.Permission;
 import be.objectify.deadbolt.core.models.Role;
@@ -53,8 +48,6 @@ import controllers.Application;
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "NICK", "EMAIL" }))
 public class User extends Model implements Subject, IdPathBindable<User> {
 
-	private static final long serialVersionUID = 1L;
-
 	private static final String NICK_AUTO_GENERATED_PREFIX = "auto-generated-nick-";
 
 	public static final String NICK_PAT = "[\\w\\s\\-_\\d]+";
@@ -62,7 +55,6 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 	@Id
 	public Long id;
 
-	@Email
 	// if you make this unique, keep in mind that users *must* merge/link their
 	// accounts then on signup with additional providers
 	// @Column(unique = true)
@@ -71,14 +63,12 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 	// TODO: what's the workflow?
 	public Boolean emailPublic;
 
-	@Pattern(value = NICK_PAT, message = "error.nick")
 	public String nick;
 
 	public String name;
 
 	public String phone;
 
-	@URL
 	public String profileLink;
 
 	/**
@@ -130,34 +120,8 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 	@OneToMany(cascade = CascadeType.ALL)
 	public List<LinkedAccount> linkedAccounts;
 
-	public static final Finder<Long, User> find = new Finder<>(Long.class, User.class);
-
-	public List<ValidationError> validate() {
-		List<ValidationError> errors = new ArrayList<>();
-		if (StringUtils.isBlank(nick)) {
-			updateNick();
-		} else {
-			ExpressionList<User> expr = User.find.query().where()
-					.eq("nick", nick);
-			if ((id == null && expr.findRowCount() > 0)
-					|| (id != null && expr.ne("id", id).findRowCount() > 0)) {
-				errors.add(new ValidationError("nick", Messages
-						.get("error.name.must.be.unique")));
-			}
-		}
-		if (StringUtils.isNotBlank(email)) {
-			ExpressionList<User> exprEmail = User.find.query().where()
-					.eq("email", email);
-			if ((id == null && exprEmail.findRowCount() > 0)
-					|| (id != null && exprEmail.ne("id", id).findRowCount() > 0)) {
-				errors.add(new ValidationError("email", Messages
-						.get("error.email.must.be.unique")));
-			}
-		} else {
-			email = null;
-		}
-		return errors.isEmpty() ? null : errors;
-	}
+	public static final Find<Long, User> find = new Find<Long, User>() {
+	};
 
 	@Override
 	public String getIdentifier() {
@@ -253,19 +217,6 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 		Ebean.save(Arrays.asList(new User[] { otherUser, this }));
 	}
 
-	private void updateNick() {
-		String initialNick = nick;
-		if (StringUtils.isBlank(initialNick) || initialNick.startsWith(NICK_AUTO_GENERATED_PREFIX)) {
-			initialNick = NICK_AUTO_GENERATED_PREFIX;
-		}
-		String newNick = initialNick;
-		int i = 0;
-		while (User.find.query().where().eq("nick", newNick).findRowCount() > 0) {
-			newNick = initialNick + ++i;
-		}
-		nick = newNick;
-	}
-
 	@Transactional
 	public static User create(final AuthUser authUser) {
 		User user = new User();
@@ -309,15 +260,27 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 				user.nick += firstName;
 			}
 		}
-		user.updateNick();
+//		user.updateNick();
 		user.save();
-		user.saveManyToManyAssociations("roles");
+		Ebean.saveManyToManyAssociations(user, "roles");
 		// user.saveManyToManyAssociations("permissions");
 		return user;
 	}
 
 	public static void merge(final AuthUser oldUser, final AuthUser newUser) {
 		User.findByAuthUserIdentity(oldUser).merge(User.findByAuthUserIdentity(newUser));
+	}
+	
+	public static String makeUnconflictedNick(String initialNick) {
+		if (StringUtils.isBlank(initialNick) || initialNick.startsWith(NICK_AUTO_GENERATED_PREFIX)) {
+			initialNick = NICK_AUTO_GENERATED_PREFIX + "1";
+		}
+		String newNick = initialNick;
+		int i = 1;
+		while (User.find.query().where().eq("nick", newNick).findRowCount() > 0) {
+			newNick = NICK_AUTO_GENERATED_PREFIX + ++i;
+		}
+		return newNick;
 	}
 
 	public Set<String> getProviders() {

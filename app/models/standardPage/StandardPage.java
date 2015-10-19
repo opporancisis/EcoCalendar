@@ -1,7 +1,9 @@
 package models.standardPage;
 
 import java.util.List;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -12,14 +14,15 @@ import models.file.UploadedFile;
 import org.apache.commons.lang3.StringUtils;
 
 import play.data.validation.Constraints.Required;
-import play.db.ebean.Model;
+
+import com.avaje.ebean.Model;
+import com.google.common.base.Strings;
+
 import utils.IdPathBindable;
 import controllers.routes;
 
 @Entity
 public class StandardPage extends Model implements IdPathBindable<StandardPage> {
-
-	private static final long serialVersionUID = 1L;
 
 	@Id
 	public Long id;
@@ -28,23 +31,22 @@ public class StandardPage extends Model implements IdPathBindable<StandardPage> 
 
 	public Boolean disabled;
 
-	@Required
 	public String title;
 
 	public String link;
 
 	@Column(columnDefinition = "TEXT")
-	public String description;
+	public String content;
 
-	@ManyToMany
-	public List<UploadedFile> attachments;
+	@ManyToMany(cascade = CascadeType.ALL)
+	public Set<UploadedFile> attachments;
 
-	public static final Finder<Long, StandardPage> find = new Finder<>(
-			Long.class, StandardPage.class);
+	public static final Find<Long, StandardPage> find = new Find<Long, StandardPage>() {
+	};
 
 	public String reallink() {
-		return StringUtils.isBlank(link) ? routes.StandardPageController
-				.getStdPageById(this).toString() : link;
+		return Strings.isNullOrEmpty(link) ? routes.StandardPageController.getStdPage(this)
+				.toString() : link;
 	}
 
 }

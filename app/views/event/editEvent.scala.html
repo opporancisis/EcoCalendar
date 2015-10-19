@@ -1,4 +1,4 @@
-@(editForm: play.data.Form[models.event.Event],
+@(editForm: play.data.Form[controllers.EventController.EventProps],
 	event: models.event.Event,
 	grandEvents: List[models.event.GrandEvent],
 	tags: List[models.event.tag.EventTag],
@@ -21,7 +21,7 @@
 	@_js("javascripts/bootstrapValidator.js")
 	@_css("lib/bootstrap-datepicker/css/datepicker3.css")
 	@_js("lib/bootstrap-datepicker/js/bootstrap-datepicker.js")
-	@_js("lib/bootstrap-datepicker/js/locales/bootstrap-datepicker.ru.js")
+	@_js("lib/bootstrap-datepicker/locales/bootstrap-datepicker.ru.min.js")
 
 	<script>
 		var countriesMap = @Html(play.libs.Json.toJson(countries).toString());

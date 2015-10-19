@@ -3,7 +3,7 @@ package models.user;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 import be.objectify.deadbolt.core.models.Permission;
 
 /**
@@ -12,18 +12,14 @@ import be.objectify.deadbolt.core.models.Permission;
  */
 @Entity
 public class UserPermission extends Model implements Permission {
-	/**
-*
-*/
-	private static final long serialVersionUID = 1L;
 
 	@Id
 	public Long id;
 
 	public String value;
 
-	public static final Model.Finder<Long, UserPermission> find = new Model.Finder<Long, UserPermission>(
-			Long.class, UserPermission.class);
+	public static final Find<Long, UserPermission> find = new Find<Long, UserPermission>(){
+	};
 
 	public String getValue() {
 		return value;

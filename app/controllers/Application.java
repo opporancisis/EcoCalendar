@@ -4,11 +4,15 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import javax.inject.Inject;
+
 import jsmessages.JsMessages;
-import play.Play;
+import jsmessages.JsMessagesFactory;
+import jsmessages.japi.Helper;
 import play.Routes;
 import play.data.Form;
 import play.i18n.Lang;
+import play.libs.Scala;
 import play.mvc.Controller;
 import play.mvc.Http.Response;
 import play.mvc.Result;
@@ -25,13 +29,18 @@ public class Application extends Controller {
 
 	public static final Lang DEF_LANG = Lang.forCode("ru");
 
-	private static final JsMessages MESSAGES = JsMessages.create(Play.application());
+	private JsMessages MESSAGES;
 
-	public static Result login() {
+	@Inject
+	public Application(JsMessagesFactory jsMessagesFactory) {
+		MESSAGES = jsMessagesFactory.all();
+	}
+	
+	public Result login() {
 		return ok(views.html.login.render(MyUsernamePasswordAuthProvider.LOGIN_FORM));
 	}
 
-	public static Result doLogin() {
+	public Result doLogin() {
 		noCache(response());
 		final Form<MyLogin> filledForm = MyUsernamePasswordAuthProvider.LOGIN_FORM
 				.bindFromRequest();
@@ -44,11 +53,11 @@ public class Application extends Controller {
 		}
 	}
 
-	public static Result signup() {
+	public Result signup() {
 		return ok(views.html.signup.render(MyUsernamePasswordAuthProvider.SIGNUP_FORM));
 	}
 
-	public static Result jsRoutes() {
+	public Result jsRoutes() {
 		return ok(
 				Routes.javascriptRouter("jsRoutes", routes.javascript.Signup.forgotPassword(),
 						routes.javascript.EventController.edit(),
@@ -62,7 +71,7 @@ public class Application extends Controller {
 				.as("text/javascript");
 	}
 
-	public static Result doSignup() {
+	public Result doSignup() {
 		noCache(response());
 		final Form<MySignup> filledForm = MyUsernamePasswordAuthProvider.SIGNUP_FORM
 				.bindFromRequest();
@@ -93,8 +102,8 @@ public class Application extends Controller {
 		return forbidden(views.html.forbidden.render());
 	}
 
-	public static Result jsMessages() {
-		return ok(MESSAGES.generate("window.Messages"));
+	public Result jsMessages() {
+		return ok(MESSAGES.apply(Scala.Option("window.Messages"), Helper.messagesFromCurrentHttpContext()));
 	}
 
 	public static LocalDateTime now() {

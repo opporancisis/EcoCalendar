@@ -1,17 +1,29 @@
 package controllers;
 
 import static play.data.Form.form;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import models.sys.Setting;
 import models.sys.SettingName;
 import models.user.RoleName;
+import models.user.SecurityRole;
 import models.user.User;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.URL;
 
 import play.Logger;
 import play.Logger.ALogger;
 import play.data.Form;
 import play.data.format.Formatters;
+import play.data.validation.Constraints.Email;
+import play.data.validation.Constraints.Pattern;
+import play.data.validation.ValidationError;
 import play.db.ebean.Transactional;
 import play.i18n.Messages;
 import play.mvc.Controller;
@@ -20,65 +32,66 @@ import providers.MyUsernamePasswordAuthUser;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import be.objectify.deadbolt.java.actions.SubjectPresent;
+
+import com.avaje.ebean.ExpressionList;
+import com.google.common.base.Strings;
+
 import controllers.helpers.ContextAugmenter;
 import controllers.helpers.ContextAugmenterAction;
 
 @ContextAugmenter
 public class UserController extends Controller {
 
-	private static final ALogger log = Logger.of(UserController.class);
-
-	private static final Form<User> EDIT_FORM = form(User.class);
+	private static final Form<UserProperties> EDIT_FORM = form(UserProperties.class);
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result list() {
+	public Result list() {
 		Application.noCache(response());
 		return ok(views.html.user.listUsers.render(User.find.query().where()
 				.ne("id", Setting.getLong(SettingName.DELETED_USER_ID)).findList()));
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result add() {
+	public Result add() {
 		return ok(views.html.user.editUser.render(EDIT_FORM, null));
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result doAdd() {
-		Form<User> filledForm = EDIT_FORM.bindFromRequest();
+	public Result doAdd() {
+		Form<UserProperties> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			return badRequest(views.html.user.editUser.render(filledForm, null));
 		}
-		User user = filledForm.get();
+		UserProperties userProps = filledForm.get();
+		User user = userProps.createUser();
 		user.save();
 		return redirect(routes.UserController.list());
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result edit(User user) {
-		Form<User> filledForm = EDIT_FORM.fill(user);
+	public Result edit(User user) {
+		Form<UserProperties> filledForm = EDIT_FORM.fill(new UserProperties(user));
 		return ok(views.html.user.editUser.render(filledForm, user));
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result doEdit(User oldUser) {
-		Form<User> filledForm = EDIT_FORM.bindFromRequest();
+	public Result doEdit(User user) {
+		Form<UserProperties> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			try {
 				filledForm.data().put("roles",
-						Formatters.print(User.class.getField("roles"), oldUser.roles));
+						Formatters.print(User.class.getField("roles"), user.roles));
 			} catch (Exception e) {
 				throw new Error();
 			}
-			filledForm.data().put("lastLogin", Formatters.print(oldUser.lastLogin));
-			return badRequest(views.html.user.editUser.render(filledForm, oldUser));
+			return badRequest(views.html.user.editUser.render(filledForm, user));
 		}
-		User user = filledForm.get();
-		if (!user.hasRole(RoleName.ADMIN) && oldUser.hasRole(RoleName.ADMIN)) {
+		UserProperties userProps = filledForm.get();
+		if (!userProps.hasRole(RoleName.ADMIN) && user.hasRole(RoleName.ADMIN)) {
 			return badRequest("cannot revoke ADMIN role");
 		}
-		boolean emailChanged = !StringUtils.equalsIgnoreCase(oldUser.email,
-				user.email);
-		user.update(oldUser.id);
+		boolean emailChanged = !StringUtils.equalsIgnoreCase(user.email, userProps.email);
+		userProps.updateUser(user);
 		User self = ContextAugmenterAction.getLoggedUser();
 		if (self.equals(user) && emailChanged) {
 			flash(Application.FLASH_MESSAGE_KEY,
@@ -90,7 +103,7 @@ public class UserController extends Controller {
 
 	@Transactional
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result remove(User user) {
+	public Result remove(User user) {
 		if (user.equals(ContextAugmenterAction.getLoggedUser())) {
 			return badRequest("cannot delete yourself");
 		}
@@ -99,14 +112,14 @@ public class UserController extends Controller {
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result changePassword(User user) {
+	public Result changePassword(User user) {
 		Application.noCache(response());
 		return ok(views.html.account.password_change.render(
 				Account.PASSWORD_CHANGE_FORM, user));
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public static Result doChangePassword(User user) {
+	public Result doChangePassword(User user) {
 		Application.noCache(response());
 		Form<Account.PasswordChange> filledForm = Account.PASSWORD_CHANGE_FORM
 				.bindFromRequest();
@@ -122,9 +135,128 @@ public class UserController extends Controller {
 	}
 
 	@SubjectPresent
-	public static Result details(User user) {
+	public Result details(User user) {
 		// get general information about user
 		return TODO;
+	}
+
+	public static class UserProperties {
+
+		public static final String NICK_PAT = "[\\w\\s\\-_\\d\u0400-\u04f9]+";
+
+		public Long id;
+
+		public Boolean blocked;
+
+		public boolean emailValidated;
+
+		@Email
+		public String email;
+
+		@Pattern(value = NICK_PAT, message = "error.nick")
+		public String nick;
+		
+		public List<SecurityRole> roles;
+		
+		public String name;
+		
+		public String phone;
+
+		@URL
+		public String profileLink;
+		
+		public String note;
+
+		public UserProperties() {
+			// no-op
+		}
+
+		public UserProperties(User user) {
+			this.blocked = user.blocked;
+			this.emailValidated = user.emailValidated;
+			this.email = user.email;
+			this.nick = user.nick;
+			this.roles = user.roles;
+			this.name = user.name;
+			this.phone = user.phone;
+			this.profileLink = user.profileLink;
+			this.note = user.note;
+		}
+
+		private void setFields(User user) {
+			user.blocked = this.blocked;
+			user.emailValidated = this.emailValidated;
+			user.email = this.email;
+			user.nick = this.nick;
+			user.roles = this.roles;
+			user.name = this.name;
+			user.phone = this.phone;
+			user.profileLink = this.profileLink;
+			user.note = this.note;
+		}
+
+		public void updateUser(User user) {
+			setFields(user);
+			user.update();
+		}
+
+		public User createUser() {
+			User user = new User();
+			setFields(user);
+			return user;
+		}
+
+		public boolean hasRole(String... aRoles) {
+			Set<String> aRolesSet = new HashSet<>(Arrays.asList(aRoles));
+			return hasRole(aRolesSet);
+		}
+
+		public boolean hasRole(Set<String> aRoles) {
+			for (SecurityRole role : roles) {
+				if (aRoles.contains(role.getName())) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public List<ValidationError> validate() {
+			List<ValidationError> errors = new ArrayList<>();
+			if (StringUtils.isBlank(nick)) {
+				nick = User.makeUnconflictedNick(null);
+			} else {
+				ExpressionList<User> expr = User.find.query().where().eq("nick", nick);
+				if ((id == null && expr.findRowCount() > 0)
+						|| (id != null && expr.ne("id", id).findRowCount() > 0)) {
+					errors.add(new ValidationError("nick", Messages
+							.get("error.name.must.be.unique")));
+				}
+			}
+			if (StringUtils.isNotBlank(email)) {
+				ExpressionList<User> exprEmail = User.find.query().where().eq("email", email);
+				if ((id == null && exprEmail.findRowCount() > 0)
+						|| (id != null && exprEmail.ne("id", id).findRowCount() > 0)) {
+					errors.add(new ValidationError("email", Messages
+							.get("error.email.must.be.unique")));
+				}
+			} else {
+				email = null;
+			}
+//			phone = PhoneValidator.purify(phone);
+//			if (!Strings.isNullOrEmpty(phone)) {
+//				if (!PhoneValidator.isValid(phone)) {
+//					errors.add(new ValidationError("phone", Messages.get("error.incorrect.phone")));
+//				}
+//				ExpressionList<User> exprPhone = User.find.query().where().eq("phone", phone);
+//				if ((id == null && exprPhone.findRowCount() > 0)
+//						|| (id != null && exprPhone.ne("id", id).findRowCount() > 0)) {
+//					errors.add(new ValidationError("phone", Messages
+//							.get("error.phone.must.be.unique")));
+//				}
+//			}
+			return errors.isEmpty() ? null : errors;
+		}
+
 	}
 
 }

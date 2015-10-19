@@ -5,9 +5,6 @@ import com.feth.play.module.pa.providers.password.DefaultUsernamePasswordAuthUse
 public class MyLoginUsernamePasswordAuthUser extends
 		DefaultUsernamePasswordAuthUser {
 
-	/**
-*
-*/
 	private static final long serialVersionUID = 1L;
 	/**
 	 * The session timeout in seconds Defaults to two weeks

@@ -83,13 +83,13 @@ public class Account extends Controller {
 	public static final Form<ProfileChange> PROFILE_CHANGE_FORM = form(ProfileChange.class);
 
 	@SubjectPresent
-	public static Result link() {
+	public Result link() {
 		Application.noCache(response());
 		return ok(link.render());
 	}
 
 	@Restrict(@Group(RoleName.USER))
-	public static Result verifyEmail() {
+	public Result verifyEmail() {
 		Application.noCache(response());
 		final User user = ContextAugmenterAction.getLoggedUser();
 		if (user.emailValidated) {
@@ -111,7 +111,7 @@ public class Account extends Controller {
 	}
 
 	// @Restrict(@Group(Role.USER))
-	// public static Result doChangePassword() {
+	// public Result doChangePassword() {
 	// com.feth.play.module.pa.controllers.Authenticate.noCache(response());
 	// final Form<Account.PasswordChange> filledForm = PASSWORD_CHANGE_FORM
 	// .bindFromRequest();
@@ -130,7 +130,7 @@ public class Account extends Controller {
 	// }
 
 	@SubjectPresent
-	public static Result askLink() {
+	public Result askLink() {
 		Application.noCache(response());
 		final AuthUser u = PlayAuthenticate.getLinkUser(session());
 		if (u == null) {
@@ -141,7 +141,7 @@ public class Account extends Controller {
 	}
 
 	@SubjectPresent
-	public static Result doLink() {
+	public Result doLink() {
 		Application.noCache(response());
 		final AuthUser u = PlayAuthenticate.getLinkUser(session());
 		if (u == null) {
@@ -165,7 +165,7 @@ public class Account extends Controller {
 	}
 
 	@SubjectPresent
-	public static Result askMerge() {
+	public Result askMerge() {
 		Application.noCache(response());
 		// this is the currently logged in user
 		final AuthUser aUser = PlayAuthenticate.getUser(session());
@@ -183,7 +183,7 @@ public class Account extends Controller {
 	}
 
 	@SubjectPresent
-	public static Result doMerge() {
+	public Result doMerge() {
 		Application.noCache(response());
 		// this is the currently logged in user
 		final AuthUser aUser = PlayAuthenticate.getUser(session());
@@ -211,7 +211,7 @@ public class Account extends Controller {
 	}
 
 	@SubjectPresent
-	public static Result profile() {
+	public Result profile() {
 		User user = ContextAugmenterAction.getLoggedUser();
 		Form<ProfileChange> filledForm = PROFILE_CHANGE_FORM
 				.fill(new ProfileChange(user.email, user.nick));
@@ -219,7 +219,7 @@ public class Account extends Controller {
 	}
 
 	@SubjectPresent
-	public static Result doChangeProfile() {
+	public Result doChangeProfile() {
 		User user = ContextAugmenterAction.getLoggedUser();
 		Form<ProfileChange> filledForm = PROFILE_CHANGE_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
@@ -245,7 +245,7 @@ public class Account extends Controller {
 		return ok(views.html.account.profile.render(filledForm));
 	}
 
-	public static Result changePassword(User user) {
+	public Result changePassword(User user) {
 		Application.noCache(response());
 		if (user == null) {
 			return badRequest();
@@ -254,7 +254,7 @@ public class Account extends Controller {
 				PASSWORD_CHANGE_FORM, null));
 	}
 
-	public static Result changePersonalPassword() {
+	public Result changePersonalPassword() {
 		User u = ContextAugmenterAction.getLoggedUser();
 
 		if (!u.emailValidated) {
@@ -263,7 +263,7 @@ public class Account extends Controller {
 		return changePassword(u);
 	}
 
-	public static Result doChangePersonalPassword() {
+	public Result doChangePersonalPassword() {
 		Application.noCache(response());
 		final User user = ContextAugmenterAction.getLoggedUser();
 		final Form<PasswordChange> filledForm = PASSWORD_CHANGE_FORM

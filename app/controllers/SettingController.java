@@ -22,13 +22,13 @@ import controllers.helpers.ContextAugmenter;
 @Restrict(@Group(RoleName.ADMIN))
 public class SettingController extends Controller {
 
-	public static Result edit() {
+	public Result edit() {
 		return ok(views.html.setting.editSettings.render(Setting
 				.editableSettings()));
 	}
 
 	@Transactional
-	public static Result doEdit() {
+	public Result doEdit() {
 		DynamicForm requestData = Form.form().bindFromRequest();
 		Map<String, Setting> settings = Setting.editableSettings();
 		for (SettingName name : SettingName.values()) {

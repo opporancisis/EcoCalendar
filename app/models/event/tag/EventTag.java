@@ -9,14 +9,12 @@ import javax.persistence.ManyToMany;
 import models.event.Event;
 import models.event.GrandEvent;
 import play.data.format.Formatters;
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 import utils.IdPathBindable;
 import utils.formatter.EventTagFormatter;
 
 @Entity
 public class EventTag extends Model implements IdPathBindable<EventTag> {
-
-	private static final long serialVersionUID = 1L;
 
 	static {
 		Formatters.register(EventTag.class, new EventTagFormatter());

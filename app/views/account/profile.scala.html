@@ -5,7 +5,7 @@
 @import scala.collection.mutable.LinkedHashMap
 @import be.objectify.deadbolt.java.views.html._
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
-@import be.objectify.deadbolt.java.DeadboltViewSupport._
+@import be.objectify.deadbolt.java.ViewSupport._
 
 @user = @{
 	ctx.args.get("user").asInstanceOf[models.user.User]
@@ -51,7 +51,7 @@
 }
 
 
-@if(viewRestrict(la(as("user")), null)) {
+@restrict(la(as("user"))) {
 <div class="panel">
 	<div>
     	@Messages("label.user.your.registration.data"):

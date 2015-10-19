@@ -8,8 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 import play.data.format.Formats;
-import play.db.ebean.Model;
 
+import com.avaje.ebean.Model;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.annotation.EnumValue;
@@ -24,11 +24,6 @@ public class TokenAction extends Model {
 		@EnumValue("PR")
 		PASSWORD_RESET
 	}
-
-	/**
-*
-*/
-	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Verification time frame (until the user clicks on the link in the email)
@@ -53,8 +48,8 @@ public class TokenAction extends Model {
 	@Formats.DateTime(pattern = "yyyy-MM-dd HH:mm:ss")
 	public Date expires;
 
-	public static final Finder<Long, TokenAction> find = new Finder<>(
-			Long.class, TokenAction.class);
+	public static final Find<Long, TokenAction> find = new Find<Long, TokenAction>() {
+	};
 
 	public static TokenAction findByToken(final String token, final Type type) {
 		return find.where().eq("token", token).eq("type", type).findUnique();

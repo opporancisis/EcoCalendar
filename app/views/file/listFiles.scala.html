@@ -3,7 +3,7 @@
 @import scala.collection.mutable.LinkedHashMap
 @import be.objectify.deadbolt.java.views.html._
 @import be.objectify.deadbolt.core.utils.TemplateUtils._
-@import be.objectify.deadbolt.java.DeadboltViewSupport._
+@import be.objectify.deadbolt.java.ViewSupport._
 @import views.menu.SystemMenu._
 
 @implicitScripts = {
@@ -25,7 +25,7 @@
 			<th>@Messages("label.created")</th>
 			<th>@Messages("label.modifed")</th>
 			<th>@Messages("label.file.type")</th>
-			@if(viewRestrict(la(as("admin")), null)) {
+			@restrict(la(as("admin"))) {
 				<th class="sorter-false filter-false">@Messages("label.action")</th>
 			}
 		</thead>
@@ -36,7 +36,7 @@
 					<td>@Formatters.print(file.created)</td>
 					<td>@Formatters.print(file.updated)</td>
 					<td>@file.mime</td>
-					@if(viewRestrict(la(as("admin")), null)) {
+					@restrict(la(as("admin"))) {
 					<td>
 							<a class="btn btn-default btn-xs" href='@{routes.FileController.edit(file)}' title="@Messages("label.do.edit")">
 								<span class="glyphicon glyphicon-pencil"></span>
@@ -58,7 +58,7 @@
 	@_foundNoneOf(classOf[models.file.UploadedFile])
 }
 
-@if(viewRestrict(la(as("admin")), null)) {
+@restrict(la(as("admin"))) {
 	@_btn(routes.FileController.add, "label.do.add")
 }
 

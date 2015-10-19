@@ -11,14 +11,12 @@ import models.event.Event;
 import models.event.GrandEvent;
 import play.data.format.Formatters;
 import play.data.validation.Constraints.Required;
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 import utils.IdPathBindable;
 import utils.formatter.OrganizationFormatter;
 
 @Entity
 public class Organization extends Model implements IdPathBindable<Organization> {
-
-	private static final long serialVersionUID = 1L;
 
 	static {
 		Formatters.register(Organization.class, new OrganizationFormatter());
@@ -27,11 +25,8 @@ public class Organization extends Model implements IdPathBindable<Organization> 
 	@Id
 	public Long id;
 
-	@Required
 	public String name;
 
-	// TODO: make rich-edit control for description
-	@Required
 	@Lob
 	public String description;
 
@@ -41,7 +36,8 @@ public class Organization extends Model implements IdPathBindable<Organization> 
 	@ManyToMany
 	public List<GrandEvent> grandEvents;
 
-	public static Finder<Long, Organization> find = new Finder<>(Long.class, Organization.class);
+	public static final Find<Long, Organization> find = new Find<Long, Organization>() {
+	};
 
 	// TODO:
 	// logo of organization

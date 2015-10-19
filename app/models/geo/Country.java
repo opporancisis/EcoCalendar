@@ -14,16 +14,14 @@ import javax.persistence.OneToMany;
 import play.data.format.Formatters;
 import play.data.format.Formatters.SimpleFormatter;
 import play.data.validation.Constraints.Required;
-import play.db.ebean.Model;
 import utils.IdPathBindable;
 
+import com.avaje.ebean.Model;
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
 
 @Entity
 public class Country extends Model implements IdPathBindable<Country> {
-
-	private static final long serialVersionUID = 1L;
 
 	static {
 		Formatters.register(Country.class, new CountryFormatter());
@@ -52,16 +50,14 @@ public class Country extends Model implements IdPathBindable<Country> {
 	@OneToMany
 	public List<City> cities;
 
-	@Required
 	public Double centerLatitude;
 
-	@Required
 	public Double centerLongitude;
 
-	@Required
 	public Integer defaultZoom;
 
-	public static Finder<Long, Country> find = new Finder<>(Long.class, Country.class);
+	public static Find<Long, Country> find = new Find<Long, Country>() {
+	};
 
 	public static List<Country> all() {
 		List<Country> countries = find.all();

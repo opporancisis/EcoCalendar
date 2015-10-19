@@ -1,64 +1,37 @@
-import java.io.File;
+package ru.ecocalendar;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.Date;
 
-import play.Application;
-import play.Configuration;
-import play.GlobalSettings;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import play.Environment;
 import play.Logger;
-import play.Logger.ALogger;
-import play.api.mvc.EssentialFilter;
 import play.data.format.Formats;
 import play.data.format.Formatters;
-import play.libs.Akka;
 import play.mvc.Call;
 import utils.formatter.LocalDateFormatter;
 import utils.formatter.LocalDateTimeFormatter;
 import utils.formatter.LocalTimeFormatter;
 import utils.formatter.LongFormatter;
 import utils.formatter.YearMonthFormatter;
-import akka.actor.Props;
 
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.PlayAuthenticate.Resolver;
 import com.feth.play.module.pa.exceptions.AccessDeniedException;
 import com.feth.play.module.pa.exceptions.AuthException;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 
 import controllers.routes;
-import events.AlertPublisher;
-import filters.AccessLog;
 
-public class Global extends GlobalSettings {
+@Singleton
+public class ApplicationStart {
 
-	private static final ALogger log = Logger.of(Global.class);
-
-	@Override
-	public Configuration onLoadConfig(Configuration config, File path, ClassLoader classloader) {
-		Config baseConfig = ConfigFactory.load();
-		// Probably want error checking here.
-		File localConf = utils.Config.getMainLocalConfig();
-		if (!localConf.exists()) {
-			return null;
-		}
-		Config testConfig = ConfigFactory.parseFile(localConf);
-		testConfig.resolve();
-		Config finalConfig = testConfig.withFallback(baseConfig);
-		return new Configuration(finalConfig);
-	}
-
-	@Override
-	public <T extends EssentialFilter> Class<T>[] filters() {
-		return new Class[] { AccessLog.class };
-	}
-
-	@Override
-	public void onStart(Application app) {
-		events.AlertPublisher.ref = Akka.system().actorOf(Props.create(AlertPublisher.class));
+	@Inject
+	public ApplicationStart(Environment environment) {
 		PlayAuthenticate.setResolver(new Resolver() {
 
 			@Override
@@ -80,7 +53,7 @@ public class Global extends GlobalSettings {
 			}
 
 			@Override
-			public Call auth(final String provider) {
+			public Call auth(String provider) {
 				// You can provide your own authentication implementation,
 				// however the default should be sufficient for most cases
 				return com.feth.play.module.pa.controllers.routes.Authenticate
@@ -98,9 +71,12 @@ public class Global extends GlobalSettings {
 			}
 
 			@Override
-			public Call onException(final AuthException e) {
+			public Call onException(AuthException e) {
 				if (e instanceof AccessDeniedException) {
-					return routes.Signup.oAuthDenied(((AccessDeniedException) e).getProviderKey());
+					// return routes.Signup.oAuthDenied(((AccessDeniedException)
+					// e).getProviderKey());
+					Logger.warn("what???", e);
+					return routes.Application.login();
 				}
 
 				// more custom problem handling here...
@@ -116,8 +92,9 @@ public class Global extends GlobalSettings {
 		Formatters.register(LocalTime.class, new LocalTimeFormatter());
 		Formatters.register(YearMonth.class, new YearMonthFormatter());
 
-		InitialData.initData();
+		if (environment.isProd() || environment.isDev()) {
+			InitialData.initData("initial-data.yml");
+		}
 
 	}
-
 }

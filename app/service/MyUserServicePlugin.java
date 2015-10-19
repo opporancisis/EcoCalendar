@@ -1,20 +1,23 @@
 package service;
 
+import javax.inject.Inject;
+
 import models.user.User;
 import play.Application;
 
+import com.feth.play.module.pa.service.UserServicePlugin;
 import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.AuthUserIdentity;
-import com.feth.play.module.pa.service.UserServicePlugin;
 
 public class MyUserServicePlugin extends UserServicePlugin {
 
-	public MyUserServicePlugin(final Application app) {
+	@Inject
+	public MyUserServicePlugin(Application app) {
 		super(app);
 	}
 
 	@Override
-	public Object save(final AuthUser authUser) {
+	public Object save(AuthUser authUser) {
 		// We don't allow users to singup automatically by login in via oauth
 		// for example
 		// return null;
@@ -28,7 +31,7 @@ public class MyUserServicePlugin extends UserServicePlugin {
 	}
 
 	@Override
-	public Object getLocalIdentity(final AuthUserIdentity identity) {
+	public Object getLocalIdentity(AuthUserIdentity identity) {
 		// For production: Caching might be a good idea here...
 		// ...and dont forget to sync the cache when users get
 		// deactivated/deleted
@@ -41,7 +44,7 @@ public class MyUserServicePlugin extends UserServicePlugin {
 	}
 
 	@Override
-	public AuthUser merge(final AuthUser newUser, final AuthUser oldUser) {
+	public AuthUser merge(AuthUser newUser, AuthUser oldUser) {
 		if (!oldUser.equals(newUser)) {
 			User.merge(oldUser, newUser);
 		}
@@ -49,13 +52,13 @@ public class MyUserServicePlugin extends UserServicePlugin {
 	}
 
 	@Override
-	public AuthUser link(final AuthUser oldUser, final AuthUser newUser) {
+	public AuthUser link(AuthUser oldUser, AuthUser newUser) {
 		User.addLinkedAccount(oldUser, newUser);
 		return newUser;
 	}
 
 	@Override
-	public AuthUser update(final AuthUser knownUser) {
+	public AuthUser update(AuthUser knownUser) {
 		// User logged in again, bump last login date
 		User.setLastLoginDate(knownUser);
 		return knownUser;

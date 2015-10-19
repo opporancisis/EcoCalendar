@@ -1,0 +1,61 @@
+@(editForm: play.data.Form[controllers.FileController.UploadedFileProperties],
+	files: List[models.file.UploadedFile])
+
+@import helpers.BootstrapHelper._
+@import scala.collection.mutable.LinkedHashMap
+
+@main(
+	"nav.file.attach"
+) {
+
+@form(routes.FileController.doAdd(), 'enctype -> "multipart/form-data") {
+	<div class="panel panel-default">
+		<div class="panel-heading">@_cap("label.file.upload.and.attach")</div>
+		<div class="panel-body">
+			@if(editForm.hasGlobalErrors) { 
+				<div class="alert alert-danger">@editForm.globalError.message</div>
+			}
+		
+			@inputText(
+				field = editForm("name"),
+				'_label -> "label.name"
+			)
+		
+			@inputFile(
+				field = editForm("uploadedFile"),
+				'_label -> "label.file",
+				'required -> true
+			)
+		
+			@_submit("label.create")
+		</div>
+	</div>
+	
+	<div class="panel panel-default">
+		<div class="panel-heading">@_cap("label.file.attach.from.library")</div>
+		<div class="panel-body">
+			@if(!files.isEmpty) {
+				<div id="filesContainer" data-masonry-options='{ "itemSelector": ".fileIcon" }'>
+					@for(file <- files) {
+						<div class="col-xs-6 col-md-3 fileIcon">
+							<a data-file-info='{"id":"@file.id","name":"@file.name","isImage":@file.isImage}' class="thumbnail">
+								@if(file.isImage) {
+									<img src="@routes.FileController.preview(file)" alt="@file.name" />
+								} else {
+									<img src="@routes.Assets.versioned(file.typeIcon)" alt="@file.name" />
+								}
+								<div class="caption">
+									<p>@file.name</p>
+								</div>
+							</a>
+						</div>
+				  	}
+			  	</div>
+			} else {
+				@_foundNoneOf(classOf[models.file.UploadedFile])
+			}
+		</div>
+	</div>
+}
+
+}

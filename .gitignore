@@ -11,3 +11,5 @@ workspace
 /bin
 
 *.bak
+.cache-main
+.cache-tests
