@@ -22,14 +22,6 @@ users:
         emailValidated:   TRUE
         blocked:          FALSE
 
-    - !!models.user.User
-        roles:
-            - *userRole
-        nick:             demo
-        email:            demo@ecocalendar.ru
-        emailValidated:   TRUE
-        blocked:          FALSE
-
 settings:
 
     - !!models.sys.Setting
