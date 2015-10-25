@@ -1,6 +1,7 @@
 package controllers;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,8 +46,8 @@ public class EventController extends Controller {
 
 	private Result list(Form<DatesInterval> intervalForm) {
 		DatesInterval f = intervalForm.get();
-		List<Event> events = Event.find.query().where().ge("startDate", f.from)
-				.le("endDate", f.till).findList();
+		List<Event> events = Event.find.query().where().ge("start", f.from)
+				.le("end", f.till).findList();
 		return ok(views.html.event.listEvents.render(events, intervalForm));
 
 	}
@@ -170,9 +171,9 @@ public class EventController extends Controller {
 			}
 		});
 		LocalDate startDate = null;
-		LocalDate endDate = null;
+		LocalDate finishDate = null;
 		for (Event event : events) {
-			DatesInterval interval = new DatesInterval(event.startDate, event.endDate);
+			DatesInterval interval = new DatesInterval(event.start.toLocalDate(), event.finish.toLocalDate());
 			List<Event> evs = map.get(interval);
 			if (evs == null) {
 				evs = new ArrayList<>();
@@ -180,18 +181,18 @@ public class EventController extends Controller {
 			}
 			evs.add(event);
 			if (startDate == null) {
-				startDate = event.startDate;
-				endDate = event.endDate;
+				startDate = event.start.toLocalDate();
+				finishDate = event.finish.toLocalDate();
 				continue;
 			}
-			if (startDate.isAfter(event.startDate)) {
-				startDate = event.startDate;
+			if (startDate.isAfter(event.start.toLocalDate())) {
+				startDate = event.start.toLocalDate();
 			}
-			if (endDate.isBefore(event.endDate)) {
-				endDate = event.endDate;
+			if (finishDate.isBefore(event.finish.toLocalDate())) {
+				finishDate = event.finish.toLocalDate();
 			}
 		}
-		return ok(views.html.event.export.render(map, startDate, endDate, lang()));
+		return ok(views.html.event.export.render(map, startDate, finishDate, lang()));
 	}
 
 	@Transactional
@@ -317,10 +318,10 @@ public class EventController extends Controller {
 		public LocalTime startTime;
 
 		@Required
-		public LocalDate endDate;
+		public LocalDate finishDate;
 
 		@Required
-		public LocalTime endTime;
+		public LocalTime finishTime;
 
 		public EventProps() {
 			// no-op
@@ -344,10 +345,10 @@ public class EventController extends Controller {
 			this.address = event.address;
 			this.extendedGeoSettings = event.extendedGeoSettings;
 			this.coords = event.coords;
-			this.startDate = event.startDate;
-			this.startTime = event.startTime;
-			this.endDate = event.endDate;
-			this.endTime = event.endTime;
+			this.startDate = event.start.toLocalDate();
+			this.startTime = event.start.toLocalTime();
+			this.finishDate = event.finish.toLocalDate();
+			this.finishTime = event.finish.toLocalTime();
 		}
 
 		private void setFields(Event event) {
@@ -367,10 +368,8 @@ public class EventController extends Controller {
 			event.address = this.address;
 			event.extendedGeoSettings = this.extendedGeoSettings;
 			event.coords = this.coords;
-			event.startDate = this.startDate;
-			event.startTime = this.startTime;
-			event.endDate = this.endDate;
-			event.endTime = this.endTime;
+			event.start = LocalDateTime.of(this.startDate, this.startTime);
+			event.finish = LocalDateTime.of(this.finishDate, this.finishTime);
 		}
 
 		public void updateEvent(Event event) {
@@ -391,7 +390,7 @@ public class EventController extends Controller {
 					errors.add(new ValidationError("", Messages.get(
 							"label.event.error.parentStartDateIsAfter", parent.startDate)));
 				}
-				if (parent.endDate.isBefore(endDate)) {
+				if (parent.endDate.isBefore(finishDate)) {
 					if (errors == null) {
 						errors = new ArrayList<>();
 					}

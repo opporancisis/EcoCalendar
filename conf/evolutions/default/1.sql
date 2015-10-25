@@ -68,10 +68,8 @@ create table event (
   city_id                       bigint,
   address                       varchar(255),
   extended_geo_settings         boolean,
-  start_date                    date,
-  start_time                    time,
-  end_date                      date,
-  end_time                      time,
+  start                         timestamp,
+  finish                        timestamp,
   created                       timestamp not null,
   updated                       timestamp not null,
   constraint pk_event primary key (id)

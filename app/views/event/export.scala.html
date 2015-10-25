@@ -77,7 +77,7 @@
 		@if(interval.from.equals(interval.till)) {
 			@ddMMMM.format(interval.from),
 			@Messages("label.week.day." + interval.from.getDayOfWeek),
-			@Formatters.print(e.startTime) - @Formatters.print(e.endTime)
+			@Formatters.print(e.start.toLocalTime) - @Formatters.print(e.finish.toLocalTime)
 		} else {
 			@if(interval.from.getMonthValue() == interval.till.getMonthValue()) {
 				@dd.format(interval.from) - @ddMMMM.format(interval.till)

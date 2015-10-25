@@ -1,8 +1,7 @@
 package models.event;
 
 import java.text.ParseException;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -87,13 +86,9 @@ public class Event extends Model implements IdPathBindable<Event> {
 	@OneToMany(cascade = CascadeType.ALL)
 	public List<GeoCoords> coords;
 
-	public LocalDate startDate;
+	public LocalDateTime start;
 
-	public LocalTime startTime;
-
-	public LocalDate endDate;
-
-	public LocalTime endTime;
+	public LocalDateTime finish;
 
 	public static Find<Long, Event> find = new Find<Long, Event>() {
 	};

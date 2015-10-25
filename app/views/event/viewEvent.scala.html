@@ -58,10 +58,8 @@
 		<div class="panel-heading">@Messages("label.event.time.info.settings")</div>
   		<div class="panel-body">
 
-			@_staticFormField("label.start.date", Formatters.print(event.startDate))
-			@_staticFormField("label.start.time", Formatters.print(event.startTime))
-			@_staticFormField("label.end.date", Formatters.print(event.endDate))
-			@_staticFormField("label.end.time", Formatters.print(event.endTime))
+			@_staticFormField("label.start.time", Formatters.print(event.start))
+			@_staticFormField("label.finish.time", Formatters.print(event.finish))
 
 		</div>
 	</div>

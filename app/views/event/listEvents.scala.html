@@ -81,7 +81,7 @@
 		<th class="sorter-false filter-false columnSelector-disable"></th>
 		<th>@Messages("label.name")</th>
 		<th>@Messages("label.start.date")</th>
-		<th>@Messages("label.end.date")</th>
+		<th>@Messages("label.finish.date")</th>
 		<th>@Messages("label.author")</th>
 		<th>@Messages("label.grand.event")</th>
 		<th>@Messages("label.city")</th>
@@ -94,8 +94,8 @@
 			<tr data-id="@e.id">
 				<td><input type="checkbox" name="events[]" value="@e.id" data-bind="checked: selectedEvents"></td>
 				<td>@e.name</td>
-				<td>@Formatters.print(e.startDate) @Formatters.print(e.startTime)</td>
-				<td>@Formatters.print(e.endDate) @Formatters.print(e.endTime)</td>
+				<td>@Formatters.print(e.start)</td>
+				<td>@Formatters.print(e.finish)</td>
 				<td>
 					<a href="@routes.UserController.details(e.author)">@e.author.nick</a>
 				</td>

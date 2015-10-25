@@ -35,7 +35,7 @@
 		var geoPoints = @if(event!=null) {@Html(play.libs.Json.toJson(event.coords).toString())} else {[]};
 		$(document).ready(function() {
 			$("#startDate").datepicker(app.settings.bootstrapDatepicker);
-			$("#endDate").datepicker(app.settings.bootstrapDatepicker);
+			$("#finishDate").datepicker(app.settings.bootstrapDatepicker);
 		});
 	</script>
 }
@@ -137,15 +137,15 @@
 			)
 
 			@inputText(
-				field = editForm("endDate"),
+				field = editForm("finishDate"),
 				args = 'required -> true,
-				'_label -> "label.end.date"
+				'_label -> "label.finish.date"
 			)
 
 			@inputText(
-				field = editForm("endTime"),
+				field = editForm("finishTime"),
 				args = 'required -> true,
-				'_label -> "label.end.time"
+				'_label -> "label.finish.time"
 			)
 
 		</div>
