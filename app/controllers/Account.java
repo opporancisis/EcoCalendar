@@ -274,7 +274,7 @@ public class Account extends Controller {
 					filledForm, null));
 		}
 		final String newPassword = filledForm.get().password;
-		user.changePassword(new MyUsernamePasswordAuthUser(newPassword), true);
+		user.changePassword(newPassword, true);
 		flash(Application.FLASH_MESSAGE_KEY,
 				Messages.get("playauthenticate.change_password.success"));
 		return redirect(routes.Account.profile());

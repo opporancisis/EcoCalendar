@@ -25,9 +25,8 @@ import models.sys.SettingName;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.avaje.ebean.Model;
-
 import play.db.ebean.Transactional;
+import providers.MyResetPasswordAuthUser;
 import utils.IdPathBindable;
 import be.objectify.deadbolt.core.models.Permission;
 import be.objectify.deadbolt.core.models.Role;
@@ -35,6 +34,7 @@ import be.objectify.deadbolt.core.models.Subject;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.ExpressionList;
+import com.avaje.ebean.Model;
 import com.feth.play.module.pa.providers.password.UsernamePasswordAuthUser;
 import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.AuthUserIdentity;
@@ -322,7 +322,8 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 		TokenAction.deleteByUser(unverified, TokenAction.Type.EMAIL_VERIFICATION);
 	}
 
-	public void changePassword(final UsernamePasswordAuthUser authUser, final boolean create) {
+	public void changePassword(String newPassword, boolean create) {
+		UsernamePasswordAuthUser authUser = new MyResetPasswordAuthUser(newPassword);
 		LinkedAccount a = this.getAccountByProvider(authUser.getProvider());
 		if (a == null) {
 			if (create) {
@@ -336,9 +337,9 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 		a.save();
 	}
 
-	public void resetPassword(final UsernamePasswordAuthUser authUser, final boolean create) {
+	public void resetPassword(String newPassword, boolean create) {
 		// You might want to wrap this into a transaction
-		this.changePassword(authUser, create);
+		this.changePassword(newPassword, create);
 		TokenAction.deleteByUser(this, TokenAction.Type.PASSWORD_RESET);
 	}
 

@@ -128,7 +128,7 @@ public class UserController extends Controller {
 			return badRequest(views.html.account.password_change.render(filledForm, user));
 		}
 		String newPassword = filledForm.get().password;
-		user.changePassword(new MyUsernamePasswordAuthUser(newPassword), true);
+		user.changePassword(newPassword, true);
 		flash(Application.FLASH_MESSAGE_KEY,
 				Messages.get("playauthenticate.change_password.success"));
 		return redirect(routes.UserController.list());

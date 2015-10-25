@@ -33,12 +33,14 @@ public class InitialData {
 		save(all, "organizations");
 		save(all, "eventTags");
 
-		User.find.query().where().eq("nick", "admin").findUnique()
-				.changePassword(new MyUsernamePasswordAuthUser("napaAdmin150"), true);
+		initPassword("root@localhost", "ecoAdmin150");
+	}
 
-		User.find.query().where().eq("nick", "demo").findUnique()
-				.changePassword(new MyUsernamePasswordAuthUser("ecoEvent450"), true);
-
+	public static void initPassword(String login, String password) {
+		User user = User.find.query().where().eq("email", login).findUnique();
+		if (user != null) {
+			user.changePassword(password, true);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
