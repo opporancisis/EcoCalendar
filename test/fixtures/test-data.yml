@@ -1,0 +1,112 @@
+
+roles:
+
+    - &adminRole !!models.user.SecurityRole
+        roleName:  admin
+
+    - &userRole !!models.user.SecurityRole
+        roleName:  user
+
+users:
+
+    - !!models.user.User
+        nick:             удаленный пользователь
+        emailValidated:   FALSE
+        blocked:          TRUE
+
+    - !!models.user.User
+        roles:
+            - *adminRole
+        nick:             admin
+        email:            root@localhost
+        emailValidated:   TRUE
+        blocked:          FALSE
+
+settings:
+
+    - !!models.sys.Setting
+        name:       DELETED_USER_ID
+        clazz:      java.lang.Long
+        value:      1    # assuming that 1 is id of the first created user
+        editable:   FALSE
+
+standardPages:
+
+    - !!models.standardPage.StandardPage
+        orderInd:   1
+        disabled:   FALSE
+        title:      О Портале
+
+    - !!models.standardPage.StandardPage
+        orderInd:   2
+        disabled:   FALSE
+        title:      Как помочь проекту
+
+    - !!models.standardPage.StandardPage
+        orderInd:   3
+        disabled:   FALSE
+        title:      Наша команда
+
+countries:
+
+    - &russia !!models.geo.Country
+        disabled:        false
+        name:            Страна1
+        centerLatitude:  60.0
+        centerLongitude: 100.0
+        defaultZoom:     2
+        code:            ru
+
+    - &ukraine !!models.geo.Country
+        disabled:        true
+        name:            Страна2
+        centerLatitude:  49.0
+        centerLongitude: 32.0
+        defaultZoom:     5
+        code:            uk
+
+cities:
+
+    - !!models.geo.City
+        disabled:        true
+        name:            Первоград
+        country:         *russia
+        centerLatitude:  55.75
+        centerLongitude: 37.62
+        defaultZoom:     10
+        weight:          10
+
+    - !!models.geo.City
+        disabled:        false
+        name:            Второград
+        country:         *russia
+        centerLatitude:  59.93
+        centerLongitude: 30.32
+        defaultZoom:     10
+        weight:          5
+
+    - !!models.geo.City
+        disabled:        true
+        name:            Третьеград
+        country:         *russia
+        centerLatitude:  58.52
+        centerLongitude: 31.28
+        defaultZoom:     12
+
+organizations:
+
+    - !!models.organization.Organization
+        name:          Экологическое движение «Первое»
+        description:   "Описание для Первого экологического движения."
+
+    - !!models.organization.Organization
+        name:          Экологическое движение «Второе»
+        description:   "Описание для Второго экологического движения."
+
+eventTags:
+
+    - !!models.event.tag.EventTag
+        name:  категория первая
+
+    - !!models.event.tag.EventTag
+        name:  категория вторая
