@@ -46,8 +46,8 @@ public class EventController extends Controller {
 
 	private Result list(Form<DatesInterval> intervalForm) {
 		DatesInterval f = intervalForm.get();
-		List<Event> events = Event.find.query().where().ge("start", f.from)
-				.le("end", f.till).findList();
+		List<Event> events = Event.find.query().where().ge("start", f.from).le("finish", f.till)
+				.findList();
 		return ok(views.html.event.listEvents.render(events, intervalForm));
 
 	}
