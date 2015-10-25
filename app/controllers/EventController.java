@@ -339,7 +339,7 @@ public class EventController extends Controller {
 			this.description = event.description;
 			this.tags = event.tags;
 			this.additionalInfoLink = event.additionalInfoLink;
-			this.moreGeneralSettings = event.moreGeneralSettings;
+			this.moreGeneralSettings = !event.organizations.isEmpty();
 			// this.parent = event.parent;
 			this.organizations = event.organizations;
 			this.useContactInfo = event.useContactInfo;
@@ -363,7 +363,6 @@ public class EventController extends Controller {
 			event.description = this.description;
 			event.tags = this.tags;
 			event.additionalInfoLink = this.additionalInfoLink;
-			event.moreGeneralSettings = this.moreGeneralSettings;
 			// event.parent = this.parent;
 			event.organizations = this.organizations;
 			event.useContactInfo = this.useContactInfo;

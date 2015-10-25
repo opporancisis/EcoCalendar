@@ -58,7 +58,6 @@ create table event (
   name                          varchar(255),
   description                   clob,
   additional_info_link          varchar(255),
-  more_general_settings         boolean,
   parent_id                     bigint,
   use_contact_info              boolean,
   use_author_contact_info       boolean,

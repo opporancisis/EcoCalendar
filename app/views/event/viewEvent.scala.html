@@ -42,15 +42,13 @@
 				@_staticFormField("label.link", event.additionalInfoLink)
 			}
 			
-			@if(event.moreGeneralSettings) {
-				@*
-				@if(event.parent != null) {
-					@_staticFormField("label.grand.event", event.parent.name)
-				}
-				*@
-				@if(event.organizations.size > 0) {
-					@_staticFormField("label.organizations", event.organizations.map(_.name).mkString(", "))
-				}
+			@*
+			@if(event.parent != null) {
+				@_staticFormField("label.grand.event", event.parent.name)
+			}
+			*@
+			@if(event.organizations.size > 0) {
+				@_staticFormField("label.organizations", event.organizations.map(_.name).mkString(", "))
 			}
 			
 		</div>

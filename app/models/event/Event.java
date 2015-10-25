@@ -58,8 +58,6 @@ public class Event extends Model implements IdPathBindable<Event> {
 
 	public String additionalInfoLink;
 
-	public Boolean moreGeneralSettings;
-
 	@ManyToOne
 	public GrandEvent parent;
 
