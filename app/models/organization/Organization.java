@@ -10,7 +10,6 @@ import javax.persistence.ManyToMany;
 import models.event.Event;
 import models.event.GrandEvent;
 import play.data.format.Formatters;
-import play.data.validation.Constraints.Required;
 import com.avaje.ebean.Model;
 import utils.IdPathBindable;
 import utils.formatter.OrganizationFormatter;
