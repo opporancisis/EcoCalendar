@@ -83,7 +83,7 @@
 		<th>@Messages("label.start.date")</th>
 		<th>@Messages("label.finish.date")</th>
 		<th>@Messages("label.author")</th>
-		<th>@Messages("label.grand.event")</th>
+		@*<th>@Messages("label.grand.event")</th>*@
 		<th>@Messages("label.city")</th>
 		<th>@Messages("label.organizations")</th>
 		<th>@Messages("label.tags")</th>
@@ -99,11 +99,13 @@
 				<td>
 					<a href="@routes.UserController.details(e.author)">@e.author.nick</a>
 				</td>
+				@*
 				<td>
 					@if(e.parent != null) {
 						<a href="@routes.GrandEventController.details(e.parent)">@e.parent.name</a>
 					}
 				</td>
+				*@
 				<td>@e.city.name</td>
 				<td>
 					@Html(e.organizations.map(o => "<a href=\"" + routes.OrganizationController.details(o) + "\">" + o.name + "</a>").mkString(", "))

@@ -1,6 +1,6 @@
 @(editForm: play.data.Form[controllers.EventController.EventProps],
 	event: models.event.Event,
-	grandEvents: List[models.event.GrandEvent],
+	//grandEvents: List[models.event.GrandEvent],
 	tags: List[models.event.tag.EventTag],
 	organizations: List[models.organization.Organization],
 	countries: List[models.geo.Country])
@@ -101,6 +101,7 @@
 				Symbol("data-bind") -> "checked: moreGeneralSettings"
 			)
 
+			@*
 			@select(
 				field = editForm("parent"),
 				'options -> grandEvents.map(a => a.id.toString -> a.name).toSeq,
@@ -108,6 +109,7 @@
 				'help -> "label.event.parent.tip",
 				'dataBind -> "visible: moreGeneralSettings()"
 			)
+			*@
 
 			@select(
 				field = editForm("organizations"),

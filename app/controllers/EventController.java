@@ -68,13 +68,13 @@ public class EventController extends Controller {
 
 	@SubjectPresent
 	public Result edit(Event event) {
-		List<GrandEvent> grandEvents = getActualGrandEvents();
-		if (event.parent != null && !grandEvents.contains(event.parent)) {
-			// grandEvents.
-		}
+		// List<GrandEvent> grandEvents = getActualGrandEvents();
+		// if (event.parent != null && !grandEvents.contains(event.parent)) {
+		// // grandEvents.
+		// }
 		EventProps eventProps = new EventProps(event);
 		return ok(views.html.event.editEvent.render(EDIT_FORM.fill(eventProps), event,
-				getActualGrandEvents(), EventTag.findAllOrdered(), Organization.find.all(),
+		/* getActualGrandEvents(), */EventTag.findAllOrdered(), Organization.find.all(),
 				Country.all()));
 	}
 
@@ -83,7 +83,7 @@ public class EventController extends Controller {
 		Form<EventProps> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			return badRequest(views.html.event.editEvent.render(filledForm, event,
-					getActualGrandEvents(), EventTag.findAllOrdered(), Organization.find.all(),
+			/* getActualGrandEvents(), */EventTag.findAllOrdered(), Organization.find.all(),
 					Country.all()));
 		}
 		// TODO: how will coords be populated?
@@ -97,7 +97,10 @@ public class EventController extends Controller {
 
 	@SubjectPresent
 	public Result add() {
-		return ok(views.html.event.editEvent.render(EDIT_FORM, null, getActualGrandEvents(),
+		return ok(views.html.event.editEvent.render(EDIT_FORM, null, /*
+																	 * getActualGrandEvents
+																	 * (),
+																	 */
 				EventTag.findAllOrdered(), Organization.find.all(), Country.all()));
 	}
 
@@ -111,7 +114,7 @@ public class EventController extends Controller {
 		Form<EventProps> filledForm = EDIT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			return badRequest(views.html.event.editEvent.render(filledForm, null,
-					getActualGrandEvents(), EventTag.findAllOrdered(), Organization.find.all(),
+			/* getActualGrandEvents(), */EventTag.findAllOrdered(), Organization.find.all(),
 					Country.all()));
 		}
 		User user = ContextAugmenterAction.getLoggedUser();
@@ -121,11 +124,11 @@ public class EventController extends Controller {
 		event.published = user.hasEnoughPowerToPublishEvents();
 		// TODO: how we will populate coords?
 		event.coords = null;
-		if (event.parent != null) {
-			// TODO: notify creator of grand event about new event
-			// TODO: take action upon GE settings: include sub-event
-			// automatically, or let GE-creator review (post or pre moderation)
-		}
+		// if (event.parent != null) {
+		// TODO: notify creator of grand event about new event
+		// TODO: take action upon GE settings: include sub-event
+		// automatically, or let GE-creator review (post or pre moderation)
+		// }
 		event.save();
 		if (!event.published) {
 			// TODO: send message to whom?
@@ -173,7 +176,8 @@ public class EventController extends Controller {
 		LocalDate startDate = null;
 		LocalDate finishDate = null;
 		for (Event event : events) {
-			DatesInterval interval = new DatesInterval(event.start.toLocalDate(), event.finish.toLocalDate());
+			DatesInterval interval = new DatesInterval(event.start.toLocalDate(),
+					event.finish.toLocalDate());
 			List<Event> evs = map.get(interval);
 			if (evs == null) {
 				evs = new ArrayList<>();
@@ -243,7 +247,10 @@ public class EventController extends Controller {
 
 	public Result calendar() {
 		// just return UI. actual events will be fetched via ajax
-		return ok(views.html.event.calendar.render(FILTER, Country.all(), getActualGrandEvents(),
+		return ok(views.html.event.calendar.render(FILTER, Country.all(), /*
+																		 * getActualGrandEvents
+																		 * (),
+																		 */
 				EventTag.findAllOrdered()));
 	}
 
@@ -265,7 +272,7 @@ public class EventController extends Controller {
 
 		public City city;
 
-		public GrandEvent parent;
+		// public GrandEvent parent;
 
 		public List<EventTag> tags;
 
@@ -285,7 +292,7 @@ public class EventController extends Controller {
 
 		public Boolean moreGeneralSettings;
 
-		public GrandEvent parent;
+		// public GrandEvent parent;
 
 		public List<Organization> organizations;
 
@@ -333,7 +340,7 @@ public class EventController extends Controller {
 			this.tags = event.tags;
 			this.additionalInfoLink = event.additionalInfoLink;
 			this.moreGeneralSettings = event.moreGeneralSettings;
-			this.parent = event.parent;
+			// this.parent = event.parent;
 			this.organizations = event.organizations;
 			this.useContactInfo = event.useContactInfo;
 			this.useAuthorContactInfo = event.useAuthorContactInfo;
@@ -357,7 +364,7 @@ public class EventController extends Controller {
 			event.tags = this.tags;
 			event.additionalInfoLink = this.additionalInfoLink;
 			event.moreGeneralSettings = this.moreGeneralSettings;
-			event.parent = this.parent;
+			// event.parent = this.parent;
 			event.organizations = this.organizations;
 			event.useContactInfo = this.useContactInfo;
 			event.useAuthorContactInfo = this.useAuthorContactInfo;
@@ -382,24 +389,24 @@ public class EventController extends Controller {
 			return event;
 		}
 
-		public List<ValidationError> validate() {
-			List<ValidationError> errors = null;
-			if (parent != null) {
-				if (parent.startDate.isAfter(startDate)) {
-					errors = new ArrayList<>();
-					errors.add(new ValidationError("", Messages.get(
-							"label.event.error.parentStartDateIsAfter", parent.startDate)));
-				}
-				if (parent.endDate.isBefore(finishDate)) {
-					if (errors == null) {
-						errors = new ArrayList<>();
-					}
-					errors.add(new ValidationError("", Messages.get(
-							"label.event.error.parentEndDateIsBefore", parent.endDate)));
-				}
-			}
-			return errors;
-		}
+		// public List<ValidationError> validate() {
+		// List<ValidationError> errors = null;
+		// if (parent != null) {
+		// if (parent.startDate.isAfter(startDate)) {
+		// errors = new ArrayList<>();
+		// errors.add(new ValidationError("", Messages.get(
+		// "label.event.error.parentStartDateIsAfter", parent.startDate)));
+		// }
+		// if (parent.endDate.isBefore(finishDate)) {
+		// if (errors == null) {
+		// errors = new ArrayList<>();
+		// }
+		// errors.add(new ValidationError("", Messages.get(
+		// "label.event.error.parentEndDateIsBefore", parent.endDate)));
+		// }
+		// }
+		// return errors;
+		// }
 
 	}
 }
