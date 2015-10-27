@@ -110,7 +110,7 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 
 	public LocalDateTime lastLogin;
 
-	public Boolean blocked;
+	public boolean blocked;
 
 	public boolean emailValidated;
 
