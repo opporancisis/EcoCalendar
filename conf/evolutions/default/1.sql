@@ -249,7 +249,6 @@ create table user (
   id                            bigint not null,
   email                         varchar(255),
   email_public                  boolean,
-  nick                          varchar(255),
   name                          varchar(255),
   phone                         varchar(255),
   profile_link                  varchar(255),
@@ -261,7 +260,7 @@ create table user (
   last_login                    timestamp,
   blocked                       boolean,
   email_validated               boolean,
-  constraint uq_user_nick_email unique (nick,email),
+  constraint uq_user_email unique (email),
   constraint pk_user primary key (id)
 );
 create sequence user_seq;

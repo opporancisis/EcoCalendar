@@ -72,12 +72,6 @@
 		'help -> "label.user.email.tip"
 	)
 
-	@inputText(
-		field = editForm("nick"),
-		'_label -> "label.nick",
-		'help -> "label.user.nick.tip"
-	)
-
 	@select(
 		field = editForm("roles"),
 		'options -> models.user.RoleName.asList().map(a => a -> Messages("label.roles." + a)).toSeq,

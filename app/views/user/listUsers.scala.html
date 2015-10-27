@@ -26,9 +26,8 @@
 	<br /><br />
 	<table class="table table-striped js-tablesorter">
 		<thead>
-			<th class="unselectable">@Messages("label.nick")</th>
+			<th class="unselectable">@Messages("label.name")</th>
 			<th>@Messages("label.email")</th>
-			<th>@Messages("label.name")</th>
 			<th class="filter-select filter-exact" data-placeholder="@Messages("label.user.status.blocked.no.matter")">@Messages("label.status.blocked")</th>
 			<th class="filter-select filter-exact" data-placeholder="@Messages("label.user.all.roles")">@Messages("label.roles")</th>
 			<th>@Messages("label.note")</th>
@@ -37,9 +36,8 @@
 		<tbody>
 			@for(user <- users) {
 				<tr>
-					<td>@user.nick</td>
-					<td>@user.email</td>
 					<td>@user.name</td>
+					<td>@user.email</td>
 					<td>@Messages(if(user.blocked) "label.yes" else "label.no")</td>
 					<td>@user.roles.map{ role => @Messages("label.roles." + role)}.mkString(",")</td>
 					<td>@user.note</td>
@@ -62,7 +60,7 @@
 			}
 		</tbody>
 		<tfoot>
-			@_tablePager(7)
+			@_tablePager(6)
 		</tfoot>
 	</table>
 } else {

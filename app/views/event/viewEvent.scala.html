@@ -27,7 +27,7 @@
 
 	@_staticFormField("label.created", Formatters.print(event.created))
 	@_staticFormField("label.updated", Formatters.print(event.updated))
-	@_staticFormField("label.author", event.author.nick)
+	@_staticFormField("label.author", event.author.name)
 
 	<div class="panel panel-default">
 		<div class="panel-heading">@Messages("label.event.general.info.settings")</div>

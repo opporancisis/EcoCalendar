@@ -138,8 +138,6 @@ public class UserController extends Controller {
 
 	public static class UserProperties {
 
-		public static final String NICK_PAT = "[\\w\\s\\-_\\d\u0400-\u04f9]+";
-
 		public Long id;
 
 		public Boolean blocked;
@@ -148,9 +146,6 @@ public class UserController extends Controller {
 
 		@Email
 		public String email;
-
-		@Pattern(value = NICK_PAT, message = "error.nick")
-		public String nick;
 
 		public List<SecurityRole> roles;
 
@@ -171,7 +166,6 @@ public class UserController extends Controller {
 			this.blocked = user.blocked;
 			this.emailValidated = user.emailValidated;
 			this.email = user.email;
-			this.nick = user.nick;
 			this.roles = user.roles;
 			this.name = user.name;
 			this.phone = user.phone;
@@ -183,7 +177,6 @@ public class UserController extends Controller {
 			user.blocked = MoreObjects.firstNonNull(this.blocked, Boolean.FALSE);
 			user.emailValidated = this.emailValidated;
 			user.email = this.email;
-			user.nick = this.nick;
 			user.roles = this.roles;
 			user.name = this.name;
 			user.phone = this.phone;
@@ -218,16 +211,6 @@ public class UserController extends Controller {
 
 		public List<ValidationError> validate() {
 			List<ValidationError> errors = new ArrayList<>();
-			if (StringUtils.isBlank(nick)) {
-				nick = User.makeUnconflictedNick(null);
-			} else {
-				ExpressionList<User> expr = User.find.query().where().eq("nick", nick);
-				if ((id == null && expr.findRowCount() > 0)
-						|| (id != null && expr.ne("id", id).findRowCount() > 0)) {
-					errors.add(new ValidationError("nick", Messages
-							.get("error.name.must.be.unique")));
-				}
-			}
 			if (StringUtils.isNotBlank(email)) {
 				ExpressionList<User> exprEmail = User.find.query().where().eq("email", email);
 				if ((id == null && exprEmail.findRowCount() > 0)

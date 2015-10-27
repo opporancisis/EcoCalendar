@@ -62,22 +62,22 @@ public class Account extends Controller {
 
 	public static class ProfileChange {
 
+		@Email
+		@Required
+		public String email;
+		
+		@Required
+		public String name;
+		
 		public ProfileChange() {
 			// no op
 		}
 
-		public ProfileChange(String email, String nick) {
+		public ProfileChange(String email, String name) {
 			this.email = email;
-			this.nick = nick;
+			this.name = name;
 		}
 
-		@Email
-		@Required
-		public String email;
-
-		@Pattern(value = User.NICK_PAT, message = "error.nick")
-		@Required
-		public String nick;
 	}
 
 	public static final Form<ProfileChange> PROFILE_CHANGE_FORM = form(ProfileChange.class);
@@ -214,7 +214,7 @@ public class Account extends Controller {
 	public Result profile() {
 		User user = ContextAugmenterAction.getLoggedUser();
 		Form<ProfileChange> filledForm = PROFILE_CHANGE_FORM
-				.fill(new ProfileChange(user.email, user.nick));
+				.fill(new ProfileChange(user.email, user.name));
 		return ok(views.html.account.profile.render(filledForm));
 	}
 
@@ -232,8 +232,8 @@ public class Account extends Controller {
 			user.emailValidated = false;
 			needUpdate = true;
 		}
-		if (!pc.nick.equals(user.nick)) {
-			user.nick = pc.nick;
+		if (!pc.name.equals(user.name)) {
+			user.name = pc.name;
 			needUpdate = true;
 		}
 		if (needUpdate) {

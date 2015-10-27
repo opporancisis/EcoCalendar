@@ -151,7 +151,6 @@ label.link=ссылка
 label.message=сообщение
 label.modifed=дата изменения
 label.name=имя
-label.nick=никнейм
 label.no=нет
 label.no.content=нет содержимого
 label.not.specified=не задано
@@ -213,7 +212,6 @@ label.roles.admin=администратор
 label.user.your.registration.data=Ваши регистрационные данные
 label.user.name.and.phone.tip=Может использоваться для контактной информации по создаваемым событиям
 label.user.note.tip=Примечание о пользователе, которое видит только администратор. Сам пользователь не имеет доступ к этой информации.
-label.user.nick.tip=при создании событий (и других действиях) посетители сайта видят никнейм создателя
 label.user.email.tip=Адрес используется в качестве логина при заходе на сайт. Также на почту могут приходить системные сообщения.
 
 ################################################################################
@@ -296,7 +294,6 @@ error.email.must.be.unique=Адрес е-почты должен быть уни
 error.need.file=Необходимо указать файл
 error.not.found.object=Объект "{0}" с идентификатором "{1}" не найден
 error.number=Numeric value expected
-error.nick=Никнейм должен содержать только латинские буквы, цифры, пробелы, символы _ и -
 error.pattern=Must satisfy {0}
 error.real=Real number value expected
 error.required=Это поле необходимо заполнить

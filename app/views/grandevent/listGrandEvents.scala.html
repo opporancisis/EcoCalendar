@@ -51,7 +51,7 @@
 				<td>@Formatters.print(event.startDate)</td>
 				<td>@Formatters.print(event.endDate)</td>
 				<td>@event.events.size</td>
-				<td>@event.author.nick</td>
+				<td>@event.author.name</td>
 				<td>@play.twirl.api.Html(event.organizations.map(o => "<a href=\"" + routes.OrganizationController.details(o) + "\">" + o.name + "</a>").mkString(", "))</td>
 				<td>@event.tags.map(_.name).mkString(", ")</td>
 				<td>

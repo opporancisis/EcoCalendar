@@ -22,8 +22,6 @@ import models.message.Message;
 import models.sys.Setting;
 import models.sys.SettingName;
 
-import org.apache.commons.lang3.StringUtils;
-
 import play.db.ebean.Transactional;
 import providers.MyResetPasswordAuthUser;
 import utils.IdPathBindable;
@@ -40,17 +38,14 @@ import com.feth.play.module.pa.user.AuthUserIdentity;
 import com.feth.play.module.pa.user.EmailIdentity;
 import com.feth.play.module.pa.user.FirstLastNameIdentity;
 import com.feth.play.module.pa.user.NameIdentity;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
 import controllers.Application;
 
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "NICK", "EMAIL" }))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "EMAIL" }))
 public class User extends Model implements Subject, IdPathBindable<User> {
-
-	private static final String NICK_AUTO_GENERATED_PREFIX = "auto-generated-nick-";
-
-	public static final String NICK_PAT = "[\\w\\s\\-_\\d]+";
 
 	@Id
 	public Long id;
@@ -62,8 +57,6 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 
 	// TODO: what's the workflow?
 	public boolean emailPublic;
-
-	public String nick;
 
 	public String name;
 
@@ -129,10 +122,10 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 	}
 
 	public String somename() {
-		if (StringUtils.isNotBlank(name)) {
+		if (!Strings.isNullOrEmpty(name)) {
 			return name;
 		} else {
-			return nick;
+			return "unknown name";
 		}
 	}
 
@@ -238,7 +231,7 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 			NameIdentity identity = (NameIdentity) authUser;
 			String name = identity.getName();
 			if (name != null) {
-				user.nick = name;
+				user.name = name;
 			}
 		}
 
@@ -247,36 +240,22 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 			String firstName = identity.getFirstName();
 			String lastName = identity.getLastName();
 			if (lastName != null) {
-				user.nick = lastName;
+				user.name = lastName;
 			}
 			if (firstName != null) {
 				if (lastName != null) {
-					user.nick += " ";
+					user.name += " ";
 				}
-				user.nick += firstName;
+				user.name += firstName;
 			}
 		}
-		// user.updateNick();
 		user.save();
 		Ebean.saveManyToManyAssociations(user, "roles");
-		// user.saveManyToManyAssociations("permissions");
 		return user;
 	}
 
 	public static void merge(AuthUser oldUser, AuthUser newUser) {
 		User.findByAuthUserIdentity(oldUser).merge(User.findByAuthUserIdentity(newUser));
-	}
-
-	public static String makeUnconflictedNick(String initialNick) {
-		if (StringUtils.isBlank(initialNick) || initialNick.startsWith(NICK_AUTO_GENERATED_PREFIX)) {
-			initialNick = NICK_AUTO_GENERATED_PREFIX + "1";
-		}
-		String newNick = initialNick;
-		int i = 1;
-		while (User.find.query().where().eq("nick", newNick).findRowCount() > 0) {
-			newNick = NICK_AUTO_GENERATED_PREFIX + ++i;
-		}
-		return newNick;
 	}
 
 	public Set<String> getProviders() {
