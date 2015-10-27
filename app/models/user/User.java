@@ -169,7 +169,7 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 		return null;
 	}
 
-	public static boolean existsByAuthUserIdentity(final AuthUserIdentity identity) {
+	public static boolean existsByAuthUserIdentity(AuthUserIdentity identity) {
 		final ExpressionList<User> exp;
 		if (identity instanceof UsernamePasswordAuthUser) {
 			exp = getUsernamePasswordAuthUserFind((UsernamePasswordAuthUser) identity);
@@ -179,13 +179,13 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 		return exp.findRowCount() > 0;
 	}
 
-	private static ExpressionList<User> getAuthUserFind(final AuthUserIdentity identity) {
+	private static ExpressionList<User> getAuthUserFind(AuthUserIdentity identity) {
 		return find.where().eq("blocked", false)
 				.eq("linkedAccounts.providerUserId", identity.getId())
 				.eq("linkedAccounts.providerKey", identity.getProvider());
 	}
 
-	public static User findByAuthUserIdentity(final AuthUserIdentity identity) {
+	public static User findByAuthUserIdentity(AuthUserIdentity identity) {
 		if (identity == null) {
 			return null;
 		}
@@ -196,18 +196,18 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 		}
 	}
 
-	public static User findByUsernamePasswordIdentity(final UsernamePasswordAuthUser identity) {
+	public static User findByUsernamePasswordIdentity(UsernamePasswordAuthUser identity) {
 		return getUsernamePasswordAuthUserFind(identity).findUnique();
 	}
 
 	private static ExpressionList<User> getUsernamePasswordAuthUserFind(
-			final UsernamePasswordAuthUser identity) {
+			UsernamePasswordAuthUser identity) {
 		return getEmailUserFind(identity.getEmail()).eq("linkedAccounts.providerKey",
 				identity.getProvider());
 	}
 
-	public void merge(final User otherUser) {
-		for (final LinkedAccount acc : otherUser.linkedAccounts) {
+	public void merge(User otherUser) {
+		for (LinkedAccount acc : otherUser.linkedAccounts) {
 			this.linkedAccounts.add(LinkedAccount.create(acc));
 		}
 		// do all other merging stuff here - like resources, etc.
@@ -218,7 +218,7 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 	}
 
 	@Transactional
-	public static User create(final AuthUser authUser) {
+	public static User create(AuthUser authUser) {
 		User user = new User();
 		user.roles = Collections.singletonList(SecurityRole
 				.findByRoleName(models.user.RoleName.USER));
@@ -260,17 +260,17 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 				user.nick += firstName;
 			}
 		}
-//		user.updateNick();
+		// user.updateNick();
 		user.save();
 		Ebean.saveManyToManyAssociations(user, "roles");
 		// user.saveManyToManyAssociations("permissions");
 		return user;
 	}
 
-	public static void merge(final AuthUser oldUser, final AuthUser newUser) {
+	public static void merge(AuthUser oldUser, AuthUser newUser) {
 		User.findByAuthUserIdentity(oldUser).merge(User.findByAuthUserIdentity(newUser));
 	}
-	
+
 	public static String makeUnconflictedNick(String initialNick) {
 		if (StringUtils.isBlank(initialNick) || initialNick.startsWith(NICK_AUTO_GENERATED_PREFIX)) {
 			initialNick = NICK_AUTO_GENERATED_PREFIX + "1";
@@ -291,32 +291,32 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 		return providerKeys;
 	}
 
-	public static void addLinkedAccount(final AuthUser oldUser, final AuthUser newUser) {
-		final User u = User.findByAuthUserIdentity(oldUser);
+	public static void addLinkedAccount(AuthUser oldUser, AuthUser newUser) {
+		User u = User.findByAuthUserIdentity(oldUser);
 		u.linkedAccounts.add(LinkedAccount.create(newUser));
 		u.save();
 	}
 
-	public static void setLastLoginDate(final AuthUser knownUser) {
-		final User u = User.findByAuthUserIdentity(knownUser);
+	public static void setLastLoginDate(AuthUser knownUser) {
+		User u = User.findByAuthUserIdentity(knownUser);
 		u.lastLogin = Application.now();
 		u.save();
 	}
 
-	public static User findByEmail(final String email) {
+	public static User findByEmail(String email) {
 		return getEmailUserFind(email).findUnique();
 	}
 
-	private static ExpressionList<User> getEmailUserFind(final String email) {
+	private static ExpressionList<User> getEmailUserFind(String email) {
 		return find.where().eq("blocked", false).eq("email", email);
 	}
 
-	public LinkedAccount getAccountByProvider(final String providerKey) {
+	public LinkedAccount getAccountByProvider(String providerKey) {
 		return LinkedAccount.findByProviderKey(this, providerKey);
 	}
 
 	@Transactional
-	public static void verify(final User unverified) {
+	public static void verify(User unverified) {
 		unverified.emailValidated = true;
 		unverified.save();
 		TokenAction.deleteByUser(unverified, TokenAction.Type.EMAIL_VERIFICATION);
