@@ -34,7 +34,7 @@ import be.objectify.deadbolt.java.actions.Restrict;
 import be.objectify.deadbolt.java.actions.SubjectPresent;
 
 import com.avaje.ebean.ExpressionList;
-import com.google.common.base.Strings;
+import com.google.common.base.MoreObjects;
 
 import controllers.helpers.ContextAugmenter;
 import controllers.helpers.ContextAugmenterAction;
@@ -184,7 +184,7 @@ public class UserController extends Controller {
 		}
 
 		private void setFields(User user) {
-			user.blocked = this.blocked;
+			user.blocked = MoreObjects.firstNonNull(this.blocked, Boolean.FALSE);
 			user.emailValidated = this.emailValidated;
 			user.email = this.email;
 			user.nick = this.nick;
