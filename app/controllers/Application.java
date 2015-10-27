@@ -111,7 +111,7 @@ public class Application extends Controller {
 	}
 
 	public static void noCache(Response response) {
-		com.feth.play.module.pa.controllers.Authenticate.noCache(response);
+		com.feth.play.module.pa.controllers.AuthenticateBase.noCache(response);
 	}
 
 }
