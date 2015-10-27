@@ -17,8 +17,6 @@ import models.user.User;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.URL;
 
-import play.Logger;
-import play.Logger.ALogger;
 import play.data.Form;
 import play.data.format.Formatters;
 import play.data.validation.Constraints.Email;
@@ -114,15 +112,13 @@ public class UserController extends Controller {
 	@Restrict(@Group(RoleName.ADMIN))
 	public Result changePassword(User user) {
 		Application.noCache(response());
-		return ok(views.html.account.password_change.render(
-				Account.PASSWORD_CHANGE_FORM, user));
+		return ok(views.html.account.password_change.render(Account.PASSWORD_CHANGE_FORM, user));
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
 	public Result doChangePassword(User user) {
 		Application.noCache(response());
-		Form<Account.PasswordChange> filledForm = Account.PASSWORD_CHANGE_FORM
-				.bindFromRequest();
+		Form<Account.PasswordChange> filledForm = Account.PASSWORD_CHANGE_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			// User did not select whether to link or not link
 			return badRequest(views.html.account.password_change.render(filledForm, user));
@@ -155,16 +151,16 @@ public class UserController extends Controller {
 
 		@Pattern(value = NICK_PAT, message = "error.nick")
 		public String nick;
-		
+
 		public List<SecurityRole> roles;
-		
+
 		public String name;
-		
+
 		public String phone;
 
 		@URL
 		public String profileLink;
-		
+
 		public String note;
 
 		public UserProperties() {
@@ -242,18 +238,20 @@ public class UserController extends Controller {
 			} else {
 				email = null;
 			}
-//			phone = PhoneValidator.purify(phone);
-//			if (!Strings.isNullOrEmpty(phone)) {
-//				if (!PhoneValidator.isValid(phone)) {
-//					errors.add(new ValidationError("phone", Messages.get("error.incorrect.phone")));
-//				}
-//				ExpressionList<User> exprPhone = User.find.query().where().eq("phone", phone);
-//				if ((id == null && exprPhone.findRowCount() > 0)
-//						|| (id != null && exprPhone.ne("id", id).findRowCount() > 0)) {
-//					errors.add(new ValidationError("phone", Messages
-//							.get("error.phone.must.be.unique")));
-//				}
-//			}
+			// phone = PhoneValidator.purify(phone);
+			// if (!Strings.isNullOrEmpty(phone)) {
+			// if (!PhoneValidator.isValid(phone)) {
+			// errors.add(new ValidationError("phone",
+			// Messages.get("error.incorrect.phone")));
+			// }
+			// ExpressionList<User> exprPhone =
+			// User.find.query().where().eq("phone", phone);
+			// if ((id == null && exprPhone.findRowCount() > 0)
+			// || (id != null && exprPhone.ne("id", id).findRowCount() > 0)) {
+			// errors.add(new ValidationError("phone", Messages
+			// .get("error.phone.must.be.unique")));
+			// }
+			// }
 			return errors.isEmpty() ? null : errors;
 		}
 
