@@ -56,7 +56,7 @@ public class ApplicationStart {
 			public Call auth(String provider) {
 				// You can provide your own authentication implementation,
 				// however the default should be sufficient for most cases
-				return com.feth.play.module.pa.controllers.routes.Authenticate
+				return com.feth.play.module.pa.controllers.routes.AuthenticateDI
 						.authenticate(provider);
 			}
 

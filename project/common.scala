@@ -26,6 +26,7 @@ object Commons {
     RoutesKeys.routesImport ++= Seq(
         "models.user.User"
     ),
+    routesGenerator := InjectedRoutesGenerator,
     offline := true,
     LessKeys.compress in Assets := true,
     pipelineStages := Seq(uglify, digest, gzip),
