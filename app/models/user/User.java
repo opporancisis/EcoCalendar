@@ -41,6 +41,7 @@ import com.feth.play.module.pa.user.AuthUserIdentity;
 import com.feth.play.module.pa.user.EmailIdentity;
 import com.feth.play.module.pa.user.FirstLastNameIdentity;
 import com.feth.play.module.pa.user.NameIdentity;
+import com.google.common.collect.ImmutableList;
 
 import controllers.Application;
 
@@ -226,8 +227,7 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 		// user.permissions.add(UserPermission.findByValue("printers.edit"));
 		user.blocked = false;
 		user.lastLogin = Application.now();
-		user.linkedAccounts = Collections.singletonList(LinkedAccount
-				.create(authUser));
+		user.linkedAccounts = ImmutableList.of(LinkedAccount.create(authUser));
 
 		if (authUser instanceof EmailIdentity) {
 			EmailIdentity identity = (EmailIdentity) authUser;
