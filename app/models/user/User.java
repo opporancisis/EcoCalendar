@@ -171,7 +171,7 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 	}
 
 	public static boolean existsByAuthUserIdentity(AuthUserIdentity identity) {
-		final ExpressionList<User> exp;
+		ExpressionList<User> exp;
 		if (identity instanceof UsernamePasswordAuthUser) {
 			exp = getUsernamePasswordAuthUserFind((UsernamePasswordAuthUser) identity);
 		} else {
@@ -284,8 +284,8 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 	}
 
 	public Set<String> getProviders() {
-		final Set<String> providerKeys = new HashSet<>(linkedAccounts.size());
-		for (final LinkedAccount acc : linkedAccounts) {
+		Set<String> providerKeys = new HashSet<>(linkedAccounts.size());
+		for (LinkedAccount acc : linkedAccounts) {
 			providerKeys.add(acc.providerKey);
 		}
 		return providerKeys;
