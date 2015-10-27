@@ -21,7 +21,7 @@ public class MyUserServicePlugin extends UserServicePlugin {
 		// We don't allow users to singup automatically by login in via oauth
 		// for example
 		// return null;
-		final boolean isLinked = User.existsByAuthUserIdentity(authUser);
+		boolean isLinked = User.existsByAuthUserIdentity(authUser);
 		if (!isLinked) {
 			return User.create(authUser).id;
 		} else {
@@ -35,7 +35,7 @@ public class MyUserServicePlugin extends UserServicePlugin {
 		// For production: Caching might be a good idea here...
 		// ...and dont forget to sync the cache when users get
 		// deactivated/deleted
-		final User u = User.findByAuthUserIdentity(identity);
+		User u = User.findByAuthUserIdentity(identity);
 		if (u != null) {
 			return u.id;
 		} else {
