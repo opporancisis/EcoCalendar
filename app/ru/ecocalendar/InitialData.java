@@ -8,7 +8,6 @@ import models.user.SecurityRole;
 import models.user.User;
 import play.Logger;
 import play.libs.Yaml;
-import providers.MyUsernamePasswordAuthUser;
 
 import com.avaje.ebean.Ebean;
 
