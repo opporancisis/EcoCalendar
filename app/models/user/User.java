@@ -2,7 +2,6 @@ package models.user;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -221,10 +220,7 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 	@Transactional
 	public static User create(AuthUser authUser) {
 		User user = new User();
-		user.roles = Collections.singletonList(SecurityRole
-				.findByRoleName(models.user.RoleName.USER));
-		// user.permissions = new ArrayList<>();
-		// user.permissions.add(UserPermission.findByValue("printers.edit"));
+		user.roles = ImmutableList.of(SecurityRole.findByRoleName(RoleName.USER));
 		user.blocked = false;
 		user.lastLogin = Application.now();
 		user.linkedAccounts = ImmutableList.of(LinkedAccount.create(authUser));
