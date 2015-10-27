@@ -61,7 +61,7 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 	public String email;
 
 	// TODO: what's the workflow?
-	public Boolean emailPublic;
+	public boolean emailPublic;
 
 	public String nick;
 
