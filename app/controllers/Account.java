@@ -51,8 +51,7 @@ public class Account extends Controller {
 
 		public String validate() {
 			if (password == null || !password.equals(repeatPassword)) {
-				return Messages
-						.get("playauthenticate.change_password.error.passwords_not_same");
+				return Messages.get("playauthenticate.change_password.error.passwords_not_same");
 			}
 			return null;
 		}
@@ -65,17 +64,17 @@ public class Account extends Controller {
 		@Email
 		@Required
 		public String email;
-		
+
 		@Required
 		public String name;
-		
+
 		public ProfileChange() {
 			// no op
 		}
 
-		public ProfileChange(String email, String name) {
-			this.email = email;
-			this.name = name;
+		public ProfileChange(User user) {
+			this.email = user.email;
+			this.name = user.name;
 		}
 
 	}
@@ -98,36 +97,15 @@ public class Account extends Controller {
 					Messages.get("playauthenticate.verify_email.error.already_validated"));
 		} else if (StringUtils.isNotBlank(user.email)) {
 			flash(Application.FLASH_MESSAGE_KEY, Messages.get(
-					"playauthenticate.verify_email.message.instructions_sent",
-					user.email));
-			MyUsernamePasswordAuthProvider.getProvider()
-					.sendVerifyEmailMailingAfterSignup(user, ctx());
+					"playauthenticate.verify_email.message.instructions_sent", user.email));
+			MyUsernamePasswordAuthProvider.getProvider().sendVerifyEmailMailingAfterSignup(user,
+					ctx());
 		} else {
-			flash(Application.FLASH_MESSAGE_KEY, Messages.get(
-					"playauthenticate.verify_email.error.set_email_first",
-					user.email));
+			flash(Application.FLASH_MESSAGE_KEY,
+					Messages.get("playauthenticate.verify_email.error.set_email_first", user.email));
 		}
 		return redirect(routes.Account.profile());
 	}
-
-	// @Restrict(@Group(Role.USER))
-	// public Result doChangePassword() {
-	// com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-	// Form<Account.PasswordChange> filledForm = PASSWORD_CHANGE_FORM
-	// .bindFromRequest();
-	// if (filledForm.hasErrors()) {
-	// // User did not select whether to link or not link
-	// return badRequest(views.user.password_change.render(filledForm));
-	// } else {
-	// User user = Application.getLocalUser(session());
-	// String newPassword = filledForm.get().password;
-	// user.changePassword(new MyUsernamePasswordAuthUser(newPassword),
-	// true);
-	// flash(Application.FLASH_MESSAGE_KEY,
-	// Messages.get("playauthenticate.change_password.success"));
-	// return redirect(routes.Account.profile());
-	// }
-	// }
 
 	@SubjectPresent
 	public Result askLink() {
@@ -211,8 +189,7 @@ public class Account extends Controller {
 	@SubjectPresent
 	public Result profile() {
 		User user = ContextAugmenterAction.getLoggedUser();
-		Form<ProfileChange> filledForm = PROFILE_CHANGE_FORM
-				.fill(new ProfileChange(user.email, user.name));
+		Form<ProfileChange> filledForm = PROFILE_CHANGE_FORM.fill(new ProfileChange(user));
 		return ok(views.html.account.profile.render(filledForm));
 	}
 
@@ -248,8 +225,7 @@ public class Account extends Controller {
 		if (user == null) {
 			return badRequest();
 		}
-		return ok(views.html.account.password_change.render(
-				PASSWORD_CHANGE_FORM, null));
+		return ok(views.html.account.password_change.render(PASSWORD_CHANGE_FORM, null));
 	}
 
 	public Result changePersonalPassword() {
@@ -264,12 +240,10 @@ public class Account extends Controller {
 	public Result doChangePersonalPassword() {
 		Application.noCache(response());
 		User user = ContextAugmenterAction.getLoggedUser();
-		Form<PasswordChange> filledForm = PASSWORD_CHANGE_FORM
-				.bindFromRequest();
+		Form<PasswordChange> filledForm = PASSWORD_CHANGE_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			// User did not select whether to link or not link
-			return badRequest(views.html.account.password_change.render(
-					filledForm, null));
+			return badRequest(views.html.account.password_change.render(filledForm, null));
 		}
 		String newPassword = filledForm.get().password;
 		user.changePassword(newPassword, true);
