@@ -91,7 +91,7 @@ public class Account extends Controller {
 	@Restrict(@Group(RoleName.USER))
 	public Result verifyEmail() {
 		Application.noCache(response());
-		final User user = ContextAugmenterAction.getLoggedUser();
+		User user = ContextAugmenterAction.getLoggedUser();
 		if (user.emailValidated) {
 			// E-Mail has been validated already
 			flash(Application.FLASH_MESSAGE_KEY,
@@ -113,14 +113,14 @@ public class Account extends Controller {
 	// @Restrict(@Group(Role.USER))
 	// public Result doChangePassword() {
 	// com.feth.play.module.pa.controllers.Authenticate.noCache(response());
-	// final Form<Account.PasswordChange> filledForm = PASSWORD_CHANGE_FORM
+	// Form<Account.PasswordChange> filledForm = PASSWORD_CHANGE_FORM
 	// .bindFromRequest();
 	// if (filledForm.hasErrors()) {
 	// // User did not select whether to link or not link
 	// return badRequest(views.user.password_change.render(filledForm));
 	// } else {
-	// final User user = Application.getLocalUser(session());
-	// final String newPassword = filledForm.get().password;
+	// User user = Application.getLocalUser(session());
+	// String newPassword = filledForm.get().password;
 	// user.changePassword(new MyUsernamePasswordAuthUser(newPassword),
 	// true);
 	// flash(Application.FLASH_MESSAGE_KEY,
@@ -132,9 +132,9 @@ public class Account extends Controller {
 	@SubjectPresent
 	public Result askLink() {
 		Application.noCache(response());
-		final AuthUser u = PlayAuthenticate.getLinkUser(session());
+		AuthUser u = PlayAuthenticate.getLinkUser(session());
 		if (u == null) {
-			// account to link could not be found, silently redirect to login
+			// account to link could not be found, silently redirect to index
 			return redirect(routes.HomePageController.index());
 		}
 		return ok(ask_link.render(ACCEPT_FORM, u));
@@ -143,37 +143,36 @@ public class Account extends Controller {
 	@SubjectPresent
 	public Result doLink() {
 		Application.noCache(response());
-		final AuthUser u = PlayAuthenticate.getLinkUser(session());
+		AuthUser u = PlayAuthenticate.getLinkUser(session());
 		if (u == null) {
-			// account to link could not be found, silently redirect to login
+			// account to link could not be found, silently redirect to index
 			return redirect(routes.HomePageController.index());
 		}
 
-		final Form<Accept> filledForm = ACCEPT_FORM.bindFromRequest();
+		Form<Accept> filledForm = ACCEPT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			// User did not select whether to link or not link
 			return badRequest(ask_link.render(filledForm, u));
-		} else {
-			// User made a choice :)
-			final boolean link = filledForm.get().accept;
-			if (link) {
-				flash(Application.FLASH_MESSAGE_KEY,
-						Messages.get("playauthenticate.accounts.link.success"));
-			}
-			return PlayAuthenticate.link(ctx(), link);
 		}
+		// User made a choice :)
+		boolean link = filledForm.get().accept;
+		if (link) {
+			flash(Application.FLASH_MESSAGE_KEY,
+					Messages.get("playauthenticate.accounts.link.success"));
+		}
+		return PlayAuthenticate.link(ctx(), link);
 	}
 
 	@SubjectPresent
 	public Result askMerge() {
 		Application.noCache(response());
 		// this is the currently logged in user
-		final AuthUser aUser = PlayAuthenticate.getUser(session());
+		AuthUser aUser = PlayAuthenticate.getUser(session());
 
 		// this is the user that was selected for a login
-		final AuthUser bUser = PlayAuthenticate.getMergeUser(session());
+		AuthUser bUser = PlayAuthenticate.getMergeUser(session());
 		if (bUser == null) {
-			// user to merge with could not be found, silently redirect to login
+			// user to merge with could not be found, silently redirect to index
 			return redirect(routes.HomePageController.index());
 		}
 
@@ -186,28 +185,27 @@ public class Account extends Controller {
 	public Result doMerge() {
 		Application.noCache(response());
 		// this is the currently logged in user
-		final AuthUser aUser = PlayAuthenticate.getUser(session());
+		AuthUser aUser = PlayAuthenticate.getUser(session());
 
 		// this is the user that was selected for a login
-		final AuthUser bUser = PlayAuthenticate.getMergeUser(session());
+		AuthUser bUser = PlayAuthenticate.getMergeUser(session());
 		if (bUser == null) {
-			// user to merge with could not be found, silently redirect to login
+			// user to merge with could not be found, silently redirect to index
 			return redirect(routes.HomePageController.index());
 		}
 
-		final Form<Accept> filledForm = ACCEPT_FORM.bindFromRequest();
+		Form<Accept> filledForm = ACCEPT_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			// User did not select whether to merge or not merge
 			return badRequest(ask_merge.render(filledForm, aUser, bUser));
-		} else {
-			// User made a choice :)
-			final boolean merge = filledForm.get().accept;
-			if (merge) {
-				flash(Application.FLASH_MESSAGE_KEY,
-						Messages.get("playauthenticate.accounts.merge.success"));
-			}
-			return PlayAuthenticate.merge(ctx(), merge);
 		}
+		// User made a choice :)
+		boolean merge = filledForm.get().accept;
+		if (merge) {
+			flash(Application.FLASH_MESSAGE_KEY,
+					Messages.get("playauthenticate.accounts.merge.success"));
+		}
+		return PlayAuthenticate.merge(ctx(), merge);
 	}
 
 	@SubjectPresent
@@ -265,15 +263,15 @@ public class Account extends Controller {
 
 	public Result doChangePersonalPassword() {
 		Application.noCache(response());
-		final User user = ContextAugmenterAction.getLoggedUser();
-		final Form<PasswordChange> filledForm = PASSWORD_CHANGE_FORM
+		User user = ContextAugmenterAction.getLoggedUser();
+		Form<PasswordChange> filledForm = PASSWORD_CHANGE_FORM
 				.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			// User did not select whether to link or not link
 			return badRequest(views.html.account.password_change.render(
 					filledForm, null));
 		}
-		final String newPassword = filledForm.get().password;
+		String newPassword = filledForm.get().password;
 		user.changePassword(newPassword, true);
 		flash(Application.FLASH_MESSAGE_KEY,
 				Messages.get("playauthenticate.change_password.success"));
