@@ -5,7 +5,6 @@ import java.util.List;
 import models.blog.BlogPost;
 import models.file.UploadedFile;
 import models.standardPage.HomePage;
-import models.standardPage.StandardPage;
 import models.user.RoleName;
 import play.data.Form;
 import play.data.validation.Constraints.Min;
@@ -15,7 +14,6 @@ import play.mvc.Result;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 
-import com.avaje.ebean.Ebean;
 import com.avaje.ebean.annotation.Transactional;
 
 import controllers.helpers.ContextAugmenter;
