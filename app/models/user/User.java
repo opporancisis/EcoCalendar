@@ -207,7 +207,7 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 
 		// deactivate the merged user that got added to this one
 		otherUser.blocked = true;
-		Ebean.save(Arrays.asList(new User[] { otherUser, this }));
+		Ebean.saveAll(ImmutableList.of(otherUser, this));
 	}
 
 	@Transactional
