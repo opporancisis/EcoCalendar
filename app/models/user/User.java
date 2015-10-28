@@ -44,7 +44,7 @@ import com.google.common.collect.ImmutableList;
 import controllers.Application;
 
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "EMAIL" }))
+//@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "EMAIL" }))
 public class User extends Model implements Subject, IdPathBindable<User> {
 
 	@Id

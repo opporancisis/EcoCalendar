@@ -260,7 +260,6 @@ create table user (
   last_login                    timestamp,
   blocked                       boolean,
   email_validated               boolean,
-  constraint uq_user_email unique (email),
   constraint pk_user primary key (id)
 );
 create sequence user_seq;
