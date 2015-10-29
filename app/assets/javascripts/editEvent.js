@@ -1,10 +1,9 @@
 
 $(document).ready(function() {
 
-	var myMap, pageModel;
+	var myMap;
 
-	pageModel = new PageModel();
-	ko.applyBindings(pageModel);
+	ko.applyBindings(new PageModel());
 
 	$("form.form-horizontal").bootstrapValidator(app.settings.bootstrapValidator);
 
@@ -78,7 +77,7 @@ $(document).ready(function() {
 //        	realInit(55.76, 37.64);
 //	    }
 			
-			var cityGeoData = self.countryCity.countriesById[pageModel.countryCity.selectedCountry()][pageModel.countryCity.selectedCity()];
+			var cityGeoData = self.countryCity.countriesById[self.countryCity.selectedCountry()][self.countryCity.selectedCity()];
 			realInit(cityGeoData.la, cityGeoData.lo, cityGeoData.z);
 			function realInit(latitude, longitude, zoom) {
 				myMap = new ymaps.Map("map", {
@@ -137,8 +136,8 @@ $(document).ready(function() {
 						});
 						myMap.geoObjects.add(point);
 					}
-//    		    pageModel.latitude(coords[0]);
-//    		    pageModel.longitude(coords[1])
+//    		    self.latitude(coords[0]);
+//    		    self.longitude(coords[1])
 				});
 			}
 			
@@ -171,7 +170,7 @@ $(document).ready(function() {
 										latitude: latitude,
 										longitude: longitude
 								};
-								pageModel.points.push(pointData);
+								self.points.push(pointData);
 							}
 						}
 					}
