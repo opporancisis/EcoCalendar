@@ -136,7 +136,6 @@ create table home_page_uploaded_file (
 
 create table karma_change (
   id                            bigint not null,
-  user_id                       bigint not null,
   change_type                   integer,
   custom_reason                 varchar(255),
   value                         bigint,
@@ -252,7 +251,6 @@ create table user (
   name                          varchar(255),
   phone                         varchar(255),
   profile_link                  varchar(255),
-  karma                         bigint,
   city_id                       bigint,
   country_for_unknown_city_id   bigint,
   unknown_city                  varchar(255),
@@ -321,9 +319,6 @@ create index ix_home_page_uploaded_file_home_page on home_page_uploaded_file (ho
 
 alter table home_page_uploaded_file add constraint fk_home_page_uploaded_file_uploaded_file foreign key (uploaded_file_id) references uploaded_file (id) on delete restrict on update restrict;
 create index ix_home_page_uploaded_file_uploaded_file on home_page_uploaded_file (uploaded_file_id);
-
-alter table karma_change add constraint fk_karma_change_user_id foreign key (user_id) references user (id) on delete restrict on update restrict;
-create index ix_karma_change_user_id on karma_change (user_id);
 
 alter table linked_account add constraint fk_linked_account_user_id foreign key (user_id) references user (id) on delete restrict on update restrict;
 create index ix_linked_account_user_id on linked_account (user_id);
@@ -411,9 +406,6 @@ drop index if exists ix_home_page_uploaded_file_home_page;
 
 alter table home_page_uploaded_file drop constraint if exists fk_home_page_uploaded_file_uploaded_file;
 drop index if exists ix_home_page_uploaded_file_uploaded_file;
-
-alter table karma_change drop constraint if exists fk_karma_change_user_id;
-drop index if exists ix_karma_change_user_id;
 
 alter table linked_account drop constraint if exists fk_linked_account_user_id;
 drop index if exists ix_linked_account_user_id;

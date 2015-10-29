@@ -76,10 +76,10 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 	 * мероприятие) и хочет, чтобы создатель быстрее набрал пороговую карму
 	 * (50), то он увеличивает ее на большое значение. Иначе - на меньшее.
 	 */
-	public Long karma;
+	// public Long karma;
 
-	@OneToMany(cascade = CascadeType.ALL)
-	public List<KarmaChange> karmaHistory;
+	// @OneToMany(cascade = CascadeType.ALL)
+	// public List<KarmaChange> karmaHistory;
 
 	// TODO: let user specify his city in profile settings
 	@ManyToOne
@@ -333,6 +333,6 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 	}
 
 	public boolean hasEnoughPowerToPublishEvents() {
-		return isAdmin() || (karma != null && karma >= 50);
+		return isAdmin();// || (karma != null && karma >= 50);
 	}
 }
