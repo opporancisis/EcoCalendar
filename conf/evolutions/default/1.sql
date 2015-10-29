@@ -253,7 +253,6 @@ create table user (
   profile_link                  varchar(255),
   city_id                       bigint,
   country_for_unknown_city_id   bigint,
-  unknown_city                  varchar(255),
   last_login                    timestamp,
   blocked                       boolean,
   email_validated               boolean,

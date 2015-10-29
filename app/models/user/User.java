@@ -97,7 +97,7 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 	 * на основе unknownCity (если он правильно заполнил это поле). И также
 	 * приходит нотификация об изменении.
 	 */
-	public String unknownCity;
+	// public String unknownCity;
 
 	public LocalDateTime lastLogin;
 
