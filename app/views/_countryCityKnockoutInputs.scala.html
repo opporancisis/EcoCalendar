@@ -25,9 +25,9 @@
 				}
 			});
 		}
-		self.selectedCountry = ko.observable(@if(editForm("country").value != null) { = "@editForm("country").value"});
+		self.selectedCountry = ko.observable(@if(editForm("country").value != null) {"@editForm("country").value"});
 		self.availableCities = ko.observableArray([]);
-		self.selectedCity = ko.observable(@if(editForm("city").value != null) { = "@editForm("city").value"});
+		self.selectedCity = ko.observable(@if(editForm("city").value != null) {"@editForm("city").value"});
 	}
 </script>
 
