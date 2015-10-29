@@ -10,6 +10,7 @@ object Dependencies {
     javaWs,
     cache,
     evolutions,
+    "org.webjars" %% "webjars-play" % "2.4.0-2",
     "org.webjars" % "bootstrap-datepicker" % "1.4.0",
     "org.apache.commons" % "commons-exec" % "1.3",
     "org.julienrf" %% "play-jsmessages" % "2.0.0",

@@ -8,12 +8,9 @@
 
 @implicitScripts = {
 	@_css("stylesheets/bootstrapValidator.css")
-	@_css("lib/bootstrap-datepicker/css/datepicker3.css")
 	@_js("lib/knockout/knockout.js")
 	@_js("javascripts/users.js")
 	@_js("javascripts/bootstrapValidator.js")
-	@_js("lib/bootstrap-datepicker/js/bootstrap-datepicker.js")
-	@_js("lib/bootstrap-datepicker/js/locales/bootstrap-datepicker.ru.js")
 	<script>
 		$(document).ready(function() {
 			$("form.form-horizontal").bootstrapValidator($.extend({}, app.settings.bootstrapValidator, {
