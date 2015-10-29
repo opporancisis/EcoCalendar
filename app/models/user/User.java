@@ -99,8 +99,6 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 	 */
 	public String unknownCity;
 
-	public String note;
-
 	public LocalDateTime lastLogin;
 
 	public boolean blocked;

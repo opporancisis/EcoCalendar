@@ -98,14 +98,6 @@
 		'help -> "label.profile.tip"
 	)
 
-	@textarea(
-		field = editForm("note"),
-		args = 'rows -> 3, 'cols -> 50,
-		'_label -> "label.note",
-		'help -> "label.user.note.tip",
-		'dataBind -> "visible: hasRoles('user')"
-	)
-
 	@_submit(if(editUser != null) "label.save" else "label.add")
 
 }

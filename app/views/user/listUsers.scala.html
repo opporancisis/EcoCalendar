@@ -30,7 +30,6 @@
 			<th>@Messages("label.email")</th>
 			<th class="filter-select filter-exact" data-placeholder="@Messages("label.user.status.blocked.no.matter")">@Messages("label.status.blocked")</th>
 			<th class="filter-select filter-exact" data-placeholder="@Messages("label.user.all.roles")">@Messages("label.roles")</th>
-			<th>@Messages("label.note")</th>
 			<th class="sorter-false filter-false unselectable">@Messages("label.action")</th>
 		</thead>
 		<tbody>
@@ -40,7 +39,6 @@
 					<td>@user.email</td>
 					<td>@Messages(if(user.blocked) "label.yes" else "label.no")</td>
 					<td>@user.roles.map{ role => @Messages("label.roles." + role)}.mkString(",")</td>
-					<td>@user.note</td>
 					<td>
 						<a class="btn btn-default btn-xs" href='@{routes.UserController.edit(user)}' title="@Messages("label.do.edit")">
 							<span class="glyphicon glyphicon-pencil"></span>

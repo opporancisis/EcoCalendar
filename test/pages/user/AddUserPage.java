@@ -28,11 +28,9 @@ public class AddUserPage extends AbstractPage {
 	public void addUser(String email) {
 		fill("#email").with(email);
 		select("#roles", "пользователь");
-		await().until("#note").areDisplayed();
 		fill("#name").with(faker.firstName());
 
 
-		fill("#note").with(faker.sentence());
 		findFirst("input[type='submit']").click();
 		assertNoErrorsInForm();
 	}

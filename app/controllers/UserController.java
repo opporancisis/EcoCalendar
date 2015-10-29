@@ -156,8 +156,6 @@ public class UserController extends Controller {
 		@URL
 		public String profileLink;
 
-		public String note;
-
 		public UserProperties() {
 			// no-op
 		}
@@ -170,7 +168,6 @@ public class UserController extends Controller {
 			this.name = user.name;
 			this.phone = user.phone;
 			this.profileLink = user.profileLink;
-			this.note = user.note;
 		}
 
 		private void setFields(User user) {
@@ -181,7 +178,6 @@ public class UserController extends Controller {
 			user.name = this.name;
 			user.phone = this.phone;
 			user.profileLink = this.profileLink;
-			user.note = this.note;
 		}
 
 		public void updateUser(User user) {
