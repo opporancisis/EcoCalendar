@@ -247,7 +247,6 @@ create sequence uploaded_file_seq;
 create table user (
   id                            bigint not null,
   email                         varchar(255),
-  email_public                  boolean,
   name                          varchar(255),
   phone                         varchar(255),
   profile_link                  varchar(255),

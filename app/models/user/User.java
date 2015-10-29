@@ -50,9 +50,6 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 	// @Column(unique = true)
 	public String email;
 
-	// TODO: what's the workflow?
-	public boolean emailPublic;
-
 	public String name;
 
 	public String phone;
