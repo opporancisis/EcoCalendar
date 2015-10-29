@@ -19,7 +19,7 @@ object Dependencies {
     "org.webjars" % "bootstrap-timepicker" % "0.2.3-1",
     "org.webjars" % "tablesorter" % "2.15.5",
     "org.webjars" % "momentjs" % "2.10.2",
-    "org.webjars" % "knockout" % "3.1.0",
+    "org.webjars" % "knockout" % "3.3.0",
     "org.webjars" % "select2" % "3.4.6",
     "org.webjars" % "underscorejs" % "1.6.0-3",
     "com.github.javafaker" % "javafaker" % "0.3" exclude("org.slf4j", "slf4j-simple"),
