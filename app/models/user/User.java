@@ -12,15 +12,11 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 import models.geo.City;
-import models.karma.KarmaChange;
 import models.message.Message;
 import models.sys.Setting;
 import models.sys.SettingName;
-
 import play.db.ebean.Transactional;
 import providers.MyResetPasswordAuthUser;
 import utils.IdPathBindable;
@@ -43,7 +39,7 @@ import com.google.common.collect.ImmutableList;
 import controllers.Application;
 
 @Entity
-//@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "EMAIL" }))
+// @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "EMAIL" }))
 public class User extends Model implements Subject, IdPathBindable<User> {
 
 	@Id
