@@ -9,33 +9,17 @@ $(document).ready(function() {
 	$("form.form-horizontal").bootstrapValidator(app.settings.bootstrapValidator);
 
 	function PageModel() {
-		for (var i = 0; i < countriesMap.length; i++) {
-			countriesMap[i].cities.sort(function(a, b) {
-				if (a.weight != null && b.weight != null) {
-					return b.weight - a.weight;
-				} else if (a.weight != null) {
-					return -1;
-				} else if (b.weight != null) {
-					return 1;
-				} else {
-					return a.name > b.name ? 1 : (a.name < b.name ? -1 : 0);
-				}
-			});
-		}
 		var self = this;
-		self.availableCountries = ko.observableArray(countriesMap);
-		self.selectedCountry = ko.observable(initialCountry);
-		self.availableCities = ko.observableArray([]);
-		self.selectedCity = ko.observable(initialCity);
-		self.selectedCountry.subscribe(function(id) {
+		self.countryCity = new CountryCityModel();
+		self.countryCity.selectedCountry.subscribe(function(id) {
 			var start = new Date().getTime();
 			if (typeof id != 'undefined') {
-				for (var i = 0; i < countriesMap.length; i++) {
-					var country = countriesMap[i];
+				for (var i = 0; i < self.countryCity.availableCountries.length; i++) {
+					var country = self.countryCity.availableCountries[i];
 					if (country.id === id) {
-						self.availableCities.removeAll();
+						self.countryCity.availableCities.removeAll();
 						country.cities.forEach(function(item) {
-							self.availableCities.push(item);
+							self.countryCity.availableCities.push(item);
 						});
 						if (myMap) {
 							myMap.setCenter([country.centerLatitude, country.centerLongitude],
@@ -49,13 +33,13 @@ $(document).ready(function() {
 			}
 			console.log("selectedCountry.subscribe: " + (new Date().getTime() - start));
 		});
-		self.selectedCity.subscribe(function(id) {
+		self.countryCity.selectedCity.subscribe(function(id) {
 			var start = new Date().getTime();
 			if (!myMap) {
 				return;
 			}
 			if (typeof id != 'undefined') {
-				var country = countriesMap[self.selectedCountry() - 1];
+				var country = self.countryCity.availableCountries[self.countryCity.selectedCountry() - 1];
 				for (var i = 0; i < country.cities.length; i++) {
 					var city = country.cities[i];
 					if (city.id === id) {
@@ -77,7 +61,7 @@ $(document).ready(function() {
 				if (typeof ymaps == 'undefined') {
 					bootbox.alert(Messages("error.yandex.maps"));
 				} else {
-					ymaps.ready(initMap);
+					ymaps.ready(self.initMap);
 				}
 			} else {
 				myMap.destroy();
@@ -85,9 +69,7 @@ $(document).ready(function() {
 			console.log("extendedGeoSettings.subscribe: " + (new Date().getTime() - start));
 		});
 		self.points = ko.observableArray(geoPoints);
-	}
-
-	function initMap() {
+		self.initMap = function() {
 //		if (navigator.geolocation) {
 //	        navigator.geolocation.getCurrentPosition(function(position) {
 //	        	realInit(position.coords.latitude, position.coords.longitude);
@@ -95,152 +77,154 @@ $(document).ready(function() {
 //	    } else {
 //        	realInit(55.76, 37.64);
 //	    }
-
-		var cityGeoData = countriesById[pageModel.selectedCountry()][pageModel.selectedCity()];
-		realInit(cityGeoData.la, cityGeoData.lo, cityGeoData.z);
-		function realInit(latitude, longitude, zoom) {
-    	    myMap = new ymaps.Map("map", {
-    	        center: [latitude, longitude],
-    	        zoom: zoom
-    	    });
-    	    
-    	    if (geoPoints.length == 1) {
-    	    	myMap.setCenter([geoPoints[0], getPoints[1]], zoom);
-    	    } else if (geoPoints.length > 1) {
-	    	    var maxLo = -180, minLo = 180, maxLa = -90, minLa = 90;
-	    	    for (var i = 0; i < geoPoints.length; i++) {
-	    	    	var obj = geoPoints[i];
-	    	    	var point = new ymaps.Placemark([obj.latitude, obj.longitude], {}, {
-	    	            draggable: true
-		            });
-	    		    myMap.geoObjects.add(point);
-	    		    if (maxLa < obj.latitude) {
-	    		    	maxLa = obj.latitude;
-	    		    }
-	    		    if (minLa > obj.latitude) {
-	    		    	minLa = obj.latitude;
-	    		    }
-	    		    if (maxLo < obj.longitude) {
-	    		    	maxLo = obj.longitude;
-	    		    }
-	    		    if (minLo > obj.longitude) {
-	    		    	minLo = obj.longitude;
-	    		    }
-	    	    }
-	    	    myMap.setBounds([maxLa, minLo], [minLa, maxLo], {
-	    	    	checkZoomRange: true,
-	    	    	callback: function(err) {
-	    	    		if (err) {
-	    	    			console.log(err);
-							// Не удалось показать заданный регион
-							// ...
-	    	    		}
-	    	    	}
+			
+			var cityGeoData = self.countryCity.countriesById[pageModel.countryCity.selectedCountry()][pageModel.countryCity.selectedCity()];
+			realInit(cityGeoData.la, cityGeoData.lo, cityGeoData.z);
+			function realInit(latitude, longitude, zoom) {
+				myMap = new ymaps.Map("map", {
+					center: [latitude, longitude],
+					zoom: zoom
 				});
-    	    }
-    		myMap.events.add(['click'], function (e) {
-    		    // Получение координат щелчка
-    		    var coords = e.get('coords');
-    		    console.log('coords: ' + coords.join(', '));
-    		    if (e.get('type') == 'click') {
+				
+				if (geoPoints.length == 1) {
+					myMap.setCenter([geoPoints[0], getPoints[1]], zoom);
+				} else if (geoPoints.length > 1) {
+					var maxLo = -180, minLo = 180, maxLa = -90, minLa = 90;
+					for (var i = 0; i < geoPoints.length; i++) {
+						var obj = geoPoints[i];
+						var point = new ymaps.Placemark([obj.latitude, obj.longitude], {}, {
+							draggable: true
+						});
+						myMap.geoObjects.add(point);
+						if (maxLa < obj.latitude) {
+							maxLa = obj.latitude;
+						}
+						if (minLa > obj.latitude) {
+							minLa = obj.latitude;
+						}
+						if (maxLo < obj.longitude) {
+							maxLo = obj.longitude;
+						}
+						if (minLo > obj.longitude) {
+							minLo = obj.longitude;
+						}
+					}
+					myMap.setBounds([maxLa, minLo], [minLa, maxLo], {
+						checkZoomRange: true,
+						callback: function(err) {
+							if (err) {
+								console.log(err);
+								// Не удалось показать заданный регион
+								// ...
+							}
+						}
+					});
+				}
+				myMap.events.add(['click'], function (e) {
+					// Получение координат щелчка
+					var coords = e.get('coords');
+					console.log('coords: ' + coords.join(', '));
+					if (e.get('type') == 'click') {
 //	    		    if (point) {
 //	    		    	myMap.geoObjects.remove(point);
 //	    		    }
-    		    	newPointDialog(coords[0], coords[1]);
-	    		    var point = new ymaps.Placemark(coords, {}, {
-	    		    	draggable: true
-		            });
-	    		    point.events.add("click", function(event) {
-	    		    	console.log(event);
-	    		    });
-	    		    myMap.geoObjects.add(point);
-    		    }
+						newPointDialog(coords[0], coords[1]);
+						var point = new ymaps.Placemark(coords, {}, {
+							draggable: true
+						});
+						point.events.add("click", function(event) {
+							console.log(event);
+						});
+						myMap.geoObjects.add(point);
+					}
 //    		    pageModel.latitude(coords[0]);
 //    		    pageModel.longitude(coords[1])
-    		});
-		}
-		
-		function newPointDialog(latitude, longitude) {
-			var box = bootbox.dialog({
-				title: Messages("label.event.new.map.point.adding"),
-				message: '<div class="row">  ' +
-		            '<div class="col-md-12"> ' +
-		            '<form class="form-horizontal" onsubmit="return false;"> ' +
-		            '<div class="form-group"> ' +
-		            '<label class="col-md-2 control-label" for="pointComment">' +
-		            Messages('label.comment') + '</label> ' +
-		            '<div class="col-md-10"> ' +
-		            '<input id="pointComment" name="pointComment" type="text" placeholder="' +
-		            Messages('label.comment') + '" class="form-control input-md"> ' +
-		            '<span class="help-block">' + Messages("label.event.map.point.comment.tip") +
-		            '</span> </div> </div> </form> </div>  </div>',
-				buttons: {
-					cancel: {
-						label: Messages("label.do.cancel")
-					},
-					success: {
-						className: "btn-success",
-						label: Messages("label.do.add"),
-						callback: function() {
-							var comment = $('#pointComment').val();
-							if (comment === "") return false;
-							var pointData = {
-									comment: comment,
-									latitude: latitude,
-									longitude: longitude
-							};
-							pageModel.points.push(pointData);
+				});
+			}
+			
+			function newPointDialog(latitude, longitude) {
+				var box = bootbox.dialog({
+					title: Messages("label.event.new.map.point.adding"),
+					message: '<div class="row">  ' +
+					'<div class="col-md-12"> ' +
+					'<form class="form-horizontal" onsubmit="return false;"> ' +
+					'<div class="form-group"> ' +
+					'<label class="col-md-2 control-label" for="pointComment">' +
+					Messages('label.comment') + '</label> ' +
+					'<div class="col-md-10"> ' +
+					'<input id="pointComment" name="pointComment" type="text" placeholder="' +
+					Messages('label.comment') + '" class="form-control input-md"> ' +
+					'<span class="help-block">' + Messages("label.event.map.point.comment.tip") +
+					'</span> </div> </div> </form> </div>  </div>',
+					buttons: {
+						cancel: {
+							label: Messages("label.do.cancel")
+						},
+						success: {
+							className: "btn-success",
+							label: Messages("label.do.add"),
+							callback: function() {
+								var comment = $('#pointComment').val();
+								if (comment === "") return false;
+								var pointData = {
+										comment: comment,
+										latitude: latitude,
+										longitude: longitude
+								};
+								pageModel.points.push(pointData);
+							}
 						}
 					}
-				}
-			});
-			box.bind('shown.bs.modal', function(){
-			    box.find("input").focus();
-			});
-		}
-		
-		function changePointDialog(title) {
-			var box = bootbox.dialog({
-				title: Messages("label.event.map.point.changing"),
-				message: '<div class="row">  ' +
-	            '<div class="col-md-12"> ' +
-	            '<form class="form-horizontal"> ' +
-	            '<div class="form-group"> ' +
-	            '<label class="col-md-2 control-label" for="pointComment">' +
-	            Messages('label.comment') + '</label> ' +
-	            '<div class="col-md-10"> ' +
-	            '<input id="pointComment" name="pointComment" type="text" value="' + title +
-	            '" placeholder="' +
-	            Messages('label.comment') + '" class="form-control input-md"> ' +
-	            '<span class="help-block">' + Messages("label.event.map.point.comment.tip") +
-	            '</span> </div> ' +
-	            '</div> </form> </div>  </div>',
-				buttons: {
-					cancel: {
-						label: Messages("label.do.cancel")
-					},
-					remove: {
-						className: "btn-danger",
-						label: Messages("label.do.remove"),
-						callback: function() {
-							console.err('here must go remove action!');
-						}
-					},
-					success: {
-						className: "btn-success",
-						label: Messages("label.do.apply"),
-						callback: function() {
-							var comment = $('#pointComment').val();
-							if (comment === "") return false;
-							console.err('here must go change comment action');
+				});
+				box.bind('shown.bs.modal', function(){
+					box.find("input").focus();
+				});
+			}
+			
+			function changePointDialog(title) {
+				var box = bootbox.dialog({
+					title: Messages("label.event.map.point.changing"),
+					message: '<div class="row">  ' +
+					'<div class="col-md-12"> ' +
+					'<form class="form-horizontal"> ' +
+					'<div class="form-group"> ' +
+					'<label class="col-md-2 control-label" for="pointComment">' +
+					Messages('label.comment') + '</label> ' +
+					'<div class="col-md-10"> ' +
+					'<input id="pointComment" name="pointComment" type="text" value="' + title +
+					'" placeholder="' +
+					Messages('label.comment') + '" class="form-control input-md"> ' +
+					'<span class="help-block">' + Messages("label.event.map.point.comment.tip") +
+					'</span> </div> ' +
+					'</div> </form> </div>  </div>',
+					buttons: {
+						cancel: {
+							label: Messages("label.do.cancel")
+						},
+						remove: {
+							className: "btn-danger",
+							label: Messages("label.do.remove"),
+							callback: function() {
+								console.err('here must go remove action!');
+							}
+						},
+						success: {
+							className: "btn-success",
+							label: Messages("label.do.apply"),
+							callback: function() {
+								var comment = $('#pointComment').val();
+								if (comment === "") return false;
+								console.err('here must go change comment action');
+							}
 						}
 					}
-				}
-			});
-			box.bind('shown.bs.modal', function(){
-			    box.find("input").focus();
-			});
+				});
+				box.bind('shown.bs.modal', function(){
+					box.find("input").focus();
+				});
+			}
 		}
 	}
+
 
 });
