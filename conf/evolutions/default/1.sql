@@ -252,7 +252,6 @@ create table user (
   phone                         varchar(255),
   profile_link                  varchar(255),
   city_id                       bigint,
-  country_for_unknown_city_id   bigint,
   last_login                    timestamp,
   blocked                       boolean,
   email_validated               boolean,
@@ -348,9 +347,6 @@ create index ix_token_action_target_user_id on token_action (target_user_id);
 alter table user add constraint fk_user_city_id foreign key (city_id) references city (id) on delete restrict on update restrict;
 create index ix_user_city_id on user (city_id);
 
-alter table user add constraint fk_user_country_for_unknown_city_id foreign key (country_for_unknown_city_id) references country (id) on delete restrict on update restrict;
-create index ix_user_country_for_unknown_city_id on user (country_for_unknown_city_id);
-
 alter table user_security_role add constraint fk_user_security_role_user foreign key (user_id) references user (id) on delete restrict on update restrict;
 create index ix_user_security_role_user on user_security_role (user_id);
 
@@ -434,9 +430,6 @@ drop index if exists ix_token_action_target_user_id;
 
 alter table user drop constraint if exists fk_user_city_id;
 drop index if exists ix_user_city_id;
-
-alter table user drop constraint if exists fk_user_country_for_unknown_city_id;
-drop index if exists ix_user_country_for_unknown_city_id;
 
 alter table user_security_role drop constraint if exists fk_user_security_role_user;
 drop index if exists ix_user_security_role_user;

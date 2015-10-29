@@ -16,7 +16,6 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import models.geo.City;
-import models.geo.Country;
 import models.karma.KarmaChange;
 import models.message.Message;
 import models.sys.Setting;
@@ -86,8 +85,8 @@ public class User extends Model implements Subject, IdPathBindable<User> {
 	public City city;
 
 	// TODO: let user specify his country in profile settings
-	@ManyToOne
-	public Country countryForUnknownCity;
+	// @ManyToOne
+	// public Country countryForUnknownCity;
 
 	// TODO: let user specify unknown for portal city as his own
 	/**
