@@ -1,11 +1,28 @@
 package controllers;
 
-import org.apache.commons.lang3.StringUtils;
-
+import static play.data.Form.form;
+import models.geo.City;
+import models.geo.Country;
 import models.user.RoleName;
 import models.user.User;
-import be.objectify.deadbolt.java.actions.Restrict;
+
+import org.apache.commons.lang3.StringUtils;
+
+import play.data.Form;
+import play.data.format.Formats.NonEmpty;
+import play.data.validation.Constraints.Email;
+import play.data.validation.Constraints.MinLength;
+import play.data.validation.Constraints.Required;
+import play.i18n.Messages;
+import play.mvc.Controller;
+import play.mvc.Result;
+import providers.MyUsernamePasswordAuthProvider;
+import views.html.account.ask_link;
+import views.html.account.ask_merge;
+import views.html.account.link;
+import views.html.account.unverified;
 import be.objectify.deadbolt.java.actions.Group;
+import be.objectify.deadbolt.java.actions.Restrict;
 import be.objectify.deadbolt.java.actions.SubjectPresent;
 
 import com.feth.play.module.pa.PlayAuthenticate;
@@ -13,19 +30,6 @@ import com.feth.play.module.pa.user.AuthUser;
 
 import controllers.helpers.ContextAugmenter;
 import controllers.helpers.ContextAugmenterAction;
-import play.data.Form;
-import play.data.format.Formats.NonEmpty;
-import play.data.validation.Constraints.Email;
-import play.data.validation.Constraints.MinLength;
-import play.data.validation.Constraints.Pattern;
-import play.data.validation.Constraints.Required;
-import play.i18n.Messages;
-import play.mvc.Controller;
-import play.mvc.Result;
-import providers.MyUsernamePasswordAuthProvider;
-import providers.MyUsernamePasswordAuthUser;
-import views.html.account.*;
-import static play.data.Form.form;
 
 @ContextAugmenter
 public class Account extends Controller {
@@ -68,6 +72,10 @@ public class Account extends Controller {
 		@Required
 		public String name;
 
+		public Country country;
+
+		public City city;
+
 		public ProfileChange() {
 			// no op
 		}
@@ -75,6 +83,10 @@ public class Account extends Controller {
 		public ProfileChange(User user) {
 			this.email = user.email;
 			this.name = user.name;
+			if (user.city != null) {
+				this.country = user.city.country;
+				this.city = user.city;
+			}
 		}
 
 	}
@@ -190,7 +202,7 @@ public class Account extends Controller {
 	public Result profile() {
 		User user = ContextAugmenterAction.getLoggedUser();
 		Form<ProfileChange> filledForm = PROFILE_CHANGE_FORM.fill(new ProfileChange(user));
-		return ok(views.html.account.profile.render(filledForm));
+		return ok(views.html.account.profile.render(filledForm, Country.all()));
 	}
 
 	@SubjectPresent
@@ -198,26 +210,17 @@ public class Account extends Controller {
 		User user = ContextAugmenterAction.getLoggedUser();
 		Form<ProfileChange> filledForm = PROFILE_CHANGE_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
-			return badRequest(views.html.account.profile.render(filledForm));
+			return badRequest(views.html.account.profile.render(filledForm, Country.all()));
 		}
 		ProfileChange pc = filledForm.get();
-		boolean needUpdate = false;
 		if (!pc.email.equals(user.email)) {
 			user.email = pc.email;
 			user.emailValidated = false;
-			needUpdate = true;
 		}
-		if (!pc.name.equals(user.name)) {
-			user.name = pc.name;
-			needUpdate = true;
-		}
-		if (needUpdate) {
-			user.update();
-		}
-		if (ContextAugmenterAction.getLoggedUser() == null) {
-			return redirect(routes.HomePageController.index());
-		}
-		return ok(views.html.account.profile.render(filledForm));
+		user.name = pc.name;
+		user.city = pc.city;
+		user.update();
+		return ok(views.html.account.profile.render(filledForm, Country.all()));
 	}
 
 	public Result changePassword(User user) {

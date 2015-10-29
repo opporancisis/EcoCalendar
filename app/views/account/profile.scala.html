@@ -1,4 +1,6 @@
-@(editForm: play.data.Form[controllers.Account.ProfileChange])
+@(editForm: play.data.Form[controllers.Account.ProfileChange],
+	countries: List[models.geo.Country]
+)
 
 @import helpers.BootstrapHelper._
 @import com.feth.play.module.pa.views.html._
@@ -11,6 +13,36 @@
 	ctx.args.get("user").asInstanceOf[models.user.User]
 }
 
+@implicitScripts = {
+	@_css("stylesheets/bootstrapValidator.css")
+	@_js("javascripts/bootstrapValidator.js")
+	<script>
+	$(document).ready(function() {
+		ko.applyBindings(new PageModel());
+		function PageModel() {
+			var self = this;
+			self.countryCity = new CountryCityModel();
+
+			self.countryCity.selectedCountry.subscribe(function(id) {
+				var start = new Date().getTime();
+				if (typeof id != 'undefined') {
+					for (var i = 0; i < self.countryCity.availableCountries.length; i++) {
+						var country = self.countryCity.availableCountries[i];
+						if (country.id === id) {
+							self.countryCity.availableCities.removeAll();
+							country.cities.forEach(function(item) {
+								self.countryCity.availableCities.push(item);
+							});
+							break;
+						}
+					}
+				}
+				console.log("selectedCountry.subscribe: " + (new Date().getTime() - start));
+			});
+		}
+	});
+	</script>
+}
 @main(
 	"nav.profile",
 	breadcrumbs = LinkedHashMap(
@@ -39,6 +71,8 @@
 		field = editForm("name"),
 		'_label -> "label.name"
 	)
+
+	@_countryCityKnockoutInputs(countries, editForm, false)
 
 	@_submit("label.save")
 

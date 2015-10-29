@@ -4,7 +4,7 @@
 * Generate generic filed constructor for twitter bootsrap *
 **********************************************************@
 
-<div class="form-group@if(elements.hasErrors){ has-error}@if(elements.args.get('required)){ required}"
+<div class="form-group@if(elements.hasErrors){ has-error}@if(elements.args.get('required).getOrElse(false).asInstanceOf[Boolean]){ required}"
 	@if(elements.args.contains('dataBind)) { data-bind="@elements.args.get('dataBind)"}>
     @if(!elements.args.contains('_text)) {
     	<label for="@elements.field.name" class="col-lg-2 control-label">@Html(Messages(elements.label.toString).capitalize)</label>
