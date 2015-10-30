@@ -66,7 +66,7 @@
 	@inputText(
 		field = editForm("email"),
 		'_label -> "label.email",
-		'help -> "label.user.email.tip"
+		'_help -> "label.user.email.tip"
 	)
 
 	@select(
@@ -79,19 +79,19 @@
 	@inputText(
 		field = editForm("name"),
 		'_label -> "label.name",
-		'help -> "label.user.name.and.phone.tip"
+		'_help -> "label.user.name.and.phone.tip"
 	)
 
 	@inputText(
 		field = editForm("phone"),
 		'_label -> "label.phone",
-		'help -> "label.user.name.and.phone.tip"
+		'_help -> "label.user.name.and.phone.tip"
 	)
 
 	@inputText(
 		field = editForm("profileLink"),
 		'_label -> "label.profile",
-		'help -> "label.profile.tip"
+		'_help -> "label.profile.tip"
 	)
 
 	@_submit(if(editUser != null) "label.save" else "label.add")

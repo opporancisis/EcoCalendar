@@ -13,8 +13,8 @@
     }
     <div class="col-lg-10@if(elements.args.contains('_text)) { col-lg-offset-2}">
 		@elements.input
-        @if(elements.args.get('help)){
-            <p class="help-block">@Messages(elements.args.get('help).get.toString).capitalize</p>
+        @if(elements.args.get('_help)){
+            <p class="help-block">@Messages(elements.args.get('_help).get.toString).capitalize</p>
         }
         @if(elements.hasErrors){
             <div class="help-block"><span class="glyphicon glyphicon-exclamation-sign"></span> @elements.errors.mkString(", ")</div>

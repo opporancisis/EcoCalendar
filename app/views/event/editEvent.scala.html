@@ -86,7 +86,7 @@
 			@inputText(
 				field = editForm("additionalInfoLink"),
 				'_label -> "label.link",
-				'help -> "label.event.additional.info.link.tip"
+				'_help -> "label.event.additional.info.link.tip"
 			)
 
 			@checkbox(
@@ -100,7 +100,7 @@
 				field = editForm("parent"),
 				'options -> grandEvents.map(a => a.id.toString -> a.name).toSeq,
 				'_label -> "label.grand.event",
-				'help -> "label.event.parent.tip",
+				'_help -> "label.event.parent.tip",
 				'dataBind -> "visible: moreGeneralSettings()"
 			)
 			*@
@@ -151,14 +151,14 @@
 				field = editForm("useContactInfo"),
 				'_text -> "label.event.useContactInfo",
 				Symbol("data-bind") -> "checked: useContactInfo",
-				'help -> "label.event.useContactInfo.tip"
+				'_help -> "label.event.useContactInfo.tip"
 			)
 		
 			@checkbox(
 				field = editForm("useAuthorContactInfo"),
 				'_text -> "label.event.useAuthorContactInfo",
 				Symbol("data-bind") -> "checked: useAuthorContactInfo",
-				'help -> "label.event.contactInfo.tip",
+				'_help -> "label.event.contactInfo.tip",
 				'dataBind -> "visible: useContactInfo()"
 			)
 		
@@ -166,7 +166,7 @@
 				field = editForm("contactName"),
 				'_label -> "label.name",
 				'dataBind -> "visible: useContactInfo() && !useAuthorContactInfo()",
-				'help -> "label.event.contactName.tip"
+				'_help -> "label.event.contactName.tip"
 			)
 		
 			<div data-bind="visible: useContactInfo() && useAuthorContactInfo()">
@@ -187,7 +187,7 @@
 				field = editForm("contactProfile"),
 				'_label -> "nav.profile",
 				'dataBind -> "visible:  useContactInfo() && !useAuthorContactInfo()",
-				'help -> "label.profile.tip"
+				'_help -> "label.profile.tip"
 			)
 		
 			<div data-bind="visible:  useContactInfo() && useAuthorContactInfo()">
@@ -208,14 +208,14 @@
 				'_text -> "label.event.extendedGeoSettings",
 				Symbol("data-bind") -> "checked: extendedGeoSettings",
 				'dataBind -> "visible: countryCity.selectedCountry() && countryCity.selectedCity()",
-				'help -> "label.event.extendedGeoSettings.tip"
+				'_help -> "label.event.extendedGeoSettings.tip"
 			)
 
 			@inputText(
 				field = editForm("address"),
 				'_label -> "label.event.address",
 				'dataBind -> "visible: !extendedGeoSettings() && countryCity.selectedCountry() && countryCity.selectedCity()",
-				'help -> "label.event.address.tip"
+				'_help -> "label.event.address.tip"
 			)
 
 			<div id="map" style="width: 100%; height: 400px;"
