@@ -1,7 +1,6 @@
 @* _countryCityKnockoutInputs Template File *@
 @(countries: List[models.geo.Country],
-	editForm: play.data.Form[_],
-	required: Boolean
+	editForm: play.data.Form[_]
 )
 
 @import helpers.BootstrapHelper._
@@ -40,8 +39,7 @@
 		"optionsValue: 'id', " + 
 		"value: selectedCountry, " +
 		"optionsCaption: '" + Messages("label.none.selected") + "', " +
-		"multiselect: true"),
-	'required -> required
+		"multiselect: true")
 )
 
 @select(
@@ -53,7 +51,6 @@
 		"optionsValue: 'id', " +
 		"value: selectedCity, " +
 		"optionsCaption: '" + Messages("label.none.selected") + "', " +
-		"multiselect: true"),
-	'required -> required
+		"multiselect: true")
 )
 </div>

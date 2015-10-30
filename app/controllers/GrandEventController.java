@@ -95,8 +95,10 @@ public class GrandEventController extends Controller {
 		@Required
 		public String description;
 
+		@Required
 		public LocalDate startDate;
 
+		@Required
 		public LocalDate endDate;
 
 		public List<EventTag> tags;

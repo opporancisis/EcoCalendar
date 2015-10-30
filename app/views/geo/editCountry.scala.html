@@ -34,8 +34,7 @@
 
 	@inputText(
 		field = editForm("name"),
-		'_label -> "label.name",
-		'required -> true
+		'_label -> "label.name"
 	)
 
 	@inputText(
@@ -46,20 +45,17 @@
 
 	@inputText(
 		field = editForm("centerLatitude"),
-		'_label -> "label.centerLatitude",
-		'required -> true
+		'_label -> "label.centerLatitude"
 	)
 
 	@inputText(
 		field = editForm("centerLongitude"),
-		'_label -> "label.centerLongitude",
-		'required -> true
+		'_label -> "label.centerLongitude"
 	)
 
 	@inputText(
 		field = editForm("defaultZoom"),
-		'_label -> "label.defaultZoom",
-		'required -> true
+		'_label -> "label.defaultZoom"
 	)
 
 	@_submit(if(country != null) "label.save" else "label.add")

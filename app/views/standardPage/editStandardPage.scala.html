@@ -54,8 +54,7 @@
 	@textarea(
 		field = editForm("description"),
 		args = 'rows -> 3, 'cols -> 50,
-		'_label -> "label.description",
-		'required -> true
+		'_label -> "label.description"
 	)
 
 	@_submit(if(page != null) "label.save" else "label.create")

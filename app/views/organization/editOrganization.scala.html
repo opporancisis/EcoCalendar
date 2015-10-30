@@ -30,15 +30,13 @@
 
 	@inputText(
 		field = editForm("name"),
-		'_label -> "label.name",
-		'required -> true
+		'_label -> "label.name"
 	)
 
 	@textarea(
 		field = editForm("description"),
 		args = 'rows -> 3, 'cols -> 50,
-		'_label -> "label.description",
-		'required -> true
+		'_label -> "label.description"
 	)
 
 	@_submit(if(org != null) "label.save" else "label.add")

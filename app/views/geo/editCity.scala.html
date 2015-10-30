@@ -37,14 +37,12 @@
 	@select(
 		field = editForm("country"),
 		'options -> countries.map(a => a.id.toString -> a.name).toSeq,
-		'_label -> "label.country",
-		'required -> true
+		'_label -> "label.country"
 	)
 
 	@inputText(
 		field = editForm("name"),
-		'_label -> "label.name",
-		'required -> true
+		'_label -> "label.name"
 	)
 
 	@inputText(
@@ -56,29 +54,25 @@
 	@inputText(
 		field = editForm("centerLatitude"),
 		'_label -> "label.centerLatitude",
-		'required -> true,
 		Symbol("data-bind") -> "value: latitude"
 	)
 
 	@inputText(
 		field = editForm("centerLongitude"),
 		'_label -> "label.centerLongitude",
-		'required -> true,
 		Symbol("data-bind") -> "value: longitude"
 	)
 
 	@inputText(
 		field = editForm("defaultZoom"),
 		'_label -> "label.defaultZoom",
-		'required -> true,
 		Symbol("data-bind") -> "value: zoom"
 	)
 
 	@inputText(
 		field = editForm("weight"),
 		'_label -> "label.weight",
-		'help -> Messages("label.city.weight.help"),
-		'required -> true
+		'help -> Messages("label.city.weight.help")
 	)
 	
 	<div id="map" style="width: 100%; height: 400px;"></div>

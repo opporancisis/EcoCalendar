@@ -73,8 +73,7 @@
 		field = editForm("roles"),
 		'options -> models.user.RoleName.asList().map(a => a -> Messages("label.roles." + a)).toSeq,
 		'_label -> "label.roles",
-		'multiple -> true,
-		'required -> true
+		'multiple -> true
 	)
 
 	@inputText(

@@ -67,15 +67,13 @@
 			<input type="hidden" name="geoPoints" data-bind="value: JSON.stringify(points())" />
 			@inputText(
 				field = editForm("name"),
-				'_label -> "label.label",
-				'required -> true
+				'_label -> "label.label"
 			)
 
 			@textarea(
 				field = editForm("description"),
 				args = 'rows -> 3, 'cols -> 50,
-				'_label -> "label.description",
-				'required -> true
+				'_label -> "label.description"
 			)
 
 			@select(
@@ -124,25 +122,21 @@
 
 			@inputText(
 				field = editForm("startDate"),
-				args = 'required -> true,
 				'_label -> "label.start.date"
 			)
 
 			@inputText(
 				field = editForm("startTime"),
-				args = 'required -> true,
 				'_label -> "label.start.time"
 			)
 
 			@inputText(
 				field = editForm("finishDate"),
-				args = 'required -> true,
 				'_label -> "label.finish.date"
 			)
 
 			@inputText(
 				field = editForm("finishTime"),
-				args = 'required -> true,
 				'_label -> "label.finish.time"
 			)
 
@@ -207,7 +201,7 @@
 		<div class="panel-heading">@Messages("label.event.geo.settings")</div>
   		<div class="panel-body">
 
-			@_countryCityKnockoutInputs(countries, editForm, true)
+			@_countryCityKnockoutInputs(countries, editForm)
 		
 			@checkbox(
 				field = editForm("extendedGeoSettings"),

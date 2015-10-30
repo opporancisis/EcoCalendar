@@ -159,6 +159,7 @@ public class StandardPageController extends Controller {
 		
 		public String link;
 
+		@Required
 		public String content;
 
 		public StandardPageProperties() {

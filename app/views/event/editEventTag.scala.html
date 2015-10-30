@@ -30,8 +30,7 @@
 
 	@inputText(
 		field = editForm("name"),
-		'_label -> "label.name",
-		'required -> true
+		'_label -> "label.name"
 	)
 
 	@_submit(if(tag != null) "label.save" else "label.add")

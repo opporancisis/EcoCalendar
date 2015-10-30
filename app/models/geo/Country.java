@@ -50,10 +50,13 @@ public class Country extends Model implements IdPathBindable<Country> {
 	@OneToMany
 	public List<City> cities;
 
+	@Required
 	public Double centerLatitude;
 
+	@Required
 	public Double centerLongitude;
 
+	@Required
 	public Integer defaultZoom;
 
 	public static Find<Long, Country> find = new Find<Long, Country>() {

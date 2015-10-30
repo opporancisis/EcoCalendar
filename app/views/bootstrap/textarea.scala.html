@@ -12,10 +12,12 @@
  *@
 @(field: play.api.data.Field, args: (Symbol,Any)*)(implicit handler: views.html.helper.FieldConstructor)
 
+@required() = {@if(!field.constraints.filter(c => {c._1 == "constraint.required"}).isEmpty) { required}}
+
 @rows = @{ args.toMap.get('rows).map(_.toString).getOrElse("") }
 @label = @{ Messages(args.toMap.get('_label).map(_.toString).getOrElse("")).capitalize }
 
 @views.html.helper.input(field, args:_*) { (id, name, value, htmlArgs) =>
     <textarea id="@id" name="@name" rows="@if(rows){@rows}else{5}"
-              class="form-control" placeholder="@label" @toHtmlArgs(htmlArgs)>@value</textarea>
+              class="form-control" @required placeholder="@label" @toHtmlArgs(htmlArgs)>@value</textarea>
 }

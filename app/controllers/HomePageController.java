@@ -51,9 +51,9 @@ public class HomePageController extends Controller {
 	}
 
 	public static class HomePageProps {
-		@Required
 		public String title;
 
+		@Required
 		public String content;
 
 		public List<UploadedFile> attachments;

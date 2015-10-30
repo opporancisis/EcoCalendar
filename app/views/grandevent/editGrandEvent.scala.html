@@ -45,26 +45,22 @@
 
 	@inputText(
 		field = editForm("name"),
-		'_label -> "label.name",
-		'required -> true
+		'_label -> "label.name"
 	)
 
 	@textarea(
 		field = editForm("description"),
 		args = 'rows -> 3, 'cols -> 50,
-		'_label -> "label.description",
-		'required -> true
+		'_label -> "label.description"
 	)
 
 	@inputText(
 		field = editForm("startDate"),
-		args = 'required -> true,
 		'_label -> "label.start.date"
 	)
 
 	@inputText(
 		field = editForm("endDate"),
-		args = 'required -> true,
 		'_label -> "label.finish.date"
 	)
 

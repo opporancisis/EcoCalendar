@@ -86,6 +86,7 @@ public class CityController extends Controller {
 		/**
 		 * The bigger is weight - higher city is placed in lists
 		 */
+		@Required
 		public Integer weight;
 
 		public CityProps() {
