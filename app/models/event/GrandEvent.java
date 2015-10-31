@@ -16,11 +16,10 @@ import models.event.tag.EventTag;
 import models.organization.Organization;
 import models.user.User;
 import play.data.format.Formatters;
-import play.data.validation.Constraints.Required;
-import com.avaje.ebean.Model;
 import utils.IdPathBindable;
 import utils.formatter.GrandEventFormatter;
 
+import com.avaje.ebean.Model;
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
 import com.fasterxml.jackson.annotation.JsonIgnore;
