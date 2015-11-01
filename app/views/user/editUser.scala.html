@@ -8,20 +8,7 @@
 
 @implicitScripts = {
 	@_css("stylesheets/bootstrapValidator.css")
-	@_js("lib/knockout/knockout.js")
-	@_js("javascripts/users.js")
 	@_js("javascripts/bootstrapValidator.js")
-	<script>
-		$(document).ready(function() {
-			$("form.form-horizontal").bootstrapValidator($.extend({}, app.settings.bootstrapValidator, {
-				excluded: [':disabled', function(field, validator) {
-					// check parent since the select itself of multiselect is normally hidden
-				    return field.parent().is(":not(:visible)");
-				}]
-			}));
-
-		});
-	</script>
 }
 
 @main(
