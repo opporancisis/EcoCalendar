@@ -67,8 +67,14 @@ public class Application extends Controller {
 						routes.javascript.OrganizationController.details(),
 						routes.javascript.FileController.doAdd(),
 						routes.javascript.MessageController.removeMany(),
-						routes.javascript.MessageController.markAsReadMany()))
-				.as("text/javascript");
+						routes.javascript.MessageController.markAsReadMany(),
+						routes.javascript.UserController.getUsers(),
+						routes.javascript.UserController.getUser(),
+						routes.javascript.UserController.updateUser(),
+						routes.javascript.UserController.createUser(),
+						routes.javascript.UserController.removeUser(),
+						routes.javascript.UserController.changeUserPassword())).as(
+				"text/javascript");
 	}
 
 	public Result doSignup() {

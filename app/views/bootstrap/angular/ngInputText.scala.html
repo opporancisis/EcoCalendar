@@ -1,0 +1,38 @@
+@**
+ * Generate an HTML input text.
+ *
+ * Example:
+ * {{{
+ * @ngInputText(field = myForm("name"), args = 'size -> 10)
+ * }}}
+ *
+ * @param field The form field.
+ * @param args Set of extra attributes.
+ * @param handler The field constructor.
+ *@
+@(field: play.api.data.Field, args: (Symbol,Any)*)(implicit handler: views.html.helper.FieldConstructor)
+
+@required() = {@if(!field.constraints.filter(c => {c._1 == "constraint.required"}).isEmpty) { required}}
+
+@ngModel = @{ Html(args.toMap.get('_model).map("ng-model=\"" + _.toString + "\"").getOrElse(""))}
+
+@inputType = @{ args.toMap.get('type).map(_.toString).getOrElse(
+	if(!field.constraints.filter(c => {c._1 == "constraint.email"}).isEmpty) {
+		"email"
+	} else {
+		"text"
+	}
+) }
+@label = @{ Messages(args.toMap.get('_label).map(_.toString).getOrElse("")).capitalize }
+
+@views.html.helper.input(field, args:_*) { (id, name, value, htmlArgs) =>
+    <input type="@inputType" id="@id" name="@name" value="@value"
+    	class="form-control" placeholder="@label"
+    	@if(args.toMap.contains('_help)) {aria-describedby="helpBlock_@id"}
+    	@required
+    	@ngModel
+    	@toHtmlArgs(htmlArgs)/>
+	<span class="glyphicon form-control-feedback" aria-hidden="true"
+		ng-show="mainForm.$submitted || mainForm.@{name}.$touched"
+		ng-class="{'glyphicon-ok' : mainForm.@{name}.$valid, 'glyphicon-remove' : mainForm.@{name}.$invalid}"></span>
+}

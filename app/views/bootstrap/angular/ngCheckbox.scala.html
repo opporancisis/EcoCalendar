@@ -1,0 +1,28 @@
+@**
+ * Generate an HTML input checkbox.
+ *
+ * Example:
+ * {{{
+ * @ngCheckbox(field = myForm("done"))
+ * }}}
+ *
+ * @param field The form field.
+ * @param args Set of extra HTML attributes.
+ * @param handler The field constructor.
+ *@
+@(field: play.api.data.Field, args: (Symbol,Any)*)(implicit handler: views.html.helper.FieldConstructor)
+
+@text = @{ Messages(args.toMap.get('_text).map(_.toString).getOrElse("")).capitalize }
+
+@ngModel = @{ Html(args.toMap.get('_model).map("ng-model=\"" + _.toString + "\"").getOrElse(""))}
+
+@views.html.helper.input(field, args:_*) { (id, name, value, htmlArgs) =>
+<div class="checkbox">
+	<label>
+	    <input type="checkbox" id="@id" name="@name" value="true"
+	    	@ngModel
+	    	@toHtmlArgs(htmlArgs)/>
+    	@text
+    </label>
+</div>
+}

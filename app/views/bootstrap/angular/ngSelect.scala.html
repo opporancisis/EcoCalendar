@@ -1,0 +1,27 @@
+@**
+ * Generate an HTML select.
+ *
+ * Example:
+ * {{{
+ * @ngSelect
+ * }}}
+ *
+ * @param field The form field.
+ * @param args Set of extra attributes
+ * @param handler The field constructor.
+ *@
+@(field: play.api.data.Field, args: (Symbol,Any)*)(implicit handler: views.html.helper.FieldConstructor)
+
+@required() = {@if(!field.constraints.filter(c => {c._1 == "constraint.required"}).isEmpty) { require-multiple}}
+
+@ngModel = @{ Html(args.toMap.get('_model).map("ng-model=\"" + _.toString + "\"").getOrElse(""))}
+
+@placeholder = @{ Html(args.toMap.get('placeholder).map("placeholder=\"" + _.toString + "\"").getOrElse(""))}
+
+@views.html.helper.input(field, args:_*) { (id, name, value, htmlArgs) =>
+	<ui-select multiple @ngModel name="@name" id="@id">
+		<ui-select-match @placeholder>{{$item.label}}</ui-select-match>
+		<ui-select-choices repeat="item.id as item in @id">{{item.label}}</ui-select-choices>
+	</ui-select>
+	
+}

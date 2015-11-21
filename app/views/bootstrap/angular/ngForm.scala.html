@@ -1,0 +1,18 @@
+@**
+ * Generate an Angular HTML form.
+ *
+ * Example:
+ * {{{
+ * @ngForm(args = 'class -> "myForm") {
+ *   ...
+ * }
+ * }}}
+ *
+ * @param args Set of extra HTML attributes.
+ * @param body The form body.
+ *@
+@(args: (Symbol,String)*)(body: => Html) 
+
+<form class="form-horizontal" name="mainForm" novalidate @toHtmlArgs(args.toMap)>
+    @body
+</form>

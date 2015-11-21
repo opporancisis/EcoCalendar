@@ -228,7 +228,7 @@ public class Account extends Controller {
 		if (user == null) {
 			return badRequest();
 		}
-		return ok(views.html.account.password_change.render(PASSWORD_CHANGE_FORM, null));
+		return ok(views.html.account.password_change.render(PASSWORD_CHANGE_FORM));
 	}
 
 	public Result changePersonalPassword() {
@@ -246,7 +246,7 @@ public class Account extends Controller {
 		Form<PasswordChange> filledForm = PASSWORD_CHANGE_FORM.bindFromRequest();
 		if (filledForm.hasErrors()) {
 			// User did not select whether to link or not link
-			return badRequest(views.html.account.password_change.render(filledForm, null));
+			return badRequest(views.html.account.password_change.render(filledForm));
 		}
 		String newPassword = filledForm.get().password;
 		user.changePassword(newPassword, true);

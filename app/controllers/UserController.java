@@ -1,12 +1,10 @@
 package controllers;
 
+import static java.util.stream.Collectors.toList;
 import static play.data.Form.form;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import models.sys.Setting;
 import models.sys.SettingName;
@@ -15,23 +13,30 @@ import models.user.SecurityRole;
 import models.user.User;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.URL;
 
 import play.data.Form;
 import play.data.format.Formatters;
 import play.data.validation.Constraints.Email;
+import play.data.validation.Constraints.MinLength;
 import play.data.validation.Constraints.Pattern;
+import play.data.validation.Constraints.Required;
 import play.data.validation.ValidationError;
 import play.db.ebean.Transactional;
 import play.i18n.Messages;
+import play.libs.Json;
+import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
-import providers.MyUsernamePasswordAuthUser;
+import utils.JsonResponse;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
 import be.objectify.deadbolt.java.actions.SubjectPresent;
 
 import com.avaje.ebean.ExpressionList;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.base.MoreObjects;
 
 import controllers.helpers.ContextAugmenter;
@@ -41,93 +46,81 @@ import controllers.helpers.ContextAugmenterAction;
 public class UserController extends Controller {
 
 	private static final Form<UserProperties> EDIT_FORM = form(UserProperties.class);
+	private static final Form<PasswordChange> PASSWORD_CHANGE_FORM = form(PasswordChange.class);
+	private static final Form<PasswordChangePresentation> PASSWORD_CHANGE_PRESENTATION_FORM = form(PasswordChangePresentation.class);
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public Result list() {
+	public Result manage() {
 		Application.noCache(response());
-		return ok(views.html.user.listUsers.render(User.find.query().where()
-				.ne("id", Setting.getLong(SettingName.DELETED_USER_ID)).findList()));
+		return ok(views.html.user.manageUsers.render(EDIT_FORM, PASSWORD_CHANGE_PRESENTATION_FORM));
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public Result add() {
-		return ok(views.html.user.editUser.render(EDIT_FORM, null));
+	public Result getUsers() {
+		List<User> users = User.find.query().where()
+				.ne("id", Setting.getLong(SettingName.DELETED_USER_ID)).findList();
+		ArrayNode arr = Json.newArray();
+		users.forEach(u -> arr.add(Json.toJson(new UserProperties(u))));
+		return ok(arr);
 	}
 
 	@Restrict(@Group(RoleName.ADMIN))
-	public Result doAdd() {
-		Form<UserProperties> filledForm = EDIT_FORM.bindFromRequest();
+	public Result getUser(User user) {
+		return ok(Json.toJson(new UserProperties(user)));
+	}
+
+	@Restrict(@Group(RoleName.ADMIN))
+	@BodyParser.Of(play.mvc.BodyParser.Json.class)
+	public Result updateUser(User user) {
+		JsonNode json = request().body().asJson();
+		Form<UserProperties> filledForm = EDIT_FORM.bind(json);
 		if (filledForm.hasErrors()) {
-			return badRequest(views.html.user.editUser.render(filledForm, null));
+			return badRequest(filledForm.errorsAsJson());
 		}
 		UserProperties userProps = filledForm.get();
-		User user = userProps.createUser();
-		user.save();
-		return redirect(routes.UserController.list());
-	}
-
-	@Restrict(@Group(RoleName.ADMIN))
-	public Result edit(User user) {
-		Form<UserProperties> filledForm = EDIT_FORM.fill(new UserProperties(user));
-		return ok(views.html.user.editUser.render(filledForm, user));
-	}
-
-	@Restrict(@Group(RoleName.ADMIN))
-	public Result doEdit(User user) {
-		Form<UserProperties> filledForm = EDIT_FORM.bindFromRequest();
-		if (filledForm.hasErrors()) {
-			try {
-				filledForm.data().put("roles",
-						Formatters.print(User.class.getField("roles"), user.roles));
-			} catch (Exception e) {
-				throw new Error();
-			}
-			return badRequest(views.html.user.editUser.render(filledForm, user));
-		}
-		UserProperties userProps = filledForm.get();
-		if (!userProps.hasRole(RoleName.ADMIN) && user.hasRole(RoleName.ADMIN)) {
-			return badRequest("cannot revoke ADMIN role");
-		}
-		boolean emailChanged = !StringUtils.equalsIgnoreCase(user.email, userProps.email);
-		userProps.updateUser(user);
 		User self = ContextAugmenterAction.getLoggedUser();
-		if (self.equals(user) && emailChanged) {
-			flash(Application.FLASH_MESSAGE_KEY,
-					Messages.get("label.your.email.has.been.changed.you.need.relogon"));
-			return redirect(routes.HomePageController.index());
+		if (self.equals(user) && !userProps.hasRole(RoleName.ADMIN)) {
+			return badRequest(Json.newObject().set("roles",
+					Json.newArray().add("error.cannot.revoke.ADMIN.role.from.yourself"))
+			/* JsonResponse.buildError("cannot revoke ADMIN role") */);
 		}
-		return redirect(routes.UserController.list());
+		userProps.updateUser(user);
+		return ok(Json.toJson(userProps));
+	}
+
+	@Restrict(@Group(RoleName.ADMIN))
+	@BodyParser.Of(play.mvc.BodyParser.Json.class)
+	public Result createUser() {
+		JsonNode json = request().body().asJson();
+		Form<UserProperties> filledForm = EDIT_FORM.bind(json);
+		if (filledForm.hasErrors()) {
+			return badRequest(filledForm.errorsAsJson());
+		}
+		UserProperties userProps = filledForm.get();
+		return ok(Json.toJson(new UserProperties(userProps.createUser())));
+	}
+
+	@Restrict(@Group(RoleName.ADMIN))
+	@BodyParser.Of(play.mvc.BodyParser.Json.class)
+	public Result changeUserPassword(User user) {
+		JsonNode json = request().body().asJson();
+		Form<PasswordChange> filledForm = PASSWORD_CHANGE_FORM.bind(json);
+		if (filledForm.hasErrors()) {
+			return badRequest(filledForm.errorsAsJson());
+		}
+		String newPassword = filledForm.get().password;
+		user.changePassword(newPassword, true);
+		return ok();
 	}
 
 	@Transactional
 	@Restrict(@Group(RoleName.ADMIN))
-	public Result remove(User user) {
+	public Result removeUser(User user) {
 		if (user.equals(ContextAugmenterAction.getLoggedUser())) {
-			return badRequest("cannot delete yourself");
+			return badRequest(JsonResponse.buildError(Messages.get("error.cannot.remove.yourself")));
 		}
 		user.deleteGracefully();
 		return ok();
-	}
-
-	@Restrict(@Group(RoleName.ADMIN))
-	public Result changePassword(User user) {
-		Application.noCache(response());
-		return ok(views.html.account.password_change.render(Account.PASSWORD_CHANGE_FORM, user));
-	}
-
-	@Restrict(@Group(RoleName.ADMIN))
-	public Result doChangePassword(User user) {
-		Application.noCache(response());
-		Form<Account.PasswordChange> filledForm = Account.PASSWORD_CHANGE_FORM.bindFromRequest();
-		if (filledForm.hasErrors()) {
-			// User did not select whether to link or not link
-			return badRequest(views.html.account.password_change.render(filledForm, user));
-		}
-		String newPassword = filledForm.get().password;
-		user.changePassword(newPassword, true);
-		flash(Application.FLASH_MESSAGE_KEY,
-				Messages.get("playauthenticate.change_password.success"));
-		return redirect(routes.UserController.list());
 	}
 
 	@SubjectPresent
@@ -147,10 +140,13 @@ public class UserController extends Controller {
 		@Email
 		public String email;
 
-		public List<SecurityRole> roles;
+		@Required
+		public List<String> roles;
 
+		@Required
 		public String name;
 
+		@Pattern(value = "\\d{5,10}", message = "error.phone")
 		public String phone;
 
 		@URL
@@ -161,10 +157,11 @@ public class UserController extends Controller {
 		}
 
 		public UserProperties(User user) {
+			this.id = user.id;
 			this.blocked = user.blocked;
 			this.emailValidated = user.emailValidated;
 			this.email = user.email;
-			this.roles = user.roles;
+			this.roles = user.roles.stream().map(r -> r.roleName).collect(toList());
 			this.name = user.name;
 			this.phone = user.phone;
 			this.profileLink = user.profileLink;
@@ -174,7 +171,7 @@ public class UserController extends Controller {
 			user.blocked = MoreObjects.firstNonNull(this.blocked, Boolean.FALSE);
 			user.emailValidated = this.emailValidated;
 			user.email = this.email;
-			user.roles = this.roles;
+			user.roles = this.roles.stream().map(SecurityRole::findByRoleName).collect(toList());
 			user.name = this.name;
 			user.phone = this.phone;
 			user.profileLink = this.profileLink;
@@ -188,21 +185,12 @@ public class UserController extends Controller {
 		public User createUser() {
 			User user = new User();
 			setFields(user);
+			user.save();
 			return user;
 		}
 
-		public boolean hasRole(String... aRoles) {
-			Set<String> aRolesSet = new HashSet<>(Arrays.asList(aRoles));
-			return hasRole(aRolesSet);
-		}
-
-		public boolean hasRole(Set<String> aRoles) {
-			for (SecurityRole role : roles) {
-				if (aRoles.contains(role.getName())) {
-					return true;
-				}
-			}
-			return false;
+		public boolean hasRole(String role) {
+			return roles.contains(role);
 		}
 
 		public List<ValidationError> validate() {
@@ -233,6 +221,27 @@ public class UserController extends Controller {
 			// }
 			return errors.isEmpty() ? null : errors;
 		}
+	}
+
+	public static class PasswordChange {
+		@MinLength(5)
+		@Required
+		public String password;
+	}
+
+	/**
+	 * Used only to draw form in html. For fetching parameters is used
+	 * PasswordChange.
+	 *
+	 */
+	public static class PasswordChangePresentation {
+		@MinLength(5)
+		@Required
+		public String password;
+
+		@MinLength(5)
+		@Required
+		public String repeatPassword;
 
 	}
 

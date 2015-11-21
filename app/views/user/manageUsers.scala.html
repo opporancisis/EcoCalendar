@@ -1,0 +1,174 @@
+@(editForm: play.data.Form[controllers.UserController.UserProperties],
+	changeForm: play.data.Form[controllers.UserController.PasswordChangePresentation]
+)
+
+@import scala.collection.mutable.LinkedHashMap
+@import views.menu.SystemMenu._
+@import helpers.BootstrapAngularHelper._
+
+@implicitScripts = {
+	@_jsWebJars("1.4.7/angular.js")
+	@_jsWebJars("angular-resource.js")
+	@_jsWebJars("ui-bootstrap-tpls.js")
+	@_jsWebJars("smart-table.js")
+	@_js("javascripts/users.js")
+	@_cssWebJars("select.css")
+	@_jsWebJars("select.js")
+	@_jsWebJars("showErrors.js")
+}
+
+@main(
+	"nav.user.list",
+	breadcrumbs = LinkedHashMap(
+		"nav.user.list" -> routes.UserController.manage
+	)
+) {
+
+<div ng-app="app" ng-controller="UsersCtl">
+<table st-table="users" class="table table-striped">
+	<thead>
+		<th>@Messages("label.ID")</th>
+		<th>@Messages("label.name")</th>
+		<th>@Messages("label.email")</th>
+		<th>@Messages("label.status.blocked")</th>
+		<th>@Messages("label.roles")</th>
+		<th>@Messages("label.action")</th>
+	</thead>
+	<tbody>
+		<tr ng-repeat="user in users">
+			<td>{{user.id}}</td>
+			<td>{{user.name}}</td>
+			<td>{{user.email}}</td>
+			<td>{{user.blocked ? "Да" : "Нет"}}</td>
+			<td>{{user.roles | toRoleName}}</td>
+			<td>
+				<a class="btn btn-default btn-xs" ng-click="editUser(user.id)" title="@Messages("label.do.edit")">
+					<span class="glyphicon glyphicon-pencil"></span>
+				</a>
+				<a class="btn btn-default btn-xs" ng-click="changePassword(user.id)" title="@Messages("label.do.change.password")">
+					<span class="glyphicon glyphicon-asterisk"></span>
+				</a>
+				<a class="btn btn-default btn-xs" ng-click="removeUser(user, $index)" title="@Messages("label.do.remove")">
+					<span class="glyphicon glyphicon-remove"></span>
+				</a>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<a ng-click="createUser()" class="btn btn-primary">@Messages("label.do.add")</a>
+
+<script type="text/ng-template" id="addEditDialog">
+	<div class="modal-header">
+		<h3 class="modal-title">{{title}}</h3>
+	</div>
+	@ngForm(){
+		<div class="modal-body">
+	  		<div ng-controller="AlertsCtrl">
+				<uib-alert ng-repeat="alert in alerts" type="{{alert.type}}" close="alert.close()">{{ alert.msg }}</uib-alert>
+			</div>
+			@ngCheckbox(
+				field = editForm("blocked"),
+				'_text -> Messages("label.status.blocked"),
+				'_model -> "user.blocked"
+			)
+		
+			@ngCheckbox(
+				field = editForm("emailValidated"),
+				'_text -> Messages("label.email.verivied"),
+				'_model -> "user.emailValidated"
+			)
+		
+			@ngInputText(
+				field = editForm("email"),
+				'_label -> "label.email",
+				'_help -> "label.user.email.tip",
+				'_model -> "user.email"
+			)
+		
+			@ngSelect(
+				field = editForm("roles"),
+				'_label -> "label.roles",
+				'multiple -> true,
+				'placeholder -> Messages("label.please.select.a.value"),
+				'_model -> "user.roles"
+			)
+		
+			@ngInputText(
+				field = editForm("name"),
+				'_label -> "label.name",
+				'_help -> "label.user.name.and.phone.tip",
+				'_model -> "user.name"
+			)
+		
+			@ngInputText(
+				field = editForm("phone"),
+				'_label -> "label.phone",
+				'_help -> "label.user.name.and.phone.tip",
+				'_model -> "user.phone"
+			)
+		
+			@ngInputText(
+				field = editForm("profileLink"),
+				'_label -> "label.profile",
+				'type -> "url",
+				'_help -> "label.profile.tip",
+				'_model -> "user.profileLink"
+			)
+		</div>
+		<div class="modal-footer">
+			<input type="submit" class="btn btn-primary" ng-click="save()" value="@_cap("label.do.save")" />
+			<button class="btn btn-warning" type="button" ng-click="cancel()">@_cap("label.do.cancel")</button>
+		</div>
+	}
+</script>
+
+<script type="text/ng-template" id="changePasswordDialog">
+	<div class="modal-header">
+		<h3 class="modal-title">@_cap("label.window.title.change.password")</h3>
+	</div>
+	@ngForm(){
+		<div class="modal-body">
+	  		<div ng-controller="AlertsCtrl">
+				<uib-alert ng-repeat="alert in alerts" type="{{alert.type}}" close="alert.close()">{{ alert.msg }}</uib-alert>
+			</div>
+			@ngInputPassword(
+				field = changeForm("password"),
+				'_label -> "playauthenticate.login.password.placeholder",
+				'_model -> "pwdObj.password"
+			)
+
+			@ngInputPassword(
+				field = changeForm("repeatPassword"),
+				'_label -> "playauthenticate.login.password.repeat",
+				'_model -> "pwdObj.repeatePassword",
+				Symbol("must-match") -> "pwdObj.password"
+			)
+		</div>
+		<div class="modal-footer">
+			<input type="submit" class="btn btn-primary" ng-click="save()" value="@_cap("label.do.save")" />
+			<button class="btn btn-warning" type="button" ng-click="cancel()">@_cap("label.do.cancel")</button>
+		</div>
+	}
+</script>
+
+<script type="text/ng-template" id="confirmUserRemoveDialog">
+	<div class="modal-header">
+		<h3 class="modal-title">@_cap("label.window.title.remove.user")</h3>
+	</div>
+	<div class="modal-body">
+  		<div ng-controller="AlertsCtrl">
+			<uib-alert ng-repeat="alert in alerts" type="{{alert.type}}" close="alert.close()">{{ alert.msg }}</uib-alert>
+		</div>
+		<div>
+			@Messages("label.are.you.sure.you.want.to.delete", "{{user.name}}")
+		</div>
+	</div>
+	<div class="modal-footer">
+		<input type="submit" class="btn btn-primary" ng-click="removeUser()" value="@_cap("label.do.remove")" />
+		<button class="btn btn-warning" type="button" ng-click="cancel()">@_cap("label.do.cancel")</button>
+	</div>
+</script>
+
+</div>
+}

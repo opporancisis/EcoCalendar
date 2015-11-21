@@ -1,0 +1,53 @@
+@(elements: helper.FieldElements)
+
+@**********************************************************
+* Generate generic filed constructor for angular-bootsrap *
+**********************************************************@
+
+@isRequired = @{!elements.field.constraints.filter(c => {c._1 == "constraint.required"}).isEmpty}
+@isEmail = @{!elements.field.constraints.filter(c => {c._1 == "constraint.email"}).isEmpty}
+@isUrl = @{elements.args.get('type) match {
+	case Some("url") => true
+	case _ => false
+}}
+@minLen = @{
+	val minLen = elements.field.constraints.filter(c => {c._1 == "constraint.minLength"});
+	if(!minLen.isEmpty) {
+		minLen.get(0)._2.get(0)
+	} else {
+		null
+	}
+}
+@mustMatch = @{elements.args.contains(Symbol("must-match"))}
+
+<div class="form-group has-feedback@{if(isRequired) {" required"}}" show-errors>
+    @if(!elements.args.contains('_text)) {
+    	<label for="@elements.field.name" class="col-lg-2 control-label">@Html(Messages(elements.label.toString).capitalize)</label>
+    }
+    <div class="col-lg-10@if(elements.args.contains('_text)) { col-lg-offset-2}">
+		@elements.input
+        @if(elements.args.get('_help)){
+            <p id="helpBlock_@elements.field.id" class="help-block">@Messages(elements.args.get('_help).get.toString).capitalize</p>
+        }
+    	<div class="help-block">
+			<p ng-show="mainForm.@{elements.field.name}.$error.custom">{{mainForm.@{elements.field.name}.$error.custom}}</p>
+			<span ng-show="mainForm.$submitted || mainForm.@{elements.field.name}.$touched">
+	   			@if(isRequired) {
+	   				<p ng-show="mainForm.@{elements.field.name}.$error.required">@Messages("error.required")</p>
+	   			}
+	   			@if(isEmail) {
+	   				<p ng-show="mainForm.@{elements.field.name}.$error.email">@Messages("error.email")</p>
+				}
+				@if(isUrl) {
+	   				<p ng-show="mainForm.@{elements.field.name}.$error.url">@Messages("error.url")</p>
+				}
+				@if(minLen != null) {
+					<p ng-show="mainForm.@{elements.field.name}.$error.minlength">@Messages("error.minLength", minLen)</p>
+				}
+				@if(mustMatch != null) {
+					<p ng-show="mainForm.@{elements.field.name}.$error.match">@Messages("error.not.match.values")</p>
+				}
+			</span>
+   		</div>
+    </div>
+</div>

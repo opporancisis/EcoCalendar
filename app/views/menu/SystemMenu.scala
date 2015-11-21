@@ -7,7 +7,7 @@ object SystemMenu {
   implicit val implicitLeftNav = LinkedHashMap(
 	"nav.sys.settings" -> routes.SettingController.edit,
 	"nav.homePage.edit" -> routes.HomePageController.edit,
-	"nav.user.list" -> routes.UserController.list,
+	"nav.user.list" -> routes.UserController.manage,
 	"nav.file.list" -> routes.FileController.list,
 	"nav.stdPage.list" -> routes.StandardPageController.list,
   "a" -> null,

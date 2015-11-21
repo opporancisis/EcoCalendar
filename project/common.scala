@@ -21,6 +21,7 @@ object Commons {
     TwirlKeys.templateImports ++= Seq(
       "play.data.format.Formatters",
       "views.html.bootstrap._",
+      "views.html.bootstrap.angular._",
       "be.objectify.deadbolt.java.views.html._"
     ),
     RoutesKeys.routesImport ++= Seq(

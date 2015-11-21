@@ -113,8 +113,10 @@ label.do.open=открыть
 label.do.play=проиграть
 label.do.read=читать
 label.do.remove=удалить
+label.do.save=сохранить
 label.do.view=смотреть
 label.email=адрес е-почты
+label.email.verivied=адрес e-mail проверифицирован
 label.entity.File=файл
 label.entity.Message=сообщение
 label.entity.UploadedFile=файл
@@ -143,6 +145,7 @@ label.grand.event=супер-событие
 label.grand.event.count=всего супер-событий
 label.home.not.configured=главная страница не настроена
 label.id=идентификатор
+label.ID=ID
 label.item.number=№ п/п
 label.label=название
 label.last.login.time=время последнего входа в систему
@@ -199,7 +202,6 @@ label.welcome=Добро пожаловать!
 label.welcome.to.portal=Добро пожаловать на сайт {0}!
 label.yes=да
 label.your.email.need.verification=Ваш адрес электронной почты требует верификации
-label.your.email.has.been.changed.you.need.relogon=Ваш адрес электронной почты был изменен. Требуется повторный вход в систему.
 
 ################################################################################
 # Users
@@ -212,6 +214,8 @@ label.roles.admin=администратор
 label.user.your.registration.data=Ваши регистрационные данные
 label.user.name.and.phone.tip=Может использоваться для контактной информации по создаваемым событиям
 label.user.email.tip=Адрес используется в качестве логина при заходе на сайт. Также на почту могут приходить системные сообщения.
+label.window.title.change.password=смена пароля
+label.window.title.remove.user=удаление пользователя
 
 ################################################################################
 # Files
@@ -283,6 +287,8 @@ format.real=Real
 ################################################################################
 error.access.forbidden=У Вас недостаточно прав для просмотра данной страницы
 error.email=Некорректный адрес е-почты
+error.phone=Некорректный номер телефона
+error.url=Некорректный адрес URL
 error.invalid=Неверное значение
 error.max=Must be less or equal to {0}
 error.maxLength=Максимальная длина {0}
@@ -292,6 +298,7 @@ error.name.must.be.unique=Имя должно быть уникальным
 error.email.must.be.unique=Адрес е-почты должен быть уникальным
 error.need.file=Необходимо указать файл
 error.not.found.object=Объект "{0}" с идентификатором "{1}" не найден
+error.not.match.values=Значения должны совпадать
 error.number=Numeric value expected
 error.pattern=Must satisfy {0}
 error.real=Real number value expected
@@ -299,6 +306,7 @@ error.required=Это поле необходимо заполнить
 error.yandex.maps=Не удалось запустить янедкс-карты. Убедитесь, что у Вас последняя версия браузера. Или проверьте связь с Интернетом.
 error.you.need.to.log.in.first.to.view=Вам необходимо сначала авторизоваться, чтобы открыть страницу {0}
 org.hibernate.validator.constraints.URL.message=Нужно указать адрес URL
+error.cannot.revoke.ADMIN.role.from.yourself=Нельзя лишить себя роли администратора
 
 ### --- play-authenticate START
 
